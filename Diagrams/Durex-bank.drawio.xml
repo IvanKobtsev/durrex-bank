@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 Edg/145.0.0.0" version="29.5.1" pages="2">
+  <diagram name="Классы" id="YwMcuM56izaopGqA0V4S">
+    <mxGraphModel dx="4017" dy="2469" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="JNA0GCsBKWwJjx55HU3Z-5" parent="1" style="text;align=center;fontStyle=1;verticalAlign=middle;spacingLeft=3;spacingRight=3;strokeColor=none;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;html=1;" value="&lt;font style=&quot;font-size: 32px;&quot;&gt;data base&lt;/font&gt;" vertex="1">
+          <mxGeometry height="26" width="80" x="370" y="10" as="geometry" />
+        </mxCell>
+        <mxCell id="Fm2ml_hyg_b9xTe10vcR-14" connectable="0" parent="1" style="group" value="" vertex="1">
+          <mxGeometry height="90" width="235" x="-40" y="660" as="geometry" />
+        </mxCell>
+        <mxCell id="R_HYoDl4G6WMGDCIS-vE-10" parent="Fm2ml_hyg_b9xTe10vcR-14" style="html=1;dropTarget=0;whiteSpace=wrap;" value="CoreService" vertex="1">
+          <mxGeometry height="90" width="180" x="50" as="geometry" />
+        </mxCell>
+        <mxCell id="R_HYoDl4G6WMGDCIS-vE-11" parent="R_HYoDl4G6WMGDCIS-vE-10" style="shape=module;jettyWidth=8;jettyHeight=4;" value="" vertex="1">
+          <mxGeometry height="20" relative="1" width="20" x="1" as="geometry">
+            <mxPoint x="-27" y="7" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Fm2ml_hyg_b9xTe10vcR-10" edge="1" parent="Fm2ml_hyg_b9xTe10vcR-14" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=oval;endFill=0;sketch=0;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;endSize=10;exitX=0;exitY=0.5;exitDx=0;exitDy=0;edgeStyle=elbowEdgeStyle;" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="-60" y="-10" />
+            </Array>
+            <mxPoint x="50" y="44.58000000000004" as="sourcePoint" />
+            <mxPoint x="-60" y="-60" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Fm2ml_hyg_b9xTe10vcR-13" parent="Fm2ml_hyg_b9xTe10vcR-14" style="html=1;whiteSpace=wrap;" value="" vertex="1">
+          <mxGeometry height="25" width="25" x="37.5" y="32.5" as="geometry" />
+        </mxCell>
+        <mxCell id="YqG8KE2RfPTcJYvDVofh-5" parent="Fm2ml_hyg_b9xTe10vcR-14" style="html=1;whiteSpace=wrap;" value="" vertex="1">
+          <mxGeometry height="25" width="25" x="210" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="Fm2ml_hyg_b9xTe10vcR-15" connectable="0" parent="1" style="group" value="" vertex="1">
+          <mxGeometry height="90" width="245" x="-40" y="497" as="geometry" />
+        </mxCell>
+        <mxCell id="R_HYoDl4G6WMGDCIS-vE-27" edge="1" parent="Fm2ml_hyg_b9xTe10vcR-15" source="R_HYoDl4G6WMGDCIS-vE-29" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;endArrow=halfCircle;endFill=0;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="230" y="43" as="sourcePoint" />
+            <mxPoint x="390" y="43" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Fm2ml_hyg_b9xTe10vcR-16" parent="Fm2ml_hyg_b9xTe10vcR-15" style="html=1;dropTarget=0;whiteSpace=wrap;" value="CreditService" vertex="1">
+          <mxGeometry height="90" width="180" x="50" as="geometry" />
+        </mxCell>
+        <mxCell id="Fm2ml_hyg_b9xTe10vcR-17" parent="Fm2ml_hyg_b9xTe10vcR-16" style="shape=module;jettyWidth=8;jettyHeight=4;" value="" vertex="1">
+          <mxGeometry height="20" relative="1" width="20" x="1" as="geometry">
+            <mxPoint x="-27" y="7" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Fm2ml_hyg_b9xTe10vcR-18" edge="1" parent="Fm2ml_hyg_b9xTe10vcR-15" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=oval;endFill=0;sketch=0;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;endSize=10;exitX=0;exitY=0.5;exitDx=0;exitDy=0;edgeStyle=elbowEdgeStyle;" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="50" y="44.58000000000004" as="sourcePoint" />
+            <mxPoint x="-80" y="45" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Fm2ml_hyg_b9xTe10vcR-19" parent="Fm2ml_hyg_b9xTe10vcR-15" style="html=1;whiteSpace=wrap;" value="" vertex="1">
+          <mxGeometry height="25" width="25" x="37.5" y="32.5" as="geometry" />
+        </mxCell>
+        <mxCell id="R_HYoDl4G6WMGDCIS-vE-29" parent="Fm2ml_hyg_b9xTe10vcR-15" style="html=1;whiteSpace=wrap;" value="" vertex="1">
+          <mxGeometry height="25" width="25" x="220" y="30.5" as="geometry" />
+        </mxCell>
+        <mxCell id="Fm2ml_hyg_b9xTe10vcR-20" connectable="0" parent="1" style="group" value="" vertex="1">
+          <mxGeometry height="90" width="245" x="-40" y="340" as="geometry" />
+        </mxCell>
+        <mxCell id="R_HYoDl4G6WMGDCIS-vE-28" edge="1" parent="Fm2ml_hyg_b9xTe10vcR-20" source="Fm2ml_hyg_b9xTe10vcR-21" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=halfCircle;endFill=0;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="389.99999999999955" y="45" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Fm2ml_hyg_b9xTe10vcR-21" parent="Fm2ml_hyg_b9xTe10vcR-20" style="html=1;dropTarget=0;whiteSpace=wrap;" value="UserService" vertex="1">
+          <mxGeometry height="90" width="180" x="50" as="geometry" />
+        </mxCell>
+        <mxCell id="Fm2ml_hyg_b9xTe10vcR-22" parent="Fm2ml_hyg_b9xTe10vcR-21" style="shape=module;jettyWidth=8;jettyHeight=4;" value="" vertex="1">
+          <mxGeometry height="20" relative="1" width="20" x="1" as="geometry">
+            <mxPoint x="-27" y="7" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Fm2ml_hyg_b9xTe10vcR-23" edge="1" parent="Fm2ml_hyg_b9xTe10vcR-20" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=oval;endFill=0;sketch=0;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;endSize=10;exitX=0;exitY=0.5;exitDx=0;exitDy=0;edgeStyle=elbowEdgeStyle;" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="-60" y="100" />
+            </Array>
+            <mxPoint x="50" y="44.58000000000004" as="sourcePoint" />
+            <mxPoint x="-60" y="140" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Fm2ml_hyg_b9xTe10vcR-24" parent="Fm2ml_hyg_b9xTe10vcR-20" style="html=1;whiteSpace=wrap;" value="" vertex="1">
+          <mxGeometry height="25" width="25" x="37.5" y="32.5" as="geometry" />
+        </mxCell>
+        <mxCell id="Fm2ml_hyg_b9xTe10vcR-38" parent="Fm2ml_hyg_b9xTe10vcR-20" style="html=1;whiteSpace=wrap;" value="" vertex="1">
+          <mxGeometry height="25" width="25" x="220" y="32.5" as="geometry" />
+        </mxCell>
+        <mxCell id="R_HYoDl4G6WMGDCIS-vE-12" connectable="0" parent="1" style="group" value="" vertex="1">
+          <mxGeometry height="120" width="235" x="-430" y="490" as="geometry" />
+        </mxCell>
+        <mxCell id="ou_nnILzB4FWKmH-YYVy-1" edge="1" parent="R_HYoDl4G6WMGDCIS-vE-12" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=halfCircle;endFill=0;endSize=6;strokeWidth=1;sketch=0;fontSize=12;exitX=1;exitY=0.5;exitDx=0;exitDy=0;edgeStyle=elbowEdgeStyle;" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="330" y="-20" />
+            </Array>
+            <mxPoint x="220" y="27.079999999999927" as="sourcePoint" />
+            <mxPoint x="330" y="-10" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="R_HYoDl4G6WMGDCIS-vE-13" parent="R_HYoDl4G6WMGDCIS-vE-12" style="html=1;dropTarget=0;whiteSpace=wrap;" value="&lt;div&gt;ApiGateway&lt;/div&gt;" vertex="1">
+          <mxGeometry height="150" width="180" x="50" y="-30" as="geometry" />
+        </mxCell>
+        <mxCell id="R_HYoDl4G6WMGDCIS-vE-14" parent="R_HYoDl4G6WMGDCIS-vE-13" style="shape=module;jettyWidth=8;jettyHeight=4;" value="" vertex="1">
+          <mxGeometry height="20" relative="1" width="20" x="1" as="geometry">
+            <mxPoint x="-27" y="7" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="R_HYoDl4G6WMGDCIS-vE-15" edge="1" parent="R_HYoDl4G6WMGDCIS-vE-12" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=oval;endFill=0;sketch=0;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;endSize=10;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="50" y="44.58000000000004" as="sourcePoint" />
+            <mxPoint y="44.58000000000004" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="R_HYoDl4G6WMGDCIS-vE-16" parent="R_HYoDl4G6WMGDCIS-vE-12" style="html=1;whiteSpace=wrap;" value="" vertex="1">
+          <mxGeometry height="25" width="25" x="37.5" y="32.5" as="geometry" />
+        </mxCell>
+        <mxCell id="ou_nnILzB4FWKmH-YYVy-3" edge="1" parent="R_HYoDl4G6WMGDCIS-vE-12" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=halfCircle;endFill=0;endSize=6;strokeWidth=1;sketch=0;fontSize=12;exitX=1;exitY=0.5;exitDx=0;exitDy=0;edgeStyle=elbowEdgeStyle;" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="330" y="90" />
+            </Array>
+            <mxPoint x="220" y="77.07999999999993" as="sourcePoint" />
+            <mxPoint x="330" y="110" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ou_nnILzB4FWKmH-YYVy-4" parent="R_HYoDl4G6WMGDCIS-vE-12" style="html=1;whiteSpace=wrap;" value="" vertex="1">
+          <mxGeometry height="25" width="25" x="210" y="65" as="geometry" />
+        </mxCell>
+        <mxCell id="Fm2ml_hyg_b9xTe10vcR-31" edge="1" parent="R_HYoDl4G6WMGDCIS-vE-12" source="Fm2ml_hyg_b9xTe10vcR-32" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=halfCircle;endFill=0;endSize=6;strokeWidth=1;sketch=0;fontSize=12;edgeStyle=elbowEdgeStyle;" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="220" y="52.07999999999993" as="sourcePoint" />
+            <mxPoint x="310" y="52" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Fm2ml_hyg_b9xTe10vcR-32" parent="R_HYoDl4G6WMGDCIS-vE-12" style="html=1;whiteSpace=wrap;" value="" vertex="1">
+          <mxGeometry height="25" width="25" x="210" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="ou_nnILzB4FWKmH-YYVy-2" parent="R_HYoDl4G6WMGDCIS-vE-12" style="html=1;whiteSpace=wrap;" value="" vertex="1">
+          <mxGeometry height="25" width="25" x="210" y="15" as="geometry" />
+        </mxCell>
+        <mxCell id="Fm2ml_hyg_b9xTe10vcR-25" connectable="0" parent="1" style="group" value="" vertex="1">
+          <mxGeometry height="90" width="250" x="-780" y="540" as="geometry" />
+        </mxCell>
+        <mxCell id="Fm2ml_hyg_b9xTe10vcR-1" parent="Fm2ml_hyg_b9xTe10vcR-25" style="html=1;dropTarget=0;whiteSpace=wrap;" value="Frontend" vertex="1">
+          <mxGeometry height="90" width="180" as="geometry" />
+        </mxCell>
+        <mxCell id="Fm2ml_hyg_b9xTe10vcR-2" parent="Fm2ml_hyg_b9xTe10vcR-1" style="shape=module;jettyWidth=8;jettyHeight=4;" value="" vertex="1">
+          <mxGeometry height="20" relative="1" width="20" x="1" as="geometry">
+            <mxPoint x="-27" y="7" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Fm2ml_hyg_b9xTe10vcR-5" edge="1" parent="Fm2ml_hyg_b9xTe10vcR-25" source="Fm2ml_hyg_b9xTe10vcR-1" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=halfCircle;endFill=0;endSize=6;strokeWidth=1;sketch=0;fontSize=12;exitX=1;exitY=0.5;exitDx=0;exitDy=0;edgeStyle=orthogonalEdgeStyle;" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="350" y="45" />
+            </Array>
+            <mxPoint x="650" y="-150" as="sourcePoint" />
+            <mxPoint x="350" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Fm2ml_hyg_b9xTe10vcR-12" parent="Fm2ml_hyg_b9xTe10vcR-25" style="html=1;whiteSpace=wrap;" value="" vertex="1">
+          <mxGeometry height="25" width="25" x="170" y="32.5" as="geometry" />
+        </mxCell>
+        <mxCell id="Fm2ml_hyg_b9xTe10vcR-26" connectable="0" parent="1" style="group" value="" vertex="1">
+          <mxGeometry height="90" width="250" x="-780" y="420" as="geometry" />
+        </mxCell>
+        <mxCell id="Fm2ml_hyg_b9xTe10vcR-27" parent="Fm2ml_hyg_b9xTe10vcR-26" style="html=1;dropTarget=0;whiteSpace=wrap;" value="Mobile App" vertex="1">
+          <mxGeometry height="90" width="180" as="geometry" />
+        </mxCell>
+        <mxCell id="Fm2ml_hyg_b9xTe10vcR-28" parent="Fm2ml_hyg_b9xTe10vcR-27" style="shape=module;jettyWidth=8;jettyHeight=4;" value="" vertex="1">
+          <mxGeometry height="20" relative="1" width="20" x="1" as="geometry">
+            <mxPoint x="-27" y="7" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Fm2ml_hyg_b9xTe10vcR-29" edge="1" parent="Fm2ml_hyg_b9xTe10vcR-26" source="Fm2ml_hyg_b9xTe10vcR-27" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=halfCircle;endFill=0;endSize=6;strokeWidth=1;sketch=0;fontSize=12;exitX=1;exitY=0.5;exitDx=0;exitDy=0;edgeStyle=orthogonalEdgeStyle;" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="350" y="45" />
+            </Array>
+            <mxPoint x="650" y="-150" as="sourcePoint" />
+            <mxPoint x="350" y="110" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Fm2ml_hyg_b9xTe10vcR-30" parent="Fm2ml_hyg_b9xTe10vcR-26" style="html=1;whiteSpace=wrap;" value="" vertex="1">
+          <mxGeometry height="25" width="25" x="170" y="32.5" as="geometry" />
+        </mxCell>
+        <mxCell id="mEu9eBspE5wEjqttKzm--1" parent="1" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;fontColor=#000000;darkOpacity=0.05;fillColor=#FFF9B2;strokeColor=none;fillStyle=solid;direction=west;gradientDirection=north;gradientColor=#FFF2A1;shadow=1;size=20;pointerEvents=1;align=left;verticalAlign=top;" value="&lt;div&gt;&lt;div class=&quot;standard-markdown grid-cols-1 grid [&amp;amp;_&amp;gt;_*]:min-w-0 gap-3&quot;&gt;&lt;p class=&quot;font-claude-response-body break-words whitespace-normal leading-[1.7]&quot;&gt;&lt;strong&gt;1. Core Service (Ядро)&lt;/strong&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div class=&quot;standard-markdown grid-cols-1 grid [&amp;amp;_&amp;gt;_*]:min-w-0 gap-3&quot;&gt;&lt;p class=&quot;font-claude-response-body break-words whitespace-normal leading-[1.7]&quot;&gt;Хранит всё, что связано с деньгами. Не знает ничего про пользователей — только accountId.&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div class=&quot;standard-markdown grid-cols-1 grid [&amp;amp;_&amp;gt;_*]:min-w-0 gap-3&quot;&gt;&lt;p class=&quot;font-claude-response-body break-words whitespace-normal leading-[1.7]&quot;&gt;Что делает:&lt;/p&gt;&lt;br/&gt;&lt;ul class=&quot;[li_&amp;amp;]:mb-0 [li_&amp;amp;]:mt-1 [li_&amp;amp;]:gap-1 [&amp;amp;:not(:last-child)_ul]:pb-1 [&amp;amp;:not(:last-child)_ol]:pb-1 list-disc flex flex-col gap-1 pl-8 mb-3&quot;&gt;&lt;li class=&quot;whitespace-normal break-words pl-2&quot;&gt;CRUD счетов (открыть, закрыть, получить список, получить по id)&lt;/li&gt;&lt;li class=&quot;whitespace-normal break-words pl-2&quot;&gt;Пополнение и снятие денег со счёта&lt;/li&gt;&lt;li class=&quot;whitespace-normal break-words pl-2&quot;&gt;Перевод между счетами&lt;/li&gt;&lt;li class=&quot;whitespace-normal break-words pl-2&quot;&gt;Хранение истории всех операций (транзакций)&lt;/li&gt;&lt;li class=&quot;whitespace-normal break-words pl-2&quot;&gt;Списание платежей по кредиту (Credit Service дёргает его)&lt;/li&gt;&lt;li class=&quot;whitespace-normal break-words pl-2&quot;&gt;Принимает запросы только от доверенных источников (Gateway и внутренних сервисов), снаружи недоступен&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div class=&quot;standard-markdown grid-cols-1 grid [&amp;amp;_&amp;gt;_*]:min-w-0 gap-3&quot;&gt;&lt;p class=&quot;font-claude-response-body break-words whitespace-normal leading-[1.7]&quot;&gt;База данных: счета, транзакции.&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="280" width="470" x="235" y="1180" as="geometry" />
+        </mxCell>
+        <mxCell id="mEu9eBspE5wEjqttKzm--2" parent="1" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;fontColor=#000000;darkOpacity=0.05;fillColor=#FFF9B2;strokeColor=none;fillStyle=solid;direction=west;gradientDirection=north;gradientColor=#FFF2A1;shadow=1;size=20;pointerEvents=1;align=left;verticalAlign=top;" value="&lt;p class=&quot;font-claude-response-body break-words whitespace-normal leading-[1.7]&quot;&gt;&lt;strong&gt;3. Credit Service (Сервис кредитов)&lt;/strong&gt;&lt;/p&gt;&lt;br/&gt;&lt;p class=&quot;font-claude-response-body break-words whitespace-normal leading-[1.7]&quot;&gt;Внутренний сервис, без UI.&lt;/p&gt;&lt;br/&gt;&lt;p class=&quot;font-claude-response-body break-words whitespace-normal leading-[1.7]&quot;&gt;Что делает:&lt;/p&gt;&lt;br/&gt;&lt;ul class=&quot;[li_&amp;amp;]:mb-0 [li_&amp;amp;]:mt-1 [li_&amp;amp;]:gap-1 [&amp;amp;:not(:last-child)_ul]:pb-1 [&amp;amp;:not(:last-child)_ol]:pb-1 list-disc flex flex-col gap-1 pl-8 mb-3&quot;&gt;&lt;li class=&quot;whitespace-normal break-words pl-2&quot;&gt;Хранит тарифы кредитов (название, процентная ставка)&lt;/li&gt;&lt;li class=&quot;whitespace-normal break-words pl-2&quot;&gt;Создание нового тарифа (запрос приходит от Gateway от имени сотрудника)&lt;/li&gt;&lt;li class=&quot;whitespace-normal break-words pl-2&quot;&gt;Выдача кредита клиенту — зачисляет деньги через Core Service&lt;/li&gt;&lt;li class=&quot;whitespace-normal break-words pl-2&quot;&gt;Хранит список активных кредитов и их состояние (остаток долга, следующий платёж)&lt;/li&gt;&lt;li class=&quot;whitespace-normal break-words pl-2&quot;&gt;По расписанию (раз в день или минуту) списывает платёж — дёргает Core Service&lt;/li&gt;&lt;li class=&quot;whitespace-normal break-words pl-2&quot;&gt;Досрочное погашение кредита&lt;/li&gt;&lt;li class=&quot;whitespace-normal break-words pl-2&quot;&gt;Снаружи недоступен, принимает запросы только от Gateway&lt;/li&gt;&lt;/ul&gt;&lt;br/&gt;&lt;p class=&quot;font-claude-response-body break-words whitespace-normal leading-[1.7]&quot;&gt;База данных: тарифы, кредиты, график платежей.&lt;/p&gt;" vertex="1">
+          <mxGeometry height="380" width="440" x="245" y="780" as="geometry" />
+        </mxCell>
+        <mxCell id="mEu9eBspE5wEjqttKzm--3" parent="1" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;fontColor=#000000;darkOpacity=0.05;fillColor=#FFF9B2;strokeColor=none;fillStyle=solid;direction=west;gradientDirection=north;gradientColor=#FFF2A1;shadow=1;size=20;pointerEvents=1;align=left;verticalAlign=top;" value="&lt;p class=&quot;font-claude-response-body break-words whitespace-normal leading-[1.7]&quot;&gt;&lt;strong&gt;2. User Service (Сервис пользователей)&lt;/strong&gt;&lt;/p&gt;&lt;br/&gt;&lt;p class=&quot;font-claude-response-body break-words whitespace-normal leading-[1.7]&quot;&gt;Единственный, кто знает кто есть кто.&lt;/p&gt;&lt;br/&gt;&lt;p class=&quot;font-claude-response-body break-words whitespace-normal leading-[1.7]&quot;&gt;Что делает:&lt;/p&gt;&lt;br/&gt;&lt;ul class=&quot;[li_&amp;amp;]:mb-0 [li_&amp;amp;]:mt-1 [li_&amp;amp;]:gap-1 [&amp;amp;:not(:last-child)_ul]:pb-1 [&amp;amp;:not(:last-child)_ol]:pb-1 list-disc flex flex-col gap-1 pl-8 mb-3&quot;&gt;&lt;li class=&quot;whitespace-normal break-words pl-2&quot;&gt;Логин — проверяет credentials и выдаёт JWT (Gateway перенаправляет логин-запрос сюда)&lt;/li&gt;&lt;li class=&quot;whitespace-normal break-words pl-2&quot;&gt;Хранение профилей клиентов и сотрудников&lt;/li&gt;&lt;li class=&quot;whitespace-normal break-words pl-2&quot;&gt;Блокировка / разблокировка пользователей&lt;/li&gt;&lt;li class=&quot;whitespace-normal break-words pl-2&quot;&gt;Создание новых сотрудников и клиентов&lt;/li&gt;&lt;li class=&quot;whitespace-normal break-words pl-2&quot;&gt;Предоставляет публичный ключ или секрет, чтобы Gateway мог валидировать токены&lt;/li&gt;&lt;li class=&quot;whitespace-normal break-words pl-2&quot;&gt;Снаружи недоступен, принимает запросы только от Gateway и внутренних сервисов&lt;/li&gt;&lt;/ul&gt;&lt;br/&gt;&lt;p class=&quot;font-claude-response-body break-words whitespace-normal leading-[1.7]&quot;&gt;База данных: пользователи, роли, credentials.&lt;/p&gt;" vertex="1">
+          <mxGeometry height="350" width="520" x="210" y="-40" as="geometry" />
+        </mxCell>
+        <mxCell id="mEu9eBspE5wEjqttKzm--4" parent="1" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;fontColor=#000000;darkOpacity=0.05;fillColor=#FFF9B2;strokeColor=none;fillStyle=solid;direction=west;gradientDirection=north;gradientColor=#FFF2A1;shadow=1;size=20;pointerEvents=1;align=left;verticalAlign=top;" value="&lt;p class=&quot;font-claude-response-body break-words whitespace-normal leading-[1.7]&quot;&gt;&lt;strong&gt;API Gateway&lt;/strong&gt;&lt;/p&gt;&lt;br/&gt;&lt;p class=&quot;font-claude-response-body break-words whitespace-normal leading-[1.7]&quot;&gt;Единственная точка входа для фронтов. Внутренние сервисы (Core, Credit) вообще не доступны снаружи.&lt;/p&gt;&lt;br/&gt;&lt;p class=&quot;font-claude-response-body break-words whitespace-normal leading-[1.7]&quot;&gt;Что делает:&lt;/p&gt;&lt;br/&gt;&lt;ul class=&quot;[li_&amp;amp;]:mb-0 [li_&amp;amp;]:mt-1 [li_&amp;amp;]:gap-1 [&amp;amp;:not(:last-child)_ul]:pb-1 [&amp;amp;:not(:last-child)_ol]:pb-1 list-disc flex flex-col gap-1 pl-8 mb-3&quot;&gt;&lt;li class=&quot;whitespace-normal break-words pl-2&quot;&gt;Принимает все запросы от Client App и Employee App&lt;/li&gt;&lt;li class=&quot;whitespace-normal break-words pl-2&quot;&gt;Валидирует JWT (один раз, здесь) — остальные сервисы токен не проверяют&lt;/li&gt;&lt;li class=&quot;whitespace-normal break-words pl-2&quot;&gt;Добавляет в проксируемый запрос заголовки X-User-Id, X-User-Role&lt;/li&gt;&lt;li class=&quot;whitespace-normal break-words pl-2&quot;&gt;Маршрутизирует запрос в нужный сервис&lt;/li&gt;&lt;li class=&quot;whitespace-normal break-words pl-2&quot;&gt;Возвращает ответ обратно фронту&lt;/li&gt;&lt;/ul&gt;&lt;br/&gt;&lt;p class=&quot;font-claude-response-body break-words whitespace-normal leading-[1.7]&quot;&gt;Своей БД нет.&lt;/p&gt;" vertex="1">
+          <mxGeometry height="350" width="490" x="-557.5" y="720" as="geometry" />
+        </mxCell>
+        <mxCell id="mEu9eBspE5wEjqttKzm--5" parent="1" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;fontColor=#000000;darkOpacity=0.05;fillColor=#FFF9B2;strokeColor=none;fillStyle=solid;direction=west;gradientDirection=north;gradientColor=#FFF2A1;shadow=1;size=20;pointerEvents=1;align=left;verticalAlign=top;" value="&lt;p class=&quot;font-claude-response-body break-words whitespace-normal leading-[1.7]&quot;&gt;&lt;strong&gt;4. Client App (Веб/мобильное приложение клиента)&lt;/strong&gt;&lt;/p&gt;&lt;br/&gt;&lt;p class=&quot;font-claude-response-body break-words whitespace-normal leading-[1.7]&quot;&gt;Тонкий фронтенд, никакой бизнес-логики. Знает только один адрес — адрес Gateway.&lt;/p&gt;&lt;br/&gt;&lt;p class=&quot;font-claude-response-body break-words whitespace-normal leading-[1.7]&quot;&gt;Что делает:&lt;/p&gt;&lt;br/&gt;&lt;ul class=&quot;[li_&amp;amp;]:mb-0 [li_&amp;amp;]:mt-1 [li_&amp;amp;]:gap-1 [&amp;amp;:not(:last-child)_ul]:pb-1 [&amp;amp;:not(:last-child)_ol]:pb-1 list-disc flex flex-col gap-1 pl-8 mb-3&quot;&gt;&lt;li class=&quot;whitespace-normal break-words pl-2&quot;&gt;Логин — отправляет credentials в Gateway, получает JWT, сохраняет его&lt;/li&gt;&lt;li class=&quot;whitespace-normal break-words pl-2&quot;&gt;Все последующие запросы идут в Gateway с JWT в заголовке&lt;/li&gt;&lt;li class=&quot;whitespace-normal break-words pl-2&quot;&gt;Открыть / закрыть счёт&lt;/li&gt;&lt;li class=&quot;whitespace-normal break-words pl-2&quot;&gt;Посмотреть свои счета и баланс&lt;/li&gt;&lt;li class=&quot;whitespace-normal break-words pl-2&quot;&gt;История операций по счёту&lt;/li&gt;&lt;li class=&quot;whitespace-normal break-words pl-2&quot;&gt;Внести / снять деньги&lt;/li&gt;&lt;li class=&quot;whitespace-normal break-words pl-2&quot;&gt;Взять кредит / погасить кредит&lt;/li&gt;&lt;li class=&quot;whitespace-normal break-words pl-2&quot;&gt;Посмотреть свои кредиты&lt;/li&gt;&lt;/ul&gt;" vertex="1">
+          <mxGeometry height="350" width="490" x="-800" y="-20" as="geometry" />
+        </mxCell>
+        <mxCell id="mEu9eBspE5wEjqttKzm--6" parent="1" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;fontColor=#000000;darkOpacity=0.05;fillColor=#FFF9B2;strokeColor=none;fillStyle=solid;direction=west;gradientDirection=north;gradientColor=#FFF2A1;shadow=1;size=20;pointerEvents=1;align=left;verticalAlign=top;" value="&lt;p class=&quot;font-claude-response-body break-words whitespace-normal leading-[1.7]&quot;&gt;&lt;strong&gt;5. Employee App (Веб/мобильное приложение сотрудника)&lt;/strong&gt;&lt;/p&gt;&lt;br/&gt;&lt;p class=&quot;font-claude-response-body break-words whitespace-normal leading-[1.7]&quot;&gt;Тонкий фронтенд с расширенными правами. Тоже знает только адрес Gateway.&lt;/p&gt;&lt;br/&gt;&lt;p class=&quot;font-claude-response-body break-words whitespace-normal leading-[1.7]&quot;&gt;Что делает:&lt;/p&gt;&lt;br/&gt;&lt;ul class=&quot;[li_&amp;amp;]:mb-0 [li_&amp;amp;]:mt-1 [li_&amp;amp;]:gap-1 [&amp;amp;:not(:last-child)_ul]:pb-1 [&amp;amp;:not(:last-child)_ol]:pb-1 list-disc flex flex-col gap-1 pl-8 mb-3&quot;&gt;&lt;li class=&quot;whitespace-normal break-words pl-2&quot;&gt;Логин — аналогично Client App&lt;/li&gt;&lt;li class=&quot;whitespace-normal break-words pl-2&quot;&gt;Все запросы идут в Gateway с JWT в заголовке&lt;/li&gt;&lt;li class=&quot;whitespace-normal break-words pl-2&quot;&gt;Посмотреть все счета всех клиентов&lt;/li&gt;&lt;li class=&quot;whitespace-normal break-words pl-2&quot;&gt;История операций по любому счёту&lt;/li&gt;&lt;li class=&quot;whitespace-normal break-words pl-2&quot;&gt;Создать новый кредитный тариф&lt;/li&gt;&lt;li class=&quot;whitespace-normal break-words pl-2&quot;&gt;Создать / заблокировать клиента или сотрудника&lt;/li&gt;&lt;li class=&quot;whitespace-normal break-words pl-2&quot;&gt;Посмотреть кредиты любого клиента&lt;/li&gt;&lt;/ul&gt;&lt;br/&gt;&lt;hr class=&quot;border-border-200 border-t-0.5 my-3 mx-1.5&quot;&gt;" vertex="1">
+          <mxGeometry height="350" width="490" x="-1100" y="670" as="geometry" />
+        </mxCell>
+        <mxCell id="Fm2ml_hyg_b9xTe10vcR-33" connectable="0" parent="1" style="group" value="" vertex="1">
+          <mxGeometry height="90" width="230" x="450" y="340" as="geometry" />
+        </mxCell>
+        <mxCell id="Fm2ml_hyg_b9xTe10vcR-34" parent="Fm2ml_hyg_b9xTe10vcR-33" style="html=1;dropTarget=0;whiteSpace=wrap;" value="UserDB (PostgreSQL)" vertex="1">
+          <mxGeometry height="90" width="180" x="50" as="geometry" />
+        </mxCell>
+        <mxCell id="Fm2ml_hyg_b9xTe10vcR-35" parent="Fm2ml_hyg_b9xTe10vcR-34" style="shape=module;jettyWidth=8;jettyHeight=4;" value="" vertex="1">
+          <mxGeometry height="20" relative="1" width="20" x="1" as="geometry">
+            <mxPoint x="-27" y="7" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Fm2ml_hyg_b9xTe10vcR-36" edge="1" parent="Fm2ml_hyg_b9xTe10vcR-33" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=oval;endFill=0;sketch=0;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;endSize=10;exitX=0;exitY=0.5;exitDx=0;exitDy=0;edgeStyle=elbowEdgeStyle;" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="-60" y="100" />
+            </Array>
+            <mxPoint x="50" y="44.58000000000004" as="sourcePoint" />
+            <mxPoint x="-100" y="45" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Fm2ml_hyg_b9xTe10vcR-37" parent="Fm2ml_hyg_b9xTe10vcR-33" style="html=1;whiteSpace=wrap;" value="" vertex="1">
+          <mxGeometry height="25" width="25" x="37.5" y="32.5" as="geometry" />
+        </mxCell>
+        <mxCell id="Fm2ml_hyg_b9xTe10vcR-39" edge="1" parent="1" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=halfCircle;endFill=0;endSize=6;strokeWidth=1;sketch=0;fontSize=12;edgeStyle=orthogonalEdgeStyle;" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="280" y="384.86" />
+            </Array>
+            <mxPoint x="205" y="384.86" as="sourcePoint" />
+            <mxPoint x="350" y="384.86" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="R_HYoDl4G6WMGDCIS-vE-17" connectable="0" parent="1" style="group" value="" vertex="1">
+          <mxGeometry height="90" width="230" x="413" y="495" as="geometry" />
+        </mxCell>
+        <mxCell id="R_HYoDl4G6WMGDCIS-vE-18" parent="R_HYoDl4G6WMGDCIS-vE-17" style="html=1;dropTarget=0;whiteSpace=wrap;" value="CreditServiceDb" vertex="1">
+          <mxGeometry height="90" width="180" x="50" as="geometry" />
+        </mxCell>
+        <mxCell id="R_HYoDl4G6WMGDCIS-vE-19" parent="R_HYoDl4G6WMGDCIS-vE-18" style="shape=module;jettyWidth=8;jettyHeight=4;" value="" vertex="1">
+          <mxGeometry height="20" relative="1" width="20" x="1" as="geometry">
+            <mxPoint x="-27" y="7" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="R_HYoDl4G6WMGDCIS-vE-20" edge="1" parent="R_HYoDl4G6WMGDCIS-vE-17" source="R_HYoDl4G6WMGDCIS-vE-21" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=oval;endFill=0;sketch=0;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;endSize=10;exitX=0;exitY=0.5;exitDx=0;exitDy=0;edgeStyle=elbowEdgeStyle;" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+            <mxPoint x="50" y="44.58000000000004" as="sourcePoint" />
+            <mxPoint x="-63" y="45" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="R_HYoDl4G6WMGDCIS-vE-21" parent="R_HYoDl4G6WMGDCIS-vE-17" style="html=1;whiteSpace=wrap;" value="" vertex="1">
+          <mxGeometry height="25" width="25" x="37.5" y="32.5" as="geometry" />
+        </mxCell>
+        <mxCell id="R_HYoDl4G6WMGDCIS-vE-22" connectable="0" parent="1" style="group" value="" vertex="1">
+          <mxGeometry height="90" width="230" x="440" y="668" as="geometry" />
+        </mxCell>
+        <mxCell id="R_HYoDl4G6WMGDCIS-vE-23" parent="R_HYoDl4G6WMGDCIS-vE-22" style="html=1;dropTarget=0;whiteSpace=wrap;" value="CoreDB" vertex="1">
+          <mxGeometry height="90" width="180" x="50" as="geometry" />
+        </mxCell>
+        <mxCell id="R_HYoDl4G6WMGDCIS-vE-24" parent="R_HYoDl4G6WMGDCIS-vE-23" style="shape=module;jettyWidth=8;jettyHeight=4;" value="" vertex="1">
+          <mxGeometry height="20" relative="1" width="20" x="1" as="geometry">
+            <mxPoint x="-27" y="7" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="R_HYoDl4G6WMGDCIS-vE-26" parent="R_HYoDl4G6WMGDCIS-vE-22" style="html=1;whiteSpace=wrap;" value="" vertex="1">
+          <mxGeometry height="25" width="25" x="37.5" y="32.5" as="geometry" />
+        </mxCell>
+        <mxCell id="YqG8KE2RfPTcJYvDVofh-7" edge="1" parent="1" source="YqG8KE2RfPTcJYvDVofh-5" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=halfCircle;endFill=0;endSize=6;strokeWidth=1;sketch=0;fontSize=12;edgeStyle=orthogonalEdgeStyle;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="300" y="713" />
+              <mxPoint x="320" y="713" />
+            </Array>
+            <mxPoint x="195" y="713" as="sourcePoint" />
+            <mxPoint x="360" y="713" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="R_HYoDl4G6WMGDCIS-vE-25" edge="1" parent="1" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=oval;endFill=0;sketch=0;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;endSize=10;exitX=0.023;exitY=0.382;exitDx=0;exitDy=0;edgeStyle=elbowEdgeStyle;exitPerimeter=0;" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+            <mxPoint x="478.0750000000003" y="713.05" as="sourcePoint" />
+            <mxPoint x="360" y="713" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="YqG8KE2RfPTcJYvDVofh-8" parent="1" style="text;align=center;fontStyle=1;verticalAlign=middle;spacingLeft=3;spacingRight=3;strokeColor=none;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;html=1;" value="&lt;font style=&quot;font-size: 32px;&quot;&gt;Durex Bank&lt;/font&gt;" vertex="1">
+          <mxGeometry height="26" width="80" x="-170" y="290" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="nUJNx6_Ikv5OD3kRZhkU" name="Компоненты">
+    <mxGraphModel grid="1" page="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

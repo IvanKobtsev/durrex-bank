@@ -1,2 +1,5 @@
 <Solution>
+  <Project Path="MyApp.CoreService/MyApp.CoreService.csproj" />
+  <Project Path="MyApp.CreditService/MyApp.CreditService.csproj" />
+  <Project Path="MyApp.UserService/MyApp.UserService.csproj" />
 </Solution>

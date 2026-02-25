@@ -1,41 +1,67 @@
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.EntityFrameworkCore;
+using MyApp.CoreService.Data;
+using MyApp.CoreService.Middleware;
+using Scalar.AspNetCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+
+
+builder.Services.AddControllers();
 builder.Services.AddOpenApi();
+
+builder.Services.AddDbContext<CoreDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddMediatR(cfg =>
+    cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
+
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Auto-apply pending migrations on startup.
+// In test environments, skip migrations and rely on EnsureCreated called by the test factory.
+if (!app.Environment.IsEnvironment("Testing"))
+{
+    using var scope = app.Services.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<CoreDbContext>();
+    await db.Database.MigrateAsync();
+}
+
+// Global exception handler: maps domain exceptions to HTTP status codes
+app.UseExceptionHandler(errApp =>
+{
+    errApp.Run(async context =>
+    {
+        var ex = context.Features.Get<IExceptionHandlerFeature>()?.Error;
+        var (status, message) = ex switch
+        {
+            KeyNotFoundException => (StatusCodes.Status404NotFound, ex.Message),
+            InvalidOperationException => (StatusCodes.Status400BadRequest, ex.Message),
+            ArgumentException => (StatusCodes.Status400BadRequest, ex.Message),
+            _ => (StatusCodes.Status500InternalServerError, "An unexpected error occurred.")
+        };
+        context.Response.StatusCode = status;
+        context.Response.ContentType = "application/json";
+        await context.Response.WriteAsJsonAsync(new { error = message });
+    });
+});
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.MapScalarApiReference();
 }
 
 app.UseHttpsRedirection();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+// Internal API key guard must be before routing
+app.UseMiddleware<InternalApiKeyMiddleware>();
 
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+app.MapControllers();
 
 app.Run();
 
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
+// Exposes Program class to the test assembly
+public partial class Program { }

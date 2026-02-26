@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MyApp.UserService.DTOs;
+using MyApp.UserService.Services;
+using MyApp.UserService.Services.Errors;
 
 namespace MyApp.UserService.Controllers;
 
@@ -7,7 +9,7 @@ namespace MyApp.UserService.Controllers;
 [ApiController]
 [Route("auth")]
 [Produces("application/json")]
-public class AuthController : ControllerBase
+public class AuthController(IAuthService authService) : ControllerBase
 {
     /// <summary>Issue a JWT token for valid credentials</summary>
     /// <response code="200">Token issued successfully</response>
@@ -15,9 +17,14 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ActionResult<LoginResponse>> Login([FromBody] LoginRequest request)
+    public async Task<ActionResult<LoginResponse>> Login([FromBody] LoginRequest request, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        var result = await authService.LoginAsync(request, ct);
+
+        if (result.IsFailed)
+            return result.HasError<UnauthorizedError>() ? Unauthorized() : BadRequest();
+
+        return Ok(result.Value);
     }
 
     /// <summary>Get the RSA public key used to validate issued JWTs</summary>
@@ -27,6 +34,6 @@ public class AuthController : ControllerBase
     [ProducesResponseType(typeof(PublicKeyResponse), StatusCodes.Status200OK)]
     public ActionResult<PublicKeyResponse> GetPublicKey()
     {
-        throw new NotImplementedException();
+        return Ok(new PublicKeyResponse(authService.GetPublicKeyPem()));
     }
 }

@@ -7,6 +7,7 @@ using MyApp.CoreService.Features.Accounts.Commands.CreateAccount;
 using MyApp.CoreService.Features.Accounts.Queries.GetAccountById;
 using MyApp.CoreService.Features.Accounts.Queries.GetAccountsByOwnerId;
 using MyApp.CoreService.Features.Accounts.Queries.GetAllAccounts;
+using MyApp.CoreService.Features.Transactions.Commands.Debit;
 using MyApp.CoreService.Features.Transactions.Commands.Deposit;
 using MyApp.CoreService.Features.Transactions.Commands.Transfer;
 using MyApp.CoreService.Features.Transactions.Commands.Withdraw;
@@ -161,6 +162,17 @@ public class AccountsController : ControllerBase
         return Ok(source);
     }
 
+    // POST /api/accounts/{id}/debit  — internal, called by CreditService only
+    [HttpPost("{id:int}/debit")]
+    [ProducesResponseType<TransactionResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Debit(int id, [FromBody] DebitRequest req, CancellationToken ct)
+    {
+        var tx = await _mediator.Send(new DebitCommand(id, req.Amount, req.Description), ct);
+        return Ok(tx);
+    }
+
     // GET /api/accounts/{id}/transactions
     [HttpGet("{id:int}/transactions")]
     [ProducesResponseType<PagedResponse<TransactionResponse>>(StatusCodes.Status200OK)]
@@ -188,3 +200,4 @@ public class AccountsController : ControllerBase
 public record DepositRequest(decimal Amount, string? Description = null);
 public record WithdrawRequest(decimal Amount, string? Description = null);
 public record TransferRequest(int TargetAccountId, decimal Amount, string? Description = null);
+public record DebitRequest(decimal Amount, string? Description = null);

@@ -4,5 +4,6 @@ public enum TransactionType
 {
     Deposit,
     Withdrawal,
-    Transfer
+    Transfer,
+    CreditRepayment
 }

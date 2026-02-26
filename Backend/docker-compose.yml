@@ -1,0 +1,30 @@
+services:
+
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  core-service:
+    build:
+      context: .
+      dockerfile: MyApp.CoreService/Dockerfile
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=durrex_core;Username=postgres;Password=postgres"
+      InternalApiKey: "dev-internal-api-key-12345"
+    ports:
+      - "5208:8080"
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:

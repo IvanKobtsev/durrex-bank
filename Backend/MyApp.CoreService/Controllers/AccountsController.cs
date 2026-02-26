@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using MyApp.CoreService.Auth;
 using MyApp.CoreService.DTOs.Responses;
 using MyApp.CoreService.Features.Accounts.Commands.CloseAccount;
 using MyApp.CoreService.Features.Accounts.Commands.CreateAccount;
@@ -19,8 +20,23 @@ namespace MyApp.CoreService.Controllers;
 public class AccountsController : ControllerBase
 {
     private readonly IMediator _mediator;
+    private readonly ICurrentUserContext _user;
 
-    public AccountsController(IMediator mediator) => _mediator = mediator;
+    public AccountsController(IMediator mediator, ICurrentUserContext user)
+    {
+        _mediator = mediator;
+        _user = user;
+    }
+
+    /// <summary>
+    /// Returns 403 if the caller is a Client and the account is not theirs; null otherwise.
+    /// </summary>
+    private IActionResult? EnforceClientOwnership(int accountOwnerId)
+    {
+        if (!_user.IsClient) return null;
+        if (_user.UserId == accountOwnerId) return null;
+        return StatusCode(StatusCodes.Status403Forbidden);
+    }
 
     // POST /api/accounts
     [HttpPost]
@@ -28,6 +44,12 @@ public class AccountsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Create([FromBody] CreateAccountCommand cmd, CancellationToken ct)
     {
+        if (_user.IsClient)
+        {
+            if (_user.UserId is null)
+                return BadRequest(new { error = "X-User-Id header is missing or invalid." });
+            cmd = cmd with { OwnerId = _user.UserId.Value };
+        }
         var account = await _mediator.Send(cmd, ct);
         return CreatedAtAction(nameof(GetById), new { id = account.Id }, account);
     }
@@ -37,6 +59,14 @@ public class AccountsController : ControllerBase
     [ProducesResponseType<IReadOnlyList<AccountResponse>>(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAll([FromQuery] int? ownerId, CancellationToken ct)
     {
+        if (_user.IsClient)
+        {
+            if (_user.UserId is null)
+                return BadRequest(new { error = "X-User-Id header is missing or invalid." });
+            var byOwner = await _mediator.Send(new GetAccountsByOwnerIdQuery(_user.UserId.Value), ct);
+            return Ok(byOwner);
+        }
+        // Employee / Internal: honour optional ?ownerId filter
         if (ownerId.HasValue)
         {
             var byOwner = await _mediator.Send(new GetAccountsByOwnerIdQuery(ownerId.Value), ct);
@@ -49,10 +79,13 @@ public class AccountsController : ControllerBase
     // GET /api/accounts/{id}
     [HttpGet("{id:int}")]
     [ProducesResponseType<AccountResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetById(int id, CancellationToken ct)
     {
         var account = await _mediator.Send(new GetAccountByIdQuery(id), ct);
+        var denied = EnforceClientOwnership(account.OwnerId);
+        if (denied is not null) return denied;
         return Ok(account);
     }
 
@@ -60,20 +93,34 @@ public class AccountsController : ControllerBase
     [HttpDelete("{id:int}")]
     [ProducesResponseType<AccountResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Close(int id, CancellationToken ct)
     {
-        var account = await _mediator.Send(new CloseAccountCommand(id), ct);
-        return Ok(account);
+        if (_user.IsClient)
+        {
+            var account = await _mediator.Send(new GetAccountByIdQuery(id), ct);
+            var denied = EnforceClientOwnership(account.OwnerId);
+            if (denied is not null) return denied;
+        }
+        var result = await _mediator.Send(new CloseAccountCommand(id), ct);
+        return Ok(result);
     }
 
     // POST /api/accounts/{id}/deposit
     [HttpPost("{id:int}/deposit")]
     [ProducesResponseType<TransactionResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Deposit(int id, [FromBody] DepositRequest req, CancellationToken ct)
     {
+        if (_user.IsClient)
+        {
+            var account = await _mediator.Send(new GetAccountByIdQuery(id), ct);
+            var denied = EnforceClientOwnership(account.OwnerId);
+            if (denied is not null) return denied;
+        }
         var tx = await _mediator.Send(new DepositCommand(id, req.Amount, req.Description), ct);
         return Ok(tx);
     }
@@ -82,9 +129,16 @@ public class AccountsController : ControllerBase
     [HttpPost("{id:int}/withdraw")]
     [ProducesResponseType<TransactionResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Withdraw(int id, [FromBody] WithdrawRequest req, CancellationToken ct)
     {
+        if (_user.IsClient)
+        {
+            var account = await _mediator.Send(new GetAccountByIdQuery(id), ct);
+            var denied = EnforceClientOwnership(account.OwnerId);
+            if (denied is not null) return denied;
+        }
         var tx = await _mediator.Send(new WithdrawCommand(id, req.Amount, req.Description), ct);
         return Ok(tx);
     }
@@ -93,9 +147,16 @@ public class AccountsController : ControllerBase
     [HttpPost("{id:int}/transfer")]
     [ProducesResponseType<TransactionResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Transfer(int id, [FromBody] TransferRequest req, CancellationToken ct)
     {
+        if (_user.IsClient)
+        {
+            var account = await _mediator.Send(new GetAccountByIdQuery(id), ct);
+            var denied = EnforceClientOwnership(account.OwnerId);
+            if (denied is not null) return denied;
+        }
         var (source, _) = await _mediator.Send(new TransferCommand(id, req.TargetAccountId, req.Amount, req.Description), ct);
         return Ok(source);
     }
@@ -103,6 +164,7 @@ public class AccountsController : ControllerBase
     // GET /api/accounts/{id}/transactions
     [HttpGet("{id:int}/transactions")]
     [ProducesResponseType<PagedResponse<TransactionResponse>>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetTransactions(
         int id,
@@ -110,6 +172,12 @@ public class AccountsController : ControllerBase
         [FromQuery] int pageSize = 20,
         CancellationToken ct = default)
     {
+        if (_user.IsClient)
+        {
+            var account = await _mediator.Send(new GetAccountByIdQuery(id), ct);
+            var denied = EnforceClientOwnership(account.OwnerId);
+            if (denied is not null) return denied;
+        }
         var result = await _mediator.Send(new GetTransactionsQuery(id, page, pageSize), ct);
         return Ok(result);
     }

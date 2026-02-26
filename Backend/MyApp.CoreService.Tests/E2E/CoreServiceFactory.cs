@@ -57,4 +57,22 @@ public class CoreServiceFactory : WebApplicationFactory<Program>
         client.DefaultRequestHeaders.Add("X-Internal-Api-Key", TestApiKey);
         return client;
     }
+
+    /// <summary>Creates an HttpClient acting as a Client user with the given userId.</summary>
+    public HttpClient CreateClientUserClient(int userId)
+    {
+        var client = CreateAuthenticatedClient();
+        client.DefaultRequestHeaders.Add("X-User-Id", userId.ToString());
+        client.DefaultRequestHeaders.Add("X-User-Role", "Client");
+        return client;
+    }
+
+    /// <summary>Creates an HttpClient acting as an Employee user with the given userId.</summary>
+    public HttpClient CreateEmployeeClient(int userId)
+    {
+        var client = CreateAuthenticatedClient();
+        client.DefaultRequestHeaders.Add("X-User-Id", userId.ToString());
+        client.DefaultRequestHeaders.Add("X-User-Role", "Employee");
+        return client;
+    }
 }

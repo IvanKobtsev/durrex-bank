@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
+using MyApp.CoreService.Auth;
 using MyApp.CoreService.Data;
 using MyApp.CoreService.Middleware;
 using Scalar.AspNetCore;
@@ -17,6 +18,29 @@ builder.Services.AddDbContext<CoreDbContext>(options =>
 builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
 
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUserContext>(sp =>
+{
+    var http = sp.GetRequiredService<IHttpContextAccessor>().HttpContext;
+    if (http is null)
+        return new CurrentUserContext { Role = CallerRole.Internal };
+
+    var userIdHeader = http.Request.Headers["X-User-Id"].FirstOrDefault();
+    var roleHeader   = http.Request.Headers["X-User-Role"].FirstOrDefault();
+
+    if (string.IsNullOrEmpty(userIdHeader) || string.IsNullOrEmpty(roleHeader))
+        return new CurrentUserContext { Role = CallerRole.Internal };
+
+    var role = roleHeader.Equals("Employee", StringComparison.OrdinalIgnoreCase)
+        ? CallerRole.Employee
+        : CallerRole.Client;
+
+    return new CurrentUserContext
+    {
+        UserId = int.TryParse(userIdHeader, out var id) ? id : null,
+        Role   = role
+    };
+});
 
 var app = builder.Build();
 

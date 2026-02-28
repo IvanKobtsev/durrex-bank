@@ -39,7 +39,7 @@ public class UserService(IUserRepository userRepository) : IUserService
             Username = request.Username,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
             Role = request.Role,
-            IsBlocked = false,
+            IsBlocked = request.IsBlocked,
         };
 
         await userRepository.AddAsync(user, ct);

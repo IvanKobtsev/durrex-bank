@@ -28,6 +28,12 @@ file class AppUserConfiguration : IEntityTypeConfiguration<AppUser>
 
         builder.HasIndex(u => u.Username).IsUnique();
 
+        builder.Property(u => u.FirstName).IsRequired().HasMaxLength(128);
+        builder.Property(u => u.LastName).IsRequired().HasMaxLength(128);
+
+        builder.Property(u => u.TelephoneNumber).IsRequired().HasMaxLength(32);
+        builder.HasIndex(u => u.TelephoneNumber).IsUnique();
+
         builder.Property(u => u.PasswordHash).IsRequired();
 
         builder.Property(u => u.Role).IsRequired();

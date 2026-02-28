@@ -40,10 +40,19 @@ public class UserService(IUserRepository userRepository) : IUserService
                 new ConflictError($"Email '{request.Email}' is already registered.")
             );
 
+        var existingByTelephone = await userRepository.FindByTelephoneNumberAsync(request.TelephoneNumber, ct);
+        if (existingByTelephone is not null)
+            return Result.Fail(
+                new ConflictError($"Telephone number '{request.TelephoneNumber}' is already registered.")
+            );
+
         var user = new AppUser
         {
             Username = request.Username,
             Email = request.Email,
+            FirstName = request.FirstName,
+            LastName = request.LastName,
+            TelephoneNumber = request.TelephoneNumber,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
             Role = request.Role,
             IsBlocked = request.IsBlocked,
@@ -76,5 +85,14 @@ public class UserService(IUserRepository userRepository) : IUserService
     }
 
     private static UserResponse MapToResponse(AppUser user) =>
-        new(user.Id, user.Username, user.Role, user.IsBlocked);
+        new(
+            user.Id,
+            user.Username,
+            user.FirstName,
+            user.LastName,
+            user.Email,
+            user.TelephoneNumber,
+            user.Role,
+            user.IsBlocked
+        );
 }

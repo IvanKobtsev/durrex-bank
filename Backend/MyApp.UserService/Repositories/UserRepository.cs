@@ -15,6 +15,9 @@ public class UserRepository(UserDbContext db) : IUserRepository
     public Task<AppUser?> FindByUsernameAsync(string username, CancellationToken ct = default) =>
         db.Users.FirstOrDefaultAsync(u => u.Username == username, ct);
 
+    public Task<AppUser?> FindByTelephoneNumberAsync(string telephoneNumber, CancellationToken ct = default) =>
+        db.Users.FirstOrDefaultAsync(u => u.TelephoneNumber == telephoneNumber, ct);
+
     public Task<List<AppUser>> GetAllAsync(CancellationToken ct = default) =>
         db.Users.ToListAsync(ct);
 

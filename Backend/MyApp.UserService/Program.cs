@@ -2,7 +2,6 @@ using System.Reflection;
 using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
-using Microsoft.OpenApi.Models;
 using MyApp.UserService.Data;
 using MyApp.UserService.Infrastructure;
 using MyApp.UserService.Repositories;
@@ -34,23 +33,23 @@ builder.Services.AddSwaggerGen(options =>
 
     options.UseInlineDefinitionsForEnums();
 
-    // options.AddSecurityDefinition(
-    //     "InternalApiKey",
-    //     new OpenApiSecurityScheme
-    //     {
-    //         Type = SecuritySchemeType.ApiKey,
-    //         In = ParameterLocation.Header,
-    //         Name = "X-Internal-Api-Key",
-    //         Description = "Internal API key (from appsettings InternalApiKey)",
-    //     }
-    // );
+    options.AddSecurityDefinition(
+        "InternalApiKey",
+        new OpenApiSecurityScheme
+        {
+            Type = SecuritySchemeType.ApiKey,
+            In = ParameterLocation.Header,
+            Name = "X-Internal-Api-Key",
+            Description = "Internal API key (from appsettings InternalApiKey)",
+        }
+    );
 
-    // options.AddSecurityRequirement(
-    //     new OpenApiSecurityRequirement
-    //     {
-    //         { new OpenApiSecuritySchemeReference("InternalApiKey"), new List<string>() },
-    //     }
-    // );
+    options.AddSecurityRequirement(
+        document => new OpenApiSecurityRequirement
+        {
+            { new OpenApiSecuritySchemeReference("InternalApiKey", document), new List<string>() },
+        }
+    );
 });
 
 builder.Services.AddDbContext<UserDbContext>(options =>

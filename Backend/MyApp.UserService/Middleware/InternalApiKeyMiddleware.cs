@@ -16,10 +16,11 @@ public class InternalApiKeyMiddleware
 
     public async Task InvokeAsync(HttpContext context)
     {
-        // Allow Scalar UI and OpenAPI spec through without a key (dev convenience)
+        // Allow Scalar UI, OpenAPI spec, and Swagger UI through without a key (dev convenience)
         if (
             context.Request.Path.StartsWithSegments("/scalar")
             || context.Request.Path.StartsWithSegments("/openapi")
+            || context.Request.Path.StartsWithSegments("/swagger")
         )
         {
             await _next(context);
@@ -28,7 +29,7 @@ public class InternalApiKeyMiddleware
 
         if (
             !context.Request.Headers.TryGetValue(HeaderName, out var providedKey)
-            || !string.Equals(providedKey, _expectedKey, StringComparison.Ordinal)
+            || !string.Equals(providedKey.ToString().Trim(), _expectedKey.Trim(), StringComparison.Ordinal)
         )
         {
             context.Response.StatusCode = StatusCodes.Status401Unauthorized;

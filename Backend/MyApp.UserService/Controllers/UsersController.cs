@@ -1,32 +1,42 @@
 using Microsoft.AspNetCore.Mvc;
 using MyApp.UserService.DTOs;
+using MyApp.UserService.Services;
+using MyApp.UserService.Services.Errors;
 
 namespace MyApp.UserService.Controllers;
 
+/// <summary>User management — create, read, block and unblock users</summary>
 [ApiController]
 [Route("users")]
 [Produces("application/json")]
-public class UsersController : ControllerBase
+public class UsersController(IUserService userService) : ControllerBase
 {
     /// <summary>Get a list of all users (clients and employees)</summary>
     /// <response code="200">List of users returned</response>
     [HttpGet]
     [ProducesResponseType(typeof(List<UserResponse>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<List<UserResponse>>> GetAll()
+    public async Task<ActionResult<List<UserResponse>>> GetAll(CancellationToken ct)
     {
-        throw new NotImplementedException();
+        var result = await userService.GetAllAsync(ct);
+        return Ok(result.Value);
     }
 
     /// <summary>Get a user profile by ID</summary>
     /// <param name="id">User ID</param>
+    /// <param name="ct"></param>
     /// <response code="200">User profile returned</response>
     /// <response code="404">User not found</response>
     [HttpGet("{id:int}")]
     [ProducesResponseType(typeof(UserResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<UserResponse>> GetById([FromRoute] int id)
+    public async Task<ActionResult<UserResponse>> GetById([FromRoute] int id, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        var result = await userService.GetByIdAsync(id, ct);
+
+        if (result.IsFailed)
+            return result.HasError<NotFoundError>() ? NotFound() : BadRequest();
+
+        return Ok(result.Value);
     }
 
     /// <summary>Create a new client or employee</summary>
@@ -35,32 +45,52 @@ public class UsersController : ControllerBase
     [HttpPost]
     [ProducesResponseType(typeof(UserResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
-    public async Task<ActionResult<UserResponse>> Create([FromBody] CreateUserRequest request)
+    public async Task<ActionResult<UserResponse>> Create(
+        [FromBody] CreateUserRequest request,
+        CancellationToken ct
+    )
     {
-        throw new NotImplementedException();
+        var result = await userService.CreateAsync(request, ct);
+
+        if (result.IsFailed)
+            return result.HasError<ConflictError>() ? Conflict() : BadRequest();
+
+        return CreatedAtAction(nameof(GetById), new { id = result.Value.Id }, result.Value);
     }
 
     /// <summary>Block a user</summary>
     /// <param name="id">User ID</param>
+    /// <param name="ct"></param>
     /// <response code="204">User blocked successfully</response>
     /// <response code="404">User not found</response>
     [HttpPatch("{id:int}/block")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Block([FromRoute] int id)
+    public async Task<IActionResult> Block([FromRoute] int id, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        var result = await userService.BlockAsync(id, ct);
+
+        if (result.IsFailed)
+            return result.HasError<NotFoundError>() ? NotFound() : BadRequest();
+
+        return NoContent();
     }
 
     /// <summary>Unblock a user</summary>
     /// <param name="id">User ID</param>
+    /// <param name="ct"></param>
     /// <response code="204">User unblocked successfully</response>
     /// <response code="404">User not found</response>
     [HttpPatch("{id:int}/unblock")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Unblock([FromRoute] int id)
+    public async Task<IActionResult> Unblock([FromRoute] int id, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        var result = await userService.UnblockAsync(id, ct);
+
+        if (result.IsFailed)
+            return result.HasError<NotFoundError>() ? NotFound() : BadRequest();
+
+        return NoContent();
     }
 }

@@ -252,6 +252,63 @@ public class AccountsControllerTests : IClassFixture<CoreServiceFactory>
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
+    // ── POST /api/accounts/{id}/debit ────────────────────────────────────────
+
+    [Fact]
+    public async Task Debit_SufficientFunds_Returns200WithCreditRepaymentTransaction()
+    {
+        var created = await (await _client.PostAsJsonAsync("/api/accounts",
+            new { OwnerId = 900, Currency = "RUB" }))
+            .Content.ReadFromJsonAsync<AccountResponse>();
+
+        await _client.PostAsJsonAsync($"/api/accounts/{created!.Id}/deposit", new { Amount = 500m });
+
+        var response = await _client.PostAsJsonAsync($"/api/accounts/{created.Id}/debit",
+            new { Amount = 150m, Description = "Credit repayment" });
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var tx = await response.Content.ReadFromJsonAsync<TransactionResponse>();
+        tx!.Amount.Should().Be(150m);
+        tx.BalanceBefore.Should().Be(500m);
+        tx.BalanceAfter.Should().Be(350m);
+        tx.Type.Should().Be(TransactionType.CreditRepayment);
+    }
+
+    [Fact]
+    public async Task Debit_InsufficientFunds_Returns400()
+    {
+        var created = await (await _client.PostAsJsonAsync("/api/accounts",
+            new { OwnerId = 901, Currency = "RUB" }))
+            .Content.ReadFromJsonAsync<AccountResponse>();
+
+        var response = await _client.PostAsJsonAsync($"/api/accounts/{created!.Id}/debit",
+            new { Amount = 1000m });
+
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    }
+
+    [Fact]
+    public async Task Debit_NegativeAmount_Returns400()
+    {
+        var created = await (await _client.PostAsJsonAsync("/api/accounts",
+            new { OwnerId = 902, Currency = "RUB" }))
+            .Content.ReadFromJsonAsync<AccountResponse>();
+
+        var response = await _client.PostAsJsonAsync($"/api/accounts/{created!.Id}/debit",
+            new { Amount = -50m });
+
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    }
+
+    [Fact]
+    public async Task Debit_NonExistentAccount_Returns404()
+    {
+        var response = await _client.PostAsJsonAsync("/api/accounts/999999/debit",
+            new { Amount = 100m });
+
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
     // ── GET /api/accounts/{id}/transactions ──────────────────────────────────
 
     [Fact]

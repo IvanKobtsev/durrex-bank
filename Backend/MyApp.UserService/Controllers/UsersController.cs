@@ -45,7 +45,10 @@ public class UsersController(IUserService userService) : ControllerBase
     [HttpPost]
     [ProducesResponseType(typeof(UserResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
-    public async Task<ActionResult<UserResponse>> Create([FromBody] CreateUserRequest request, CancellationToken ct)
+    public async Task<ActionResult<UserResponse>> Create(
+        [FromBody] CreateUserRequest request,
+        CancellationToken ct
+    )
     {
         var result = await userService.CreateAsync(request, ct);
 

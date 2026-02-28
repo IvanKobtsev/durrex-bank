@@ -9,6 +9,9 @@ public class UserRepository(UserDbContext db) : IUserRepository
     public Task<AppUser?> FindByIdAsync(int id, CancellationToken ct = default) =>
         db.Users.FirstOrDefaultAsync(u => u.Id == id, ct);
 
+    public Task<AppUser?> FindByEmailAsync(string email, CancellationToken ct = default) =>
+        db.Users.FirstOrDefaultAsync(u => u.Email == email, ct);
+
     public Task<AppUser?> FindByUsernameAsync(string username, CancellationToken ct = default) =>
         db.Users.FirstOrDefaultAsync(u => u.Username == username, ct);
 

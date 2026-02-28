@@ -13,6 +13,7 @@ public class DataSeeder(UserDbContext _dbContext, IConfiguration _configuration)
             new AppUser
             {
                 Username = "admin",
+                Email = "admin@example.com",
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(_configuration["AdminPassword"]),
                 Role = Role.Employee,
                 IsBlocked = false,

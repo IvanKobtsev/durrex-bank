@@ -28,15 +28,22 @@ public class UserService(IUserRepository userRepository) : IUserService
         CancellationToken ct = default
     )
     {
-        var existing = await userRepository.FindByUsernameAsync(request.Username, ct);
-        if (existing is not null)
+        var existingByUsername = await userRepository.FindByUsernameAsync(request.Username, ct);
+        if (existingByUsername is not null)
             return Result.Fail(
                 new ConflictError($"Username '{request.Username}' is already taken.")
+            );
+
+        var existingByEmail = await userRepository.FindByEmailAsync(request.Email, ct);
+        if (existingByEmail is not null)
+            return Result.Fail(
+                new ConflictError($"Email '{request.Email}' is already registered.")
             );
 
         var user = new AppUser
         {
             Username = request.Username,
+            Email = request.Email,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
             Role = request.Role,
             IsBlocked = request.IsBlocked,

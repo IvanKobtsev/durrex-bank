@@ -7,6 +7,7 @@ using MyApp.UserService.Data;
 using MyApp.UserService.Infrastructure;
 using MyApp.UserService.Repositories;
 using MyApp.UserService.Services;
+using MyApp.UserService.Swagger;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,6 +34,8 @@ builder.Services.AddSwaggerGen(options =>
     options.IncludeXmlComments(xmlPath);
 
     options.UseInlineDefinitionsForEnums();
+
+    options.OperationFilter<GatewayHeadersOperationFilter>();
 
     options.AddSecurityDefinition(
         "InternalApiKey",

@@ -42,7 +42,7 @@ public class CreditsController(IMediator mediator, ICurrentUserContext currentUs
         }
         else
         {
-            return Forbid();
+            return StatusCode(StatusCodes.Status403Forbidden);
         }
 
         var credit = await mediator.Send(
@@ -87,7 +87,7 @@ public class CreditsController(IMediator mediator, ICurrentUserContext currentUs
         }
         else
         {
-            return Forbid();
+            return StatusCode(StatusCodes.Status403Forbidden);
         }
 
         return Ok(await mediator.Send(new GetCreditsByClientQuery(resolvedClientId), ct));
@@ -110,7 +110,7 @@ public class CreditsController(IMediator mediator, ICurrentUserContext currentUs
         var credit = await mediator.Send(new GetCreditByIdQuery(id), ct);
 
         if (currentUser.IsClient && currentUser.UserId != credit.ClientId)
-            return Forbid();
+            return StatusCode(StatusCodes.Status403Forbidden);
 
         return Ok(credit);
     }
@@ -139,7 +139,7 @@ public class CreditsController(IMediator mediator, ICurrentUserContext currentUs
         {
             var credit = await mediator.Send(new GetCreditByIdQuery(id), ct);
             if (currentUser.UserId != credit.ClientId)
-                return Forbid();
+                return StatusCode(StatusCodes.Status403Forbidden);
         }
 
         return Ok(await mediator.Send(new RepayCommand(id), ct));

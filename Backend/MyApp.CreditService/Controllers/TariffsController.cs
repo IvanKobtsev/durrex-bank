@@ -32,7 +32,7 @@ public class TariffsController(IMediator mediator, ICurrentUserContext currentUs
     )
     {
         if (!currentUser.IsEmployee)
-            return Forbid();
+            return StatusCode(StatusCodes.Status403Forbidden);
 
         return Ok(
             await mediator.Send(

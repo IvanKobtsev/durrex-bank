@@ -21,7 +21,7 @@ public class UsersController(IUserService userService, ICurrentUserContext curre
     public async Task<ActionResult<List<UserResponse>>> GetAll(CancellationToken ct)
     {
         if (!currentUser.IsEmployee)
-            return Forbid();
+            return StatusCode(StatusCodes.Status403Forbidden);
 
         var result = await userService.GetAllAsync(ct);
         return Ok(result.Value);
@@ -40,7 +40,7 @@ public class UsersController(IUserService userService, ICurrentUserContext curre
     public async Task<ActionResult<UserResponse>> GetById([FromRoute] int id, CancellationToken ct)
     {
         if (currentUser.IsClient && currentUser.UserId != id)
-            return Forbid();
+            return StatusCode(StatusCodes.Status403Forbidden);
 
         var result = await userService.GetByIdAsync(id, ct);
 
@@ -64,7 +64,7 @@ public class UsersController(IUserService userService, ICurrentUserContext curre
     )
     {
         if (!currentUser.IsEmployee)
-            return Forbid();
+            return StatusCode(StatusCodes.Status403Forbidden);
 
         var result = await userService.CreateAsync(request, ct);
 
@@ -87,7 +87,7 @@ public class UsersController(IUserService userService, ICurrentUserContext curre
     public async Task<IActionResult> Block([FromRoute] int id, CancellationToken ct)
     {
         if (!currentUser.IsEmployee)
-            return Forbid();
+            return StatusCode(StatusCodes.Status403Forbidden);
 
         var result = await userService.BlockAsync(id, ct);
 
@@ -110,7 +110,7 @@ public class UsersController(IUserService userService, ICurrentUserContext curre
     public async Task<IActionResult> Unblock([FromRoute] int id, CancellationToken ct)
     {
         if (!currentUser.IsEmployee)
-            return Forbid();
+            return StatusCode(StatusCodes.Status403Forbidden);
 
         var result = await userService.UnblockAsync(id, ct);
 

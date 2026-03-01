@@ -1,4 +1,5 @@
 using System.Reflection;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using MyApp.CreditService.Swagger;
 
@@ -39,6 +40,10 @@ builder.Services.AddSwaggerGen(options =>
         }
     );
 });
+
+builder.Services.AddDbContext<CreditDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
+);
 
 var app = builder.Build();
 

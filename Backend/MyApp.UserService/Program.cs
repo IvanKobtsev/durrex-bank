@@ -44,12 +44,10 @@ builder.Services.AddSwaggerGen(options =>
         }
     );
 
-    options.AddSecurityRequirement(
-        document => new OpenApiSecurityRequirement
-        {
-            { new OpenApiSecuritySchemeReference("InternalApiKey", document), new List<string>() },
-        }
-    );
+    options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
+    {
+        { new OpenApiSecuritySchemeReference("InternalApiKey", document), new List<string>() },
+    });
 });
 
 builder.Services.AddDbContext<UserDbContext>(options =>

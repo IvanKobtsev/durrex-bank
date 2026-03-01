@@ -1,3 +1,4 @@
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using MyApp.CreditService.DTOs.Credits;
 
@@ -7,7 +8,7 @@ namespace MyApp.CreditService.Controllers;
 [ApiController]
 [Route("credits")]
 [Produces("application/json")]
-public class CreditsController : ControllerBase
+public class CreditsController(IMediator mediator) : ControllerBase
 {
     /// <summary>Issue a new loan to a client</summary>
     /// <remarks>
@@ -19,10 +20,17 @@ public class CreditsController : ControllerBase
     [HttpPost]
     [ProducesResponseType(typeof(CreditResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<CreditResponse>> Issue([FromBody] IssueCreditRequest request)
-    {
-        throw new NotImplementedException();
-    }
+    public async Task<ActionResult<CreditResponse>> Issue([FromBody] IssueCreditRequest request) =>
+        Ok(
+            await mediator.Send(
+                new IssueCreditCommand(
+                    request.ClientId,
+                    request.AccountId,
+                    request.TariffId,
+                    request.Amount
+                )
+            )
+        );
 
     /// <summary>List credits for a client</summary>
     /// <remarks>
@@ -34,10 +42,8 @@ public class CreditsController : ControllerBase
     [HttpGet]
     [ProducesResponseType(typeof(List<CreditResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<List<CreditResponse>>> GetByClient([FromQuery] int? clientId)
-    {
-        throw new NotImplementedException();
-    }
+    public async Task<ActionResult<List<CreditResponse>>> GetByClient([FromQuery] int? clientId) =>
+        Ok(await mediator.Send(new GetCreditsByClientQuery(clientId)));
 
     /// <summary>Get full credit details including repayment schedule</summary>
     /// <param name="id">Credit ID</param>
@@ -48,10 +54,8 @@ public class CreditsController : ControllerBase
     [ProducesResponseType(typeof(CreditDetailResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<CreditDetailResponse>> GetById([FromRoute] int id)
-    {
-        throw new NotImplementedException();
-    }
+    public async Task<ActionResult<CreditDetailResponse>> GetById([FromRoute] int id, CancellationToken ct)
+        => Ok(await mediator.Send(new GetCreditByIdQuery(id), ct));
 
     /// <summary>Fully repay a credit early</summary>
     /// <remarks>
@@ -68,8 +72,6 @@ public class CreditsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<CreditResponse>> Repay([FromRoute] int id)
-    {
-        throw new NotImplementedException();
-    }
+    public async Task<ActionResult<CreditResponse>> Repay([FromRoute] int id, CancellationToken ct)
+        => Ok(await mediator.Send(new RepayCommand(id), ct));
 }

@@ -95,3 +95,10 @@ export function decapitalizeFirstCharacter(
 ): string | undefined {
   return input ? input.charAt(0).toLowerCase() + input.slice(1) : undefined;
 }
+
+export function padWithZeros(value: string, targetLength: number): string {
+  if (value.length >= targetLength) {
+    return value;
+  }
+  return "0".repeat(targetLength - value.length) + value;
+}

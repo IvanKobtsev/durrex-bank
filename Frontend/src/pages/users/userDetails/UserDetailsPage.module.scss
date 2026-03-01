@@ -1,0 +1,82 @@
+@use "src/styles/variables" as *;
+@use "src/styles/mixins" as *;
+
+.wrapper {
+  @include container;
+  margin: 20px auto;
+  width: 1000px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.userCard {
+  padding: 0 10px;
+
+  &.blocked {
+    opacity: 0.6;
+    border-color: #f44336;
+  }
+
+  .userHeader {
+    display: flex;
+    justify-content: flex-start;
+    gap: 20px;
+    align-items: center;
+    margin-bottom: 0.5rem;
+
+    h2 {
+      font-size: 30px;
+      margin: 0;
+    }
+
+    .role {
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      &.employee {
+        background-color: #f44336;
+        color: white;
+      }
+      &.client {
+        background-color: #2196f3;
+        color: white;
+      }
+    }
+  }
+
+  .userInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .blockedNotice {
+    margin-top: 0.5rem;
+    padding: 0.3rem 0.5rem;
+    background-color: #f44336;
+    color: white;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    text-align: center;
+  }
+}
+
+.accounts {
+  display: flex;
+  flex-direction: column;
+}
+
+.accountsList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.accountsHeader {
+  color: $primary;
+  font-size: 30px;
+  margin: 10px 0;
+  padding: 0 !important;
+}

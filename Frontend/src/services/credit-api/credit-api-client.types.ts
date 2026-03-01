@@ -5,6 +5,8 @@ export type CreateTariffRequest = {
   name?: string | null;
   /** Annual interest rate (e.g. 0.12 for 12%) */
   interestRate?: number;
+  /** Fixed loan duration in months */
+  termMonths?: number;
 }
 export function deserializeCreateTariffRequest(json: string): CreateTariffRequest {
   const data = JSON.parse(json) as CreateTariffRequest;
@@ -226,6 +228,8 @@ export type TariffResponse = {
   name?: string | null;
   /** Annual interest rate (e.g. 0.12 for 12%) */
   interestRate?: number;
+  /** Fixed loan duration in months */
+  termMonths?: number;
 }
 export function deserializeTariffResponse(json: string): TariffResponse {
   const data = JSON.parse(json) as TariffResponse;
@@ -244,30 +248,6 @@ export function serializeTariffResponse(_data: TariffResponse | undefined) {
 export function prepareSerializeTariffResponse(_data: TariffResponse): TariffResponse {
   const data: Record<string, any> = { ..._data };
   return data as TariffResponse;
-}
-export enum XUserRole {
-    Client = "Client",
-    Employee = "Employee",
-}
-export enum XUserRole2 {
-    Client = "Client",
-    Employee = "Employee",
-}
-export enum XUserRole3 {
-    Client = "Client",
-    Employee = "Employee",
-}
-export enum XUserRole4 {
-    Client = "Client",
-    Employee = "Employee",
-}
-export enum XUserRole5 {
-    Client = "Client",
-    Employee = "Employee",
-}
-export enum XUserRole6 {
-    Client = "Client",
-    Employee = "Employee",
 }
 import type { AxiosError } from 'axios'
 export class ApiException extends Error {

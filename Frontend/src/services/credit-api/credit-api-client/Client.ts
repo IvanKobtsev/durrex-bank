@@ -15,12 +15,10 @@ import { getAxios, getBaseUrl } from './helpers';
 
 /**
  * Issue a new loan to a client
- * @param x_User_Id (optional) Injected by API Gateway — authenticated user ID
- * @param x_User_Role (optional) Injected by API Gateway — authenticated user role
  * @param body (optional) 
  * @return Loan issued and funds credited to the acount
  */
-export function creditsPOST(x_User_Id?: number | undefined, x_User_Role?: Types.XUserRole | undefined, body?: Types.IssueCreditRequest | undefined, config?: AxiosRequestConfig | undefined): Promise<Types.CreditResponse> {
+export function creditsPOST(body?: Types.IssueCreditRequest | undefined, config?: AxiosRequestConfig | undefined): Promise<Types.CreditResponse> {
     let url_ = getBaseUrl() + "/credits";
       url_ = url_.replace(/[?&]$/, "");
 
@@ -34,8 +32,6 @@ export function creditsPOST(x_User_Id?: number | undefined, x_User_Role?: Types.
         url: url_,
         headers: {
             ..._requestConfigCreditsPOST?.headers,
-            "X-User-Id": x_User_Id !== undefined && x_User_Id !== null ? "" + x_User_Id : "",
-            "X-User-Role": x_User_Role !== undefined && x_User_Role !== null ? "" + x_User_Role : "",
             "Content-Type": "application/json",
             "Accept": "application/json",
             ...config?.headers,
@@ -87,11 +83,9 @@ function processCreditsPOST(response: AxiosResponse): Promise<Types.CreditRespon
 /**
  * List credits for a client
  * @param clientId (optional) Client whose credits to return
- * @param x_User_Id (optional) Injected by API Gateway — authenticated user ID
- * @param x_User_Role (optional) Injected by API Gateway — authenticated user role
  * @return List of credits returned
  */
-export function creditsAll(clientId?: number | undefined, x_User_Id?: number | undefined, x_User_Role?: Types.XUserRole2 | undefined, config?: AxiosRequestConfig | undefined): Promise<Types.CreditResponse[]> {
+export function creditsAll(clientId?: number | undefined, config?: AxiosRequestConfig | undefined): Promise<Types.CreditResponse[]> {
     let url_ = getBaseUrl() + "/credits?";
     if (clientId === null)
         throw new Error("The parameter 'clientId' cannot be null.");
@@ -106,8 +100,6 @@ export function creditsAll(clientId?: number | undefined, x_User_Id?: number | u
         url: url_,
         headers: {
             ..._requestConfigCreditsAll?.headers,
-            "X-User-Id": x_User_Id !== undefined && x_User_Id !== null ? "" + x_User_Id : "",
-            "X-User-Role": x_User_Role !== undefined && x_User_Role !== null ? "" + x_User_Role : "",
             "Accept": "application/json",
             ...config?.headers,
         }
@@ -162,11 +154,9 @@ function processCreditsAll(response: AxiosResponse): Promise<Types.CreditRespons
 /**
  * Get full credit details including repayment schedule
  * @param id Credit ID
- * @param x_User_Id (optional) Injected by API Gateway — authenticated user ID
- * @param x_User_Role (optional) Injected by API Gateway — authenticated user role
  * @return Credit details returned
  */
-export function creditsGET(id: number, x_User_Id?: number | undefined, x_User_Role?: Types.XUserRole3 | undefined, config?: AxiosRequestConfig | undefined): Promise<Types.CreditDetailResponse> {
+export function creditsGET(id: number, config?: AxiosRequestConfig | undefined): Promise<Types.CreditDetailResponse> {
     let url_ = getBaseUrl() + "/credits/{id}";
     if (id === undefined || id === null)
       throw new Error("The parameter 'id' must be defined.");
@@ -180,8 +170,6 @@ export function creditsGET(id: number, x_User_Id?: number | undefined, x_User_Ro
         url: url_,
         headers: {
             ..._requestConfigCreditsGET?.headers,
-            "X-User-Id": x_User_Id !== undefined && x_User_Id !== null ? "" + x_User_Id : "",
-            "X-User-Role": x_User_Role !== undefined && x_User_Role !== null ? "" + x_User_Role : "",
             "Accept": "application/json",
             ...config?.headers,
         }
@@ -239,11 +227,9 @@ function processCreditsGET(response: AxiosResponse): Promise<Types.CreditDetailR
 /**
  * Fully repay a credit early
  * @param id Credit ID to repay
- * @param x_User_Id (optional) Injected by API Gateway — authenticated user ID
- * @param x_User_Role (optional) Injected by API Gateway — authenticated user role
  * @return Credit fully repaid and closed
  */
-export function repay(id: number, x_User_Id?: number | undefined, x_User_Role?: Types.XUserRole4 | undefined, config?: AxiosRequestConfig | undefined): Promise<Types.CreditResponse> {
+export function repay(id: number, config?: AxiosRequestConfig | undefined): Promise<Types.CreditResponse> {
     let url_ = getBaseUrl() + "/credits/{id}/repay";
     if (id === undefined || id === null)
       throw new Error("The parameter 'id' must be defined.");
@@ -257,8 +243,6 @@ export function repay(id: number, x_User_Id?: number | undefined, x_User_Role?: 
         url: url_,
         headers: {
             ..._requestConfigRepay?.headers,
-            "X-User-Id": x_User_Id !== undefined && x_User_Id !== null ? "" + x_User_Id : "",
-            "X-User-Role": x_User_Role !== undefined && x_User_Role !== null ? "" + x_User_Role : "",
             "Accept": "application/json",
             ...config?.headers,
         }
@@ -322,11 +306,9 @@ function processRepay(response: AxiosResponse): Promise<Types.CreditResponse> {
 
 /**
  * Get all available credit tariffs
- * @param x_User_Id (optional) Injected by API Gateway — authenticated user ID
- * @param x_User_Role (optional) Injected by API Gateway — authenticated user role
  * @return List of tariffs returned
  */
-export function tariffsAll(x_User_Id?: number | undefined, x_User_Role?: Types.XUserRole5 | undefined, config?: AxiosRequestConfig | undefined): Promise<Types.TariffResponse[]> {
+export function tariffsAll(config?: AxiosRequestConfig | undefined): Promise<Types.TariffResponse[]> {
     let url_ = getBaseUrl() + "/tariffs";
       url_ = url_.replace(/[?&]$/, "");
 
@@ -337,8 +319,6 @@ export function tariffsAll(x_User_Id?: number | undefined, x_User_Role?: Types.X
         url: url_,
         headers: {
             ..._requestConfigTariffsAll?.headers,
-            "X-User-Id": x_User_Id !== undefined && x_User_Id !== null ? "" + x_User_Id : "",
-            "X-User-Role": x_User_Role !== undefined && x_User_Role !== null ? "" + x_User_Role : "",
             "Accept": "application/json",
             ...config?.headers,
         }
@@ -385,12 +365,10 @@ function processTariffsAll(response: AxiosResponse): Promise<Types.TariffRespons
 
 /**
  * Create a new credit tariff
- * @param x_User_Id (optional) Injected by API Gateway — authenticated user ID
- * @param x_User_Role (optional) Injected by API Gateway — authenticated user role
  * @param body (optional) 
  * @return Tariff created successfully
  */
-export function tariffs(x_User_Id?: number | undefined, x_User_Role?: Types.XUserRole6 | undefined, body?: Types.CreateTariffRequest | undefined, config?: AxiosRequestConfig | undefined): Promise<Types.TariffResponse> {
+export function tariffs(body?: Types.CreateTariffRequest | undefined, config?: AxiosRequestConfig | undefined): Promise<Types.TariffResponse> {
     let url_ = getBaseUrl() + "/tariffs";
       url_ = url_.replace(/[?&]$/, "");
 
@@ -404,8 +382,6 @@ export function tariffs(x_User_Id?: number | undefined, x_User_Role?: Types.XUse
         url: url_,
         headers: {
             ..._requestConfigTariffs?.headers,
-            "X-User-Id": x_User_Id !== undefined && x_User_Id !== null ? "" + x_User_Id : "",
-            "X-User-Role": x_User_Role !== undefined && x_User_Role !== null ? "" + x_User_Role : "",
             "Content-Type": "application/json",
             "Accept": "application/json",
             ...config?.headers,

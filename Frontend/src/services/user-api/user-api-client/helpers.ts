@@ -76,7 +76,6 @@ export function isParameterObject(param: unknown) {
 }
 
 let _baseUrl = "https://localhost:7086/user";
-// let _baseUrl = "";
 /*
   Returns the base URL for http requests
 */

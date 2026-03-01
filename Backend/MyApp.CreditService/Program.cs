@@ -11,6 +11,8 @@ builder.Services.AddHttpClient<ICoreServiceClient, CoreServiceClient>(c =>
     c.BaseAddress = new Uri(builder.Configuration["Services:CoreService:BaseUrl"]!)
 );
 
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
+
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc(

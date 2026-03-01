@@ -7,6 +7,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
+builder.Services.AddHttpClient<ICoreServiceClient, CoreServiceClient>(c =>
+    c.BaseAddress = new Uri(builder.Configuration["Services:CoreService:BaseUrl"]!)
+);
+
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc(

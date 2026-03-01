@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="menu">Menü</string>
+    <string name="my_loans">Meine Kredite</string>
+    <string name="suggestions_for_you">Vorschläge für Sie</string>
+    <string name="bank_offices">Bankfilialen</string>
+    <string name="help">Hilfe</string>
+    <string name="language">Sprache</string>
+    <string name="exit">Ausgang</string>
+    <string name="exit_dialog_title">Sind Sie sicher, dass Sie gehen möchten?</string>
+    <string name="cancel">Abbrechen</string>
+
+    <string name="help_label">Wir können helfen</string>
+    <string name="help_description">Haben Sie Fragen zur Nutzung der App? Kontaktieren Sie unsere Hotline %1$s</string>
+
+    <string name="apply">Bewerben</string>
+</resources>

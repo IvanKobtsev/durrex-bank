@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="rub" translatable="false">₽</string>
+    <string name="menu">Меню</string>
+    <string name="my_loans">Мои займы</string>
+    <string name="suggestions_for_you">Предложения для Вас</string>
+    <string name="bank_offices">Отделения банка</string>
+    <string name="help">Помощь</string>
+    <string name="language">Язык</string>
+    <string name="exit">Выйти</string>
+    <string name="exit_dialog_title">Вы уверены, что хотите выйти?</string>
+    <string name="cancel">Отмена</string>
+
+    <string name="help_label">Мы поможем</string>
+    <string name="help_description">Остались вопросы по использованию приложения? Обратитесь к нам на горячую линию %1$s</string>
+
+    <string name="russian" translatable="false">Русский</string>
+    <string name="english" translatable="false">English</string>
+    <string name="deutsch" translatable="false">Deutsch</string>
+    <string name="kyrg" translatable="false">Кыргызча</string>
+
+    <string name="apply">Применить</string>
+
+
+    <string name="specific_suggestions_for_you">Специальное предложение</string>
+    <string name="specific_suggestions_for_you_description">Погасите займ досрочно и мы увеличим лимит для следующего займа</string>
+    <string name="nearest_banks">Ближайшее отделение банка</string>
+</resources>

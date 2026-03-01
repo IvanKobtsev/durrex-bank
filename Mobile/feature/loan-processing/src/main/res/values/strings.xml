@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="loan_processing">Оформление займа</string>
+    <string name="loan_processing_description">После оформления заявки на займ, банк проведет анализ вашей кредитной истории</string>
+    <string name="your_data">Ваши данные</string>
+    <string name="first_name_placeholder">Имя</string>
+    <string name="second_name_placeholder">Фамилия</string>
+    <string name="phone_placeholder">Телефон</string>
+    <string name="create_loan">Оформить займ</string>
+
+    <string name="loan_label_approved">Получите %1$d ₽ в банке</string>
+    <string name="loan_description_approved">Для получения придите в банк с паспортом до %1$s</string>
+    <string name="show_banks">Посмотреть адреса банков</string>
+
+    <string name="loan_label_rejected">Заявка не одобрена</string>
+    <string name="loan_description_rejected">Сейчас мы не можем одобрить вашу заявку</string>
+    <string name="go_to_main">Вернуться на главную</string>
+
+    <string name="loan_strange_error">И снова что то пошло не так(</string>
+    <string name="loan_bad_request">Проблема с веденными данными(</string>
+</resources>

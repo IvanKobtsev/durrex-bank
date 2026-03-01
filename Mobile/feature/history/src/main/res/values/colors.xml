@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="fontPrimary">#151E2A</color>
+    <color name="bgPrimary">#FFFFFF</color>
+    <color name="permanentDark">#DEB800</color>
+    <color name="permanentPrimary">#FED200</color>
+</resources>

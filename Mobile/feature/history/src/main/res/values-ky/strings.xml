@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="menu">Меню</string>
+    <string name="my_loans">Менин карыздарым</string>
+    <string name="suggestions_for_you">Сиз үчүн сунуштар</string>
+    <string name="bank_offices">Банк бөлүмдөрү</string>
+    <string name="help">Жардам</string>
+    <string name="language">Тил</string>
+    <string name="exit">Чыгуу</string>
+    <string name="exit_dialog_title">Чыккыңыз келеби?</string>
+    <string name="cancel">Жокко чыгаруу</string>
+
+    <string name="help_label">Биз жардам бере алабыз</string>
+    <string name="help_description">Колдонуу жөнүндө суроолоруңуз барбы? Биздин ысык линияга %1$s байланышыңыз</string>
+
+    <string name="apply">Колдонуу</string>
+</resources>

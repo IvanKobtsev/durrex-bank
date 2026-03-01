@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="get_loan">Получите займ\nв 2 клика</string>
+    <string name="get_loan_description_card">Деньги наличными\nна любые цели</string>
+
+    <string name="registered">На рассмотрении</string>
+    <string name="approved">Одобрен</string>
+    <string name="rejected">Не одобрен</string>
+
+    <string name="tariff">Тариф: </string>
+</resources>

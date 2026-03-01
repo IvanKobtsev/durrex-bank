@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="not_match_password">Пароли не совпадают</string>
+    <string name="empty_field">Поле не должно быть пустым</string>
+    <string name="login_constraint">Слишком коротко</string>
+    <string name="name_constraint">Имя не может быть пустым</string>
+    <string name="phone_constraint">Номера не существует. Проверьте правильность ввода</string>
+    <string name="email_constraint">Почты не существует. Проверьте правильность ввода</string>
+    <string name="surname_constraint">Фамиля не может быть пустой</string>
+</resources>

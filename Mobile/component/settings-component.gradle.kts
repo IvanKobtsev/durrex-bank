@@ -1,0 +1,6 @@
+include(":component")
+include(":component:api")
+include(":component:architecture")
+include(":component:common")
+include(":component:ui")
+include(":component:util")

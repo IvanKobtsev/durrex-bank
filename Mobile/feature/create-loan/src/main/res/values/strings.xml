@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="create_loan">Создание кредита</string>
+    <string name="process_date">Выберите условия кредита</string>
+    <string name="select_tariff">Выберите тариф</string>
+    <string name="balance">Баланс</string>
+    <string name="create_credit">Создать кредит</string>
+    <string name="select_account">Выберите счет</string>
+    <string name="input_amount">Введите сумму</string>
+</resources>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="menu">Menu</string>
+    <string name="my_loans">My Loans</string>
+    <string name="suggestions_for_you">Suggestions for You</string>
+    <string name="bank_offices">Bank Offices</string>
+    <string name="help">Help</string>
+    <string name="language">Language</string>
+    <string name="exit">Exit</string>
+    <string name="exit_dialog_title">Are you sure you want to exit?</string>
+    <string name="cancel">Cancel</string>
+
+    <string name="help_label">We can help</string>
+    <string name="help_description">Have questions about using the app? Contact our hotline %1$s</string>
+
+    <string name="apply">Apply</string>
+</resources>

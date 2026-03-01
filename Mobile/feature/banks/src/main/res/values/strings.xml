@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="service_dont_work">Сервис временно недоступен</string>
+    <string name="come_to_main">Вернуться на главную</string>
+</resources>

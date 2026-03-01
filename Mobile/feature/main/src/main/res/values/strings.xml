@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="main">Главная</string>
+    <string name="loan_sum">Сумма займа</string>
+    <string name="rub">₽</string>
+    <string name="create_account">Откройте счет быстро!</string>
+    <string name="conditions">Условия</string>
+    <string name="choose_currency">Выберите валюту</string>
+    <string name="conditions_description">Под %1$s%% на %2$d дней</string>
+    <string name="continue_button">Продолжить</string>
+    <string name="open_button">Открыть</string>
+    <string name="max_amount">Максимум</string>
+    <string name="my_loans">Мои займы</string>
+    <string name="my_accouts">Мои счета</string>
+    <string name="my_loans_placeholder">Здесь будут отображаться Ваши активные займы</string>
+    <string name="my_accounts_placeholder">Здесь будут отображаться Ваши активные счета</string>
+    <string name="look_all">Посмотреть все</string>
+    <string name="not_connection_failure">Соединение с интернетом пропало, попробуйте позже</string>
+    <string name="strange_error">Упс… Что-то пошло не так, попробуйте позже</string>
+</resources>

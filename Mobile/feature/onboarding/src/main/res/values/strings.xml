@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="create_loan">Оформить займ</string>
+    <string name="create_loan_description">Выберите сумму и нажмите «продолжить». Затем укажите свои данные.\nПосле нажатия «Оформить займ» заявка поступит в банк</string>
+    <string name="get_loan">Получить займ</string>
+    <string name="get_loan_description">Отслеживайте изменение статуса заявки.\nКогда займ будет одобрен, подойдите с паспортом в отделение банка для подписания договора</string>
+    <string name="created_loans">Оформленные займы</string>
+    <string name="created_loans_description">На главном экране приложения отображается список оформленных займов.</string>
+    <string name="bank_office">отделение банка</string>
+    <string name="next">Далее</string>
+    <string name="back">Назад</string>
+    <string name="close">Закрыть</string>
+</resources>

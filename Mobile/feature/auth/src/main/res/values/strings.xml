@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="email">Почта</string>
+    <string name="first_name">Имя</string>
+    <string name="last_name">Фамилия</string>
+    <string name="phone">Телефон</string>
+    <string name="login">Логин</string>
+    <string name="password">Пароль</string>
+    <string name="repeat_password">Повторите пароль</string>
+    <string name="sign_in">Вход</string>
+    <string name="sign_up">Регистрация</string>
+    <string name="sign_in_action">Войти</string>
+    <string name="sign_up_action">Зарегестрироваться</string>
+
+
+    <string name="min_size_error">Минимальный размер %d</string>
+    <string name="invalid_phone">Такого номера телефона не существует</string>
+    <string name="invalid_email">Неверно набрана почта</string>
+    <string name="sign_up_bad_request">Пользователь с такими данными уже сущаетсвует</string>
+    <string name="not_connection_failure">Соединение с интернетом пропало, попробуйте позже</string>
+    <string name="strange_error">Упс… Что-то пошло не так, попробуйте позже</string>
+
+    <string name="cancelled_failure">Еще не придумал<!--TODO--></string>
+
+    <string name="shift">шифт</string>
+    <string name="loans">займы</string>
+</resources>

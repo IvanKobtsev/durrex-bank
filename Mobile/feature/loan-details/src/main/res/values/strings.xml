@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="my_loans">Мои займы</string>
+    <string name="number">№</string>
+
+    <string name="first_name">Имя</string>
+    <string name="second_name">Фамилия</string>
+    <string name="phone">Номер телефона</string>
+
+    <string name="loan_number">Номер займа</string>
+    <string name="tariff">Дата оформления</string>
+    <string name="remain_balance">Оставшийся баланс</string>
+    <string name="percent">Процент</string>
+    <string name="amount">Сумма</string>
+
+    <string name="state">Статус</string>
+    <string name="state_description">Когда займ примет статус «Одобрен», Вам нужно будет подойти с паспортом в отделение банка для подписания договора и получить деньги</string>
+    <string name="rub">₽</string>
+
+    <string name="not_found_error">Не найдено такой займ,что то пошло не так</string>
+    <string name="strange_error">Произошла ошибка, но фиксики уже пшли ее чинить</string>
+    <string name="no_connections_error">Бип буп бип, проблемы с соедиением</string>
+</resources>

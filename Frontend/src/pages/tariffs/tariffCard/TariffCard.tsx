@@ -21,7 +21,7 @@ export function TariffCard({ tariff, type = "management" }: TariffCardProps) {
         {tariff.name}
       </div>
       <div className={styles.rightWrapper}>
-        {`${(tariff.interestRate ?? 0) * 100}% годовых, рассчитан на ${tariff.termMonths} мес.`}
+        {`${Math.round((tariff.interestRate ?? 0) * 100)}% годовых, рассчитан на ${tariff.termMonths} мес.`}
         {/*<Button className={styles.redButton} title={"Удалить"} />*/}
       </div>
     </div>

@@ -79,15 +79,10 @@ public class JwtForwardingMiddleware
 
             await _next(context);
         }
-        // catch (SecurityTokenException)
-        // {
-        //     context.Response.StatusCode = 401;
-        //     await context.Response.WriteAsync("Invalid or expired token.");
-        // }
-        catch (Exception ex)
+        catch (Exception)
         {
-            Console.WriteLine(ex.ToString());
-            throw;
+            context.Response.StatusCode = 401;
+            await context.Response.WriteAsync("Invalid or expired token.");
         }
     }
 }

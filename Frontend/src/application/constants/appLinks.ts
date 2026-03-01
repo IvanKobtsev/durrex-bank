@@ -3,7 +3,7 @@ import { createRoute, RequiredNumberParam } from "react-router-url-params";
 export const AppLinks = {
   Login: createRoute("/login"),
   Users: createRoute("/users"),
-  Dashboard: createRoute("/dashboard"),
+  Dashboard: createRoute("/"),
   UserCreation: createRoute("/users/create"),
   UserDetails: createRoute("/users/:userId", {
     userId: RequiredNumberParam,

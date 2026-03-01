@@ -19,11 +19,15 @@ export function TariffsManagementPage() {
         />
       </div>
       <div className={styles.tariffsList}>
-        {tariffsQuery.data
-          ?.sort((t1, t2) => (t1.id ?? 0) - (t2.id ?? 0))
-          .map((t) => (
-            <TariffCard key={t.id} tariff={t} type={"management"} />
-          ))}
+        {tariffsQuery.data && tariffsQuery.data?.length > 0 ? (
+          tariffsQuery.data
+            ?.sort((t1, t2) => (t1.id ?? 0) - (t2.id ?? 0))
+            .map((t) => (
+              <TariffCard key={t.id} tariff={t} type={"management"} />
+            ))
+        ) : (
+          <div className={styles.noTariffs}>Нет тарифов</div>
+        )}
       </div>
     </div>
   );

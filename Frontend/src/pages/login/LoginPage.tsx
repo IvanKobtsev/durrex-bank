@@ -35,7 +35,7 @@ export function LoginPage() {
       <form className={styles.form} onSubmit={form.handleSubmitDefault}>
         <Input
           {...registerString(form, "username")}
-          fieldProps={{ title: "Почта" }}
+          fieldProps={{ title: "Имя пользователя" }}
         />
         <Input
           {...registerPassword(form, "password")}

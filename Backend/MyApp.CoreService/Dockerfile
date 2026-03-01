@@ -8,7 +8,7 @@ COPY ["MyApp.CoreService/MyApp.CoreService.csproj", "MyApp.CoreService/"]
 RUN dotnet restore "MyApp.CoreService/MyApp.CoreService.csproj"
 COPY MyApp.CoreService/ MyApp.CoreService/
 WORKDIR "/src/MyApp.CoreService"
-RUN dotnet publish -c Release -o /app/publish --no-restore
+RUN dotnet publish -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app

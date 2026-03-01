@@ -2,10 +2,12 @@ using System.Reflection;
 using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
+using MyApp.UserService.Auth;
 using MyApp.UserService.Data;
 using MyApp.UserService.Infrastructure;
 using MyApp.UserService.Repositories;
 using MyApp.UserService.Services;
+using MyApp.UserService.Swagger;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,6 +35,8 @@ builder.Services.AddSwaggerGen(options =>
 
     options.UseInlineDefinitionsForEnums();
 
+    options.OperationFilter<GatewayHeadersOperationFilter>();
+
     options.AddSecurityDefinition(
         "InternalApiKey",
         new OpenApiSecurityScheme
@@ -53,6 +57,30 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddDbContext<UserDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUserContext>(sp =>
+{
+    var http = sp.GetRequiredService<IHttpContextAccessor>().HttpContext;
+    if (http is null)
+        return new CurrentUserContext { Role = CallerRole.Internal };
+
+    var userIdHeader = http.Request.Headers["X-User-Id"].FirstOrDefault();
+    var roleHeader   = http.Request.Headers["X-User-Role"].FirstOrDefault();
+
+    if (string.IsNullOrEmpty(userIdHeader) || string.IsNullOrEmpty(roleHeader))
+        return new CurrentUserContext { Role = CallerRole.Internal };
+
+    var role = roleHeader.Equals("Employee", StringComparison.OrdinalIgnoreCase)
+        ? CallerRole.Employee
+        : CallerRole.Client;
+
+    return new CurrentUserContext
+    {
+        UserId = int.TryParse(userIdHeader, out var id) ? id : null,
+        Role   = role
+    };
+});
+
 builder.Services.AddScoped<DataSeeder>();
 builder.Services.AddSingleton<RsaKeyProvider>();
 builder.Services.AddScoped<IAuthService, AuthService>();

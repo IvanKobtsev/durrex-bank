@@ -54,10 +54,8 @@ public class CreditsController(IMediator mediator) : ControllerBase
     [ProducesResponseType(typeof(CreditDetailResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<CreditDetailResponse>> GetById([FromRoute] int id)
-    {
-        throw new NotImplementedException();
-    }
+    public async Task<ActionResult<CreditDetailResponse>> GetById([FromRoute] int id, CancellationToken ct)
+        => Ok(await mediator.Send(new GetCreditByIdQuery(id), ct));
 
     /// <summary>Fully repay a credit early</summary>
     /// <remarks>
@@ -74,8 +72,6 @@ public class CreditsController(IMediator mediator) : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<CreditResponse>> Repay([FromRoute] int id)
-    {
-        throw new NotImplementedException();
-    }
+    public async Task<ActionResult<CreditResponse>> Repay([FromRoute] int id, CancellationToken ct)
+        => Ok(await mediator.Send(new RepayCommand(id), ct));
 }

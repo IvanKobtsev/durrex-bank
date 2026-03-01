@@ -1,6 +1,7 @@
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using MyApp.CreditService.Infrastructure;
 using MyApp.CreditService.Middleware;
 using MyApp.CreditService.Services;
 using MyApp.CreditService.Swagger;
@@ -9,9 +10,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
+builder.Services.AddTransient<CoreServiceApiKeyHandler>();
 builder.Services.AddHttpClient<ICoreServiceClient, CoreServiceClient>(c =>
-    c.BaseAddress = new Uri(builder.Configuration["Services:CoreService:BaseUrl"]!)
-);
+    c.BaseAddress = new Uri(builder.Configuration["Services:CoreService:BaseUrl"]!))
+    .AddHttpMessageHandler<CoreServiceApiKeyHandler>();
 
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
 
@@ -69,6 +71,25 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<CreditDbContext>();
     await db.Database.MigrateAsync();
 }
+
+app.UseExceptionHandler(exceptionApp =>
+    exceptionApp.Run(async context =>
+    {
+        var ex = context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerFeature>()?.Error;
+
+        var (status, message) = ex switch
+        {
+            KeyNotFoundException => (StatusCodes.Status404NotFound, ex.Message),
+            InvalidOperationException => (StatusCodes.Status400BadRequest, ex.Message),
+            HttpRequestException httpEx => ((int)(httpEx.StatusCode ?? System.Net.HttpStatusCode.BadGateway), httpEx.Message),
+            _ => (StatusCodes.Status500InternalServerError, "An unexpected error occurred.")
+        };
+
+        context.Response.StatusCode = status;
+        context.Response.ContentType = "application/json";
+        await context.Response.WriteAsJsonAsync(new { error = message });
+    })
+);
 
 app.UseSwagger();
 app.UseSwaggerUI(options =>

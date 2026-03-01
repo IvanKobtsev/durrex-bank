@@ -23,7 +23,7 @@ docker build -f MyApp.CreditService/Dockerfile -t credit-service .
 docker run -p 5002:8080 `
   -e "ConnectionStrings__Default=Host=host.docker.internal;Database=credit_db;Username=postgres;Password=postgres" `
   -e "Services__CoreService__BaseUrl=http://host.docker.internal:5001" `
-  -e "InternalApiKey=dev-internal-key" `
+  -e "InternalApiKey=dev-internal-key-12345" `
   credit-service
 ```
 

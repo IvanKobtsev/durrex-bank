@@ -7,14 +7,18 @@ public class IssueCreditHandler(CreditDbContext db, ICoreServiceClient coreClien
 {
     public async Task<CreditResponse> Handle(IssueCreditCommand request, CancellationToken ct)
     {
-        var tariff = await db.Tariffs.FindAsync([request.TariffId], ct)
+        var tariff =
+            await db.Tariffs.FindAsync([request.TariffId], ct)
             ?? throw new KeyNotFoundException($"Tariff {request.TariffId} not found.");
 
-        var minuteRate = tariff.InterestRate / (365 * 24 * 60);
+        // var minuteRate = tariff.InterestRate / (365 * 24 * 60);
+        var minuteRate = tariff.InterestRate; // For demo purposes
         var payment = Math.Round(
-            request.Amount * minuteRate
+            request.Amount
+                * minuteRate
                 / (1 - (decimal)Math.Pow((double)(1 + minuteRate), -tariff.TermMonths)),
-            2);
+            2
+        );
 
         var issuedAt = DateTime.UtcNow;
         var credit = new Credit
@@ -26,13 +30,14 @@ public class IssueCreditHandler(CreditDbContext db, ICoreServiceClient coreClien
             RemainingBalance = payment * tariff.TermMonths,
             Status = CreditStatus.Active,
             IssuedAt = issuedAt,
-            Schedule = Enumerable.Range(1, tariff.TermMonths)
+            Schedule = Enumerable
+                .Range(1, tariff.TermMonths)
                 .Select(i => new PaymentScheduleEntry
                 {
                     DueDate = issuedAt.AddMinutes(i),
                     Amount = payment,
                 })
-                .ToList()
+                .ToList(),
         };
 
         db.Credits.Add(credit);

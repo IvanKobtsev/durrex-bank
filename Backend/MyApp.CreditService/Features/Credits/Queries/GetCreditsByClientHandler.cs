@@ -12,6 +12,7 @@ public class GetCreditsByClientHandler(CreditDbContext db)
     {
         var credits = await db
             .Credits.Where(c => c.ClientId == request.ClientId)
+            .Include(c => c.Tariff)
             .ToListAsync(cancellationToken);
 
         return credits

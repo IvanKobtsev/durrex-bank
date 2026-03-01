@@ -54,3 +54,51 @@
     gap: 8px;
   }
 }
+
+.transactionsTitle {
+  color: $primary;
+  font-size: 30px;
+  margin: 10px 0;
+  font-weight: 500;
+}
+
+.transactions {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.transaction {
+  font-weight: 500;
+  background-color: color-mix(in srgb, lightblue 50%, transparent 0%);
+  padding: 10px 20px;
+  border-radius: 10px;
+
+  //&.positive {
+  //  background-color: color-mix(in srgb, green 50%, transparent 0%);
+  //}
+
+  &.negative {
+    background-color: color-mix(in srgb, red 50%, transparent 0%);
+  }
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+
+  .text {
+    color: $primary;
+    font-size: 18px;
+    font-weight: 500;
+  }
+
+  .button {
+    &.disabled {
+      opacity: 0.6;
+    }
+  }
+}

@@ -6,8 +6,8 @@ import { Loading } from "components/uikit/suspense/Loading.tsx";
 import { AppLinks } from "application/constants/appLinks.ts";
 import { DataEntry } from "components/DataEntry/DataEntry.tsx";
 import { useCreditsGETQuery } from "services/credit-api/credit-api-client/Query.ts";
-import { padWithZeros } from "../../../helpers/string-helpers.tsx";
-import { formatDateRu } from "../../accounts/accountDetails/AccountDetailsPage.tsx";
+import { padWithZeros } from "helpers/string-helpers.tsx";
+import { formatDateRu } from "pages/accounts/accountDetails/AccountDetailsPage.tsx";
 
 export function CreditDetailsPage() {
   const { creditId } = AppLinks.CreditDetails.useParams();

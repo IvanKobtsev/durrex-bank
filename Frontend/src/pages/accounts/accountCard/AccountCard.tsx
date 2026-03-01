@@ -4,9 +4,13 @@ import { AppLinks } from "application/constants/appLinks.ts";
 import { Button } from "components/uikit/buttons/Button.tsx";
 import { useNavigate } from "react-router-dom";
 import { padWithZeros } from "helpers/string-helpers.tsx";
-import { useAccountsDELETEMutation } from "services/core-api/core-api-client/Query.ts";
+import {
+  accountsAllQueryKey,
+  useAccountsDELETEMutation,
+} from "services/core-api/core-api-client/Query.ts";
 import { toast } from "react-toastify";
 import clsx from "clsx";
+import { queryClient } from "services/query-client-helper.ts";
 
 export function AccountCard({ account }: { account: AccountResponse }) {
   const navigate = useNavigate();
@@ -16,8 +20,11 @@ export function AccountCard({ account }: { account: AccountResponse }) {
         toast.error("Невозможно закрыть счёт с положительным балансом.");
       else toast.error("Ошибка при закрытии счёта.");
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       toast.error("Счёт успешно закрыт.");
+      await queryClient.invalidateQueries({
+        queryKey: accountsAllQueryKey(account.ownerId),
+      });
     },
   });
 

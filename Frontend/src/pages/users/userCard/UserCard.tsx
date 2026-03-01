@@ -19,20 +19,20 @@ export interface UserCardProps {
 export function UserCard({ user, type = "management" }: UserCardProps) {
   const navigate = useNavigate();
   const blockUserMutation = useBlockMutation(user.id!, {
-    onError: (error) => {
+    onError: () => {
       toast.error("Ошибка при блокировке пользователя.");
     },
-    onSuccess: async (userResponse) => {
+    onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: usersAllQueryKey(),
       });
     },
   });
   const unblockUserMutation = useUnblockMutation(user.id!, {
-    onError: (error) => {
+    onError: () => {
       toast.error("Ошибка при разблокировке пользователя.");
     },
-    onSuccess: async (userResponse) => {
+    onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: usersAllQueryKey(),
       });
@@ -70,7 +70,7 @@ export function UserCard({ user, type = "management" }: UserCardProps) {
   );
 }
 
-const translateRole = (role: UserResponse["role"]) => {
+export const translateRole = (role: UserResponse["role"]) => {
   switch (role) {
     case "Employee":
       return "Сотрудник";

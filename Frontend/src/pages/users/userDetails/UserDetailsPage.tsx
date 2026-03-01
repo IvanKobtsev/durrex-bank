@@ -7,15 +7,11 @@ import { DataEntry } from "components/DataEntry/DataEntry.tsx";
 import { UserResponseRole } from "services/user-api/user-api-client.types.ts";
 import { useAccountsAllQuery } from "services/core-api/core-api-client/Query.ts";
 import { AccountCard } from "pages/accounts/accountCard/AccountCard.tsx";
-import {
-  useCreditsAllQuery,
-  useCreditsGETQuery,
-} from "../../../services/credit-api/credit-api-client/Query.ts";
-import { CreditCard } from "../../credits/creditCard/CreditCard.tsx";
+import { useCreditsAllQuery } from "services/credit-api/credit-api-client/Query.ts";
+import { CreditCard } from "pages/credits/creditCard/CreditCard.tsx";
+import { translateRole } from "../userCard/UserCard.tsx";
 
-export interface UserDetailsPageProps {}
-
-export function UserDetailsPage(props: UserDetailsPageProps) {
+export function UserDetailsPage() {
   const { userId } = AppLinks.UserDetails.useParams();
 
   const { data: user, isLoading: userLoading } = useUsersGETQuery(userId);
@@ -44,7 +40,7 @@ export function UserDetailsPage(props: UserDetailsPageProps) {
                     [styles.client]: user.role === UserResponseRole.Client,
                   })}
                 >
-                  {user.role}
+                  {translateRole(user.role)}
                 </span>
               )}
             </div>

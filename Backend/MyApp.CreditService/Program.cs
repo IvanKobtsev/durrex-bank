@@ -1,6 +1,7 @@
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using MyApp.CreditService.Auth;
 using MyApp.CreditService.Infrastructure;
 using MyApp.CreditService.Middleware;
 using MyApp.CreditService.Services;
@@ -22,6 +23,30 @@ builder.Services.AddDbContext<CreditDbContext>(options =>
 );
 
 builder.Services.AddHostedService<PaymentSchedulerService>();
+
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUserContext>(sp =>
+{
+    var http = sp.GetRequiredService<IHttpContextAccessor>().HttpContext;
+    if (http is null)
+        return new CurrentUserContext { Role = CallerRole.Internal };
+
+    var userIdHeader = http.Request.Headers["X-User-Id"].FirstOrDefault();
+    var roleHeader   = http.Request.Headers["X-User-Role"].FirstOrDefault();
+
+    if (string.IsNullOrEmpty(userIdHeader) || string.IsNullOrEmpty(roleHeader))
+        return new CurrentUserContext { Role = CallerRole.Internal };
+
+    var role = roleHeader.Equals("Employee", StringComparison.OrdinalIgnoreCase)
+        ? CallerRole.Employee
+        : CallerRole.Client;
+
+    return new CurrentUserContext
+    {
+        UserId = int.TryParse(userIdHeader, out var id) ? id : null,
+        Role   = role
+    };
+});
 
 builder.Services.AddSwaggerGen(options =>
 {

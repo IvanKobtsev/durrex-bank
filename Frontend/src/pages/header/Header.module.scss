@@ -1,8 +1,22 @@
+@use "src/styles/variables" as *;
+
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px;
   background-color: #504c57;
+  font-size: 20px;
+  padding: 10px 20px;
+  color: $primary;
+}
+
+.logo {
   cursor: pointer;
+}
+
+.logout {
+  background-color: #ff003e !important;
+  color: #fff !important;
+  opacity: 0.6;
+  box-shadow: none !important;
 }

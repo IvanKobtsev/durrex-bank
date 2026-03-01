@@ -42,7 +42,7 @@ export function registerNumber<T extends FieldValues>(
   type: "int" | "currency" = "int",
 ) {
   return {
-    ...registerBase(form, name, numberField()),
+    ...registerBase(form, name, { ...requiredRule(), ...numberField() }),
     type: "number",
     step: type === "int" ? "1" : "0.01",
   };

@@ -1,0 +1,25 @@
+@use "src/styles/variables" as *;
+@use "src/styles/mixins" as *;
+
+.wrapper {
+  @include container;
+  width: 800px;
+  margin: 50px auto;
+  //height: 100%;
+  padding-bottom: 25px;
+}
+
+.header {
+  font-family: "Cruinn", sans-serif !important;
+  font-size: 30px;
+  font-weight: 500;
+  color: $primary;
+  margin-bottom: 12px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  //width: 400px;
+}

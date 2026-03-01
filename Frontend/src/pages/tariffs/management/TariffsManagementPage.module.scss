@@ -1,0 +1,28 @@
+@use "src/styles/variables" as *;
+@use "src/styles/mixins" as *;
+
+.wrapper {
+  width: 1800px;
+  margin: 50px auto;
+  height: 100%;
+}
+
+.header {
+  @include container;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  height: 80px;
+  font-size: 40px;
+  font-weight: 500;
+  padding: 0 35px;
+}
+
+.tariffsList {
+  @include container;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}

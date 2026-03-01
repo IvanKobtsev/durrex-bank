@@ -1,0 +1,72 @@
+@use "src/styles/variables" as *;
+@use "src/styles/mixins" as *;
+
+.wrapper {
+  @include container;
+  margin: 20px auto;
+  width: 1000px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.userCard {
+  padding: 0 10px;
+
+  .status {
+    background-color: green;
+    padding: 5px 10px;
+    border-radius: 10px;
+
+    &.closed {
+      opacity: 0.6;
+      background-color: red;
+    }
+  }
+
+  .accountHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+
+    h2 {
+      font-size: 30px;
+      margin: 0 20px 0 0;
+    }
+
+    .leftWrapper {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+    }
+
+    .balance {
+      font-size: 24px;
+      font-weight: 500;
+    }
+  }
+
+  .accountInfo {
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
+    gap: 8px;
+  }
+}
+
+.history {
+  color: $primary;
+  font-weight: 500;
+  font-size: 30px;
+}
+
+.scheduleEntry {
+  padding: 10px;
+  border-radius: 10px;
+  background-color: color-mix(in srgb, lightblue 50%, transparent 0%);
+
+  &.missed {
+    background-color: color-mix(in srgb, red 50%, transparent 0%);
+  }
+}

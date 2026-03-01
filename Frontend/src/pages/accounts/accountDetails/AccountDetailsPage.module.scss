@@ -1,0 +1,104 @@
+@use "src/styles/variables" as *;
+@use "src/styles/mixins" as *;
+
+.wrapper {
+  @include container;
+  margin: 20px auto;
+  width: 1000px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.userCard {
+  padding: 0 10px;
+
+  .status {
+    background-color: green;
+    padding: 5px 10px;
+    border-radius: 10px;
+
+    &.closed {
+      opacity: 0.6;
+      background-color: red;
+    }
+  }
+
+  .accountHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+
+    h2 {
+      font-size: 30px;
+      margin: 0 20px 0 0;
+    }
+
+    .leftWrapper {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+    }
+
+    .balance {
+      font-size: 24px;
+      font-weight: 500;
+    }
+  }
+
+  .accountInfo {
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
+    gap: 8px;
+  }
+}
+
+.transactionsTitle {
+  color: $primary;
+  font-size: 30px;
+  margin: 10px 0;
+  font-weight: 500;
+}
+
+.transactions {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.transaction {
+  font-weight: 500;
+  background-color: color-mix(in srgb, lightblue 50%, transparent 0%);
+  padding: 10px 20px;
+  border-radius: 10px;
+
+  //&.positive {
+  //  background-color: color-mix(in srgb, green 50%, transparent 0%);
+  //}
+
+  &.negative {
+    background-color: color-mix(in srgb, red 50%, transparent 0%);
+  }
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+
+  .text {
+    color: $primary;
+    font-size: 18px;
+    font-weight: 500;
+  }
+
+  .button {
+    &.disabled {
+      opacity: 0.6;
+    }
+  }
+}

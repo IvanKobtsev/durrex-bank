@@ -10,7 +10,7 @@ import { useLoginMutation } from "services/user-api/user-api-client/Query.ts";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { AppLinks } from "application/constants/appLinks.ts";
-import { useAdvancedForm } from "../../helpers/form/useAdvancedForm.ts";
+import { useAdvancedForm } from "helpers/form/useAdvancedForm.ts";
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -20,7 +20,7 @@ export function LoginPage() {
     },
     onSuccess: (data) => {
       localStorage.setItem("access_token", data.token ?? "");
-      navigate(AppLinks.Users.link());
+      navigate(AppLinks.Dashboard.link());
     },
   });
   const onSubmit = async (data: LoginRequest) => {

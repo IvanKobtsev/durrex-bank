@@ -18,99 +18,50 @@ import * as Client from './Client'
 export { Client };
 import type { AxiosRequestConfig } from 'axios';
 
-export type CreditsPOSTQueryParameters = {
-  x_User_Id?: number | undefined ;
-  x_User_Role?: Types.XUserRole | undefined ;
-}
-
 export type CreditsAllQueryParameters = {
   clientId?: number | undefined ;
-  x_User_Id?: number | undefined ;
-  x_User_Role?: Types.XUserRole2 | undefined ;
 }
 
 export type CreditsGETQueryParameters = {
   id: number ;
-  x_User_Id?: number | undefined ;
-  x_User_Role?: Types.XUserRole3 | undefined ;
 }
 
 export type RepayQueryParameters = {
   id: number ;
-  x_User_Id?: number | undefined ;
-  x_User_Role?: Types.XUserRole4 | undefined ;
 }
 
-export type TariffsAllQueryParameters = {
-  x_User_Id?: number | undefined ;
-  x_User_Role?: Types.XUserRole5 | undefined ;
-}
-
-export type TariffsQueryParameters = {
-  x_User_Id?: number | undefined ;
-  x_User_Role?: Types.XUserRole6 | undefined ;
-}
-
-export function creditsPOSTUrl(x_User_Id?: number | undefined, x_User_Role?: Types.XUserRole | undefined): string {
+export function creditsPOSTUrl(): string {
   let url_ = getBaseUrl() + "/credits";
   url_ = url_.replace(/[?&]$/, "");
   return url_;
 }
 
-export function creditsPOSTMutationKey(x_User_Id?: number | undefined, x_User_Role?: Types.XUserRole | undefined): MutationKey {
+export function creditsPOSTMutationKey(): MutationKey {
   return trimArrayEnd([
       'Client',
       'creditsPOST',
-      x_User_Id as any,
-      x_User_Role as any,
     ]);
 }
 
 /**
  * Issue a new loan to a client
- * @param x_User_Id (optional) Injected by API Gateway — authenticated user ID
- * @param x_User_Role (optional) Injected by API Gateway — authenticated user role
  * @param body (optional) 
  * @return Loan issued and funds credited to the acount
  */
-export function useCreditsPOSTMutation<TContext>(x_User_Id?: number | undefined, x_User_Role?: Types.XUserRole | undefined, options?: Omit<UseMutationOptions<Types.CreditResponse, unknown, Types.IssueCreditRequest, TContext>, 'mutationKey' | 'mutationFn'>): UseMutationResult<Types.CreditResponse, unknown, Types.IssueCreditRequest, TContext> {
-  const key = creditsPOSTMutationKey(x_User_Id, x_User_Role);
+export function useCreditsPOSTMutation<TContext>(options?: Omit<UseMutationOptions<Types.CreditResponse, unknown, Types.IssueCreditRequest, TContext>, 'mutationKey' | 'mutationFn'>): UseMutationResult<Types.CreditResponse, unknown, Types.IssueCreditRequest, TContext> {
+  const key = creditsPOSTMutationKey();
   
   const metaContext = useContext(QueryMetaContext);
   options = addMetaToOptions(options, metaContext);
   
   return useMutation({
     ...options,
-    mutationFn: (body: Types.IssueCreditRequest) => Client.creditsPOST(x_User_Id, x_User_Role, body),
+    mutationFn: (body: Types.IssueCreditRequest) => Client.creditsPOST(body),
     mutationKey: key,
   });
 }
   
-type CreditsPOST__MutationParameters = CreditsPOSTQueryParameters & {
-  body: Types.IssueCreditRequest;
-}
-
-/**
- * Issue a new loan to a client
- * @param x_User_Id (optional) Injected by API Gateway — authenticated user ID
- * @param x_User_Role (optional) Injected by API Gateway — authenticated user role
- * @param body (optional) 
- * @return Loan issued and funds credited to the acount
- */
-export function useCreditsPOSTMutationWithParameters<TContext>(options?: Omit<UseMutationOptions<Types.CreditResponse, unknown, CreditsPOST__MutationParameters, TContext>, 'mutationKey' | 'mutationFn'> & { parameters?: CreditsPOSTQueryParameters}): UseMutationResult<Types.CreditResponse, unknown, CreditsPOST__MutationParameters, TContext> {
-  const key = creditsPOSTMutationKey(options?.parameters?.x_User_Id!, options?.parameters?.x_User_Role!);
-  
-  const metaContext = useContext(QueryMetaContext);
-  options = addMetaToOptions(options, metaContext);
-  
-return useMutation({
-  ...options, 
-  mutationFn: (data: CreditsPOST__MutationParameters) => Client.creditsPOST(data.x_User_Id ?? options?.parameters?.x_User_Id!, data.x_User_Role ?? options?.parameters?.x_User_Role!, data.body),
-  mutationKey: key,
-});
-}
-  
-export function creditsAllUrl(clientId?: number | undefined, x_User_Id?: number | undefined, x_User_Role?: Types.XUserRole2 | undefined): string {
+export function creditsAllUrl(clientId?: number | undefined): string {
   let url_ = getBaseUrl() + "/credits?";
 if (clientId === null)
     throw new Error("The parameter 'clientId' cannot be null.");
@@ -129,18 +80,15 @@ export function setCreditsAllDefaultOptions(options: typeof creditsAllDefaultOpt
   creditsAllDefaultOptions = options;
 }
 
-export function creditsAllQueryKey(dto: CreditsAllQueryParameters): QueryKey;
-export function creditsAllQueryKey(clientId?: number | undefined, x_User_Id?: number | undefined, x_User_Role?: Types.XUserRole2 | undefined): QueryKey;
+export function creditsAllQueryKey(clientId?: number | undefined): QueryKey;
 export function creditsAllQueryKey(...params: any[]): QueryKey {
   if (params.length === 1 && isParameterObject(params[0])) {
-    const { clientId, x_User_Id, x_User_Role,  } = params[0] as CreditsAllQueryParameters;
+    const { clientId,  } = params[0] as CreditsAllQueryParameters;
 
     return trimArrayEnd([
         'Client',
         'creditsAll',
         clientId as any,
-        x_User_Id as any,
-        x_User_Role as any,
       ]);
   } else {
     return trimArrayEnd([
@@ -152,32 +100,28 @@ export function creditsAllQueryKey(...params: any[]): QueryKey {
 }
 export function __creditsAll(context: QueryFunctionContext, axiosConfig?: AxiosRequestConfig | undefined) {
   return Client.creditsAll(
-      context.queryKey[2] as number | undefined,       context.queryKey[3] as number | undefined,       context.queryKey[4] as Types.XUserRole2 | undefined,axiosConfig    );
+      context.queryKey[2] as number | undefined,axiosConfig    );
 }
 
 export function useCreditsAllQuery<TSelectData = Types.CreditResponse[], TError = unknown>(dto: CreditsAllQueryParameters, options?: Omit<UseQueryOptions<Types.CreditResponse[], TError, TSelectData>, 'queryKey'>, axiosConfig?: Partial<AxiosRequestConfig>): UseQueryResult<TSelectData, TError>;
 /**
  * List credits for a client
  * @param clientId (optional) Client whose credits to return
- * @param x_User_Id (optional) Injected by API Gateway — authenticated user ID
- * @param x_User_Role (optional) Injected by API Gateway — authenticated user role
  * @return List of credits returned
  */
-export function useCreditsAllQuery<TSelectData = Types.CreditResponse[], TError = unknown>(clientId?: number | undefined, x_User_Id?: number | undefined, x_User_Role?: Types.XUserRole2 | undefined, options?: Omit<UseQueryOptions<Types.CreditResponse[], TError, TSelectData>, 'queryKey'>, axiosConfig?: Partial<AxiosRequestConfig>): UseQueryResult<TSelectData, TError>;
+export function useCreditsAllQuery<TSelectData = Types.CreditResponse[], TError = unknown>(clientId?: number | undefined, options?: Omit<UseQueryOptions<Types.CreditResponse[], TError, TSelectData>, 'queryKey'>, axiosConfig?: Partial<AxiosRequestConfig>): UseQueryResult<TSelectData, TError>;
 export function useCreditsAllQuery<TSelectData = Types.CreditResponse[], TError = unknown>(...params: any []): UseQueryResult<TSelectData, TError> {
   let options: UseQueryOptions<Types.CreditResponse[], TError, TSelectData> | undefined = undefined;
   let axiosConfig: AxiosRequestConfig |undefined = undefined;
   let clientId: any = undefined;
-  let x_User_Id: any = undefined;
-  let x_User_Role: any = undefined;
   
   if (params.length > 0) {
     if (isParameterObject(params[0])) {
-      ({ clientId, x_User_Id, x_User_Role,  } = params[0] as CreditsAllQueryParameters);
+      ({ clientId,  } = params[0] as CreditsAllQueryParameters);
       options = params[1];
       axiosConfig = params[2];
     } else {
-      [clientId, x_User_Id, x_User_Role, options, axiosConfig] = params;
+      [clientId, options, axiosConfig] = params;
     }
   }
 
@@ -186,7 +130,7 @@ export function useCreditsAllQuery<TSelectData = Types.CreditResponse[], TError 
 
   return useQuery<Types.CreditResponse[], TError, TSelectData>({
     queryFn: axiosConfig ? (context) => __creditsAll(context, axiosConfig) : __creditsAll,
-    queryKey: creditsAllQueryKey(clientId, x_User_Id, x_User_Role),
+    queryKey: creditsAllQueryKey(clientId),
     ...creditsAllDefaultOptions as unknown as Omit<UseQueryOptions<Types.CreditResponse[], TError, TSelectData>, 'queryKey'>,
     ...options,
   });
@@ -194,12 +138,10 @@ export function useCreditsAllQuery<TSelectData = Types.CreditResponse[], TError 
 /**
  * List credits for a client
  * @param clientId (optional) Client whose credits to return
- * @param x_User_Id (optional) Injected by API Gateway — authenticated user ID
- * @param x_User_Role (optional) Injected by API Gateway — authenticated user role
  * @return List of credits returned
  */
-export function setCreditsAllData(queryClient: QueryClient, updater: (data: Types.CreditResponse[] | undefined) => Types.CreditResponse[], clientId?: number | undefined, x_User_Id?: number | undefined, x_User_Role?: Types.XUserRole2 | undefined) {
-  queryClient.setQueryData(creditsAllQueryKey(clientId, x_User_Id, x_User_Role),
+export function setCreditsAllData(queryClient: QueryClient, updater: (data: Types.CreditResponse[] | undefined) => Types.CreditResponse[], clientId?: number | undefined) {
+  queryClient.setQueryData(creditsAllQueryKey(clientId),
     updater
   );
 }
@@ -207,15 +149,13 @@ export function setCreditsAllData(queryClient: QueryClient, updater: (data: Type
 /**
  * List credits for a client
  * @param clientId (optional) Client whose credits to return
- * @param x_User_Id (optional) Injected by API Gateway — authenticated user ID
- * @param x_User_Role (optional) Injected by API Gateway — authenticated user role
  * @return List of credits returned
  */
 export function setCreditsAllDataByQueryId(queryClient: QueryClient, queryKey: QueryKey, updater: (data: Types.CreditResponse[] | undefined) => Types.CreditResponse[]) {
   queryClient.setQueryData(queryKey, updater);
 }
     
-export function creditsGETUrl(id: number, x_User_Id?: number | undefined, x_User_Role?: Types.XUserRole3 | undefined): string {
+export function creditsGETUrl(id: number): string {
   let url_ = getBaseUrl() + "/credits/{id}";
 if (id === undefined || id === null)
   throw new Error("The parameter 'id' must be defined.");
@@ -233,18 +173,15 @@ export function setCreditsGETDefaultOptions(options: typeof creditsGETDefaultOpt
   creditsGETDefaultOptions = options;
 }
 
-export function creditsGETQueryKey(dto: CreditsGETQueryParameters): QueryKey;
-export function creditsGETQueryKey(id: number, x_User_Id?: number | undefined, x_User_Role?: Types.XUserRole3 | undefined): QueryKey;
+export function creditsGETQueryKey(id: number): QueryKey;
 export function creditsGETQueryKey(...params: any[]): QueryKey {
   if (params.length === 1 && isParameterObject(params[0])) {
-    const { id, x_User_Id, x_User_Role,  } = params[0] as CreditsGETQueryParameters;
+    const { id,  } = params[0] as CreditsGETQueryParameters;
 
     return trimArrayEnd([
         'Client',
         'creditsGET',
         id as any,
-        x_User_Id as any,
-        x_User_Role as any,
       ]);
   } else {
     return trimArrayEnd([
@@ -256,32 +193,28 @@ export function creditsGETQueryKey(...params: any[]): QueryKey {
 }
 export function __creditsGET(context: QueryFunctionContext, axiosConfig?: AxiosRequestConfig | undefined) {
   return Client.creditsGET(
-      context.queryKey[2] as number,       context.queryKey[3] as number | undefined,       context.queryKey[4] as Types.XUserRole3 | undefined,axiosConfig    );
+      context.queryKey[2] as number,axiosConfig    );
 }
 
 export function useCreditsGETQuery<TSelectData = Types.CreditDetailResponse, TError = unknown>(dto: CreditsGETQueryParameters, options?: Omit<UseQueryOptions<Types.CreditDetailResponse, TError, TSelectData>, 'queryKey'>, axiosConfig?: Partial<AxiosRequestConfig>): UseQueryResult<TSelectData, TError>;
 /**
  * Get full credit details including repayment schedule
  * @param id Credit ID
- * @param x_User_Id (optional) Injected by API Gateway — authenticated user ID
- * @param x_User_Role (optional) Injected by API Gateway — authenticated user role
  * @return Credit details returned
  */
-export function useCreditsGETQuery<TSelectData = Types.CreditDetailResponse, TError = unknown>(id: number, x_User_Id?: number | undefined, x_User_Role?: Types.XUserRole3 | undefined, options?: Omit<UseQueryOptions<Types.CreditDetailResponse, TError, TSelectData>, 'queryKey'>, axiosConfig?: Partial<AxiosRequestConfig>): UseQueryResult<TSelectData, TError>;
+export function useCreditsGETQuery<TSelectData = Types.CreditDetailResponse, TError = unknown>(id: number, options?: Omit<UseQueryOptions<Types.CreditDetailResponse, TError, TSelectData>, 'queryKey'>, axiosConfig?: Partial<AxiosRequestConfig>): UseQueryResult<TSelectData, TError>;
 export function useCreditsGETQuery<TSelectData = Types.CreditDetailResponse, TError = unknown>(...params: any []): UseQueryResult<TSelectData, TError> {
   let options: UseQueryOptions<Types.CreditDetailResponse, TError, TSelectData> | undefined = undefined;
   let axiosConfig: AxiosRequestConfig |undefined = undefined;
   let id: any = undefined;
-  let x_User_Id: any = undefined;
-  let x_User_Role: any = undefined;
   
   if (params.length > 0) {
     if (isParameterObject(params[0])) {
-      ({ id, x_User_Id, x_User_Role,  } = params[0] as CreditsGETQueryParameters);
+      ({ id,  } = params[0] as CreditsGETQueryParameters);
       options = params[1];
       axiosConfig = params[2];
     } else {
-      [id, x_User_Id, x_User_Role, options, axiosConfig] = params;
+      [id, options, axiosConfig] = params;
     }
   }
 
@@ -290,7 +223,7 @@ export function useCreditsGETQuery<TSelectData = Types.CreditDetailResponse, TEr
 
   return useQuery<Types.CreditDetailResponse, TError, TSelectData>({
     queryFn: axiosConfig ? (context) => __creditsGET(context, axiosConfig) : __creditsGET,
-    queryKey: creditsGETQueryKey(id, x_User_Id, x_User_Role),
+    queryKey: creditsGETQueryKey(id),
     ...creditsGETDefaultOptions as unknown as Omit<UseQueryOptions<Types.CreditDetailResponse, TError, TSelectData>, 'queryKey'>,
     ...options,
   });
@@ -298,12 +231,10 @@ export function useCreditsGETQuery<TSelectData = Types.CreditDetailResponse, TEr
 /**
  * Get full credit details including repayment schedule
  * @param id Credit ID
- * @param x_User_Id (optional) Injected by API Gateway — authenticated user ID
- * @param x_User_Role (optional) Injected by API Gateway — authenticated user role
  * @return Credit details returned
  */
-export function setCreditsGETData(queryClient: QueryClient, updater: (data: Types.CreditDetailResponse | undefined) => Types.CreditDetailResponse, id: number, x_User_Id?: number | undefined, x_User_Role?: Types.XUserRole3 | undefined) {
-  queryClient.setQueryData(creditsGETQueryKey(id, x_User_Id, x_User_Role),
+export function setCreditsGETData(queryClient: QueryClient, updater: (data: Types.CreditDetailResponse | undefined) => Types.CreditDetailResponse, id: number) {
+  queryClient.setQueryData(creditsGETQueryKey(id),
     updater
   );
 }
@@ -311,15 +242,13 @@ export function setCreditsGETData(queryClient: QueryClient, updater: (data: Type
 /**
  * Get full credit details including repayment schedule
  * @param id Credit ID
- * @param x_User_Id (optional) Injected by API Gateway — authenticated user ID
- * @param x_User_Role (optional) Injected by API Gateway — authenticated user role
  * @return Credit details returned
  */
 export function setCreditsGETDataByQueryId(queryClient: QueryClient, queryKey: QueryKey, updater: (data: Types.CreditDetailResponse | undefined) => Types.CreditDetailResponse) {
   queryClient.setQueryData(queryKey, updater);
 }
     
-export function repayUrl(id: number, x_User_Id?: number | undefined, x_User_Role?: Types.XUserRole4 | undefined): string {
+export function repayUrl(id: number): string {
   let url_ = getBaseUrl() + "/credits/{id}/repay";
 if (id === undefined || id === null)
   throw new Error("The parameter 'id' must be defined.");
@@ -328,32 +257,28 @@ url_ = url_.replace("{id}", encodeURIComponent("" + id));
   return url_;
 }
 
-export function repayMutationKey(id: number, x_User_Id?: number | undefined, x_User_Role?: Types.XUserRole4 | undefined): MutationKey {
+export function repayMutationKey(id: number): MutationKey {
   return trimArrayEnd([
       'Client',
       'repay',
       id as any,
-      x_User_Id as any,
-      x_User_Role as any,
     ]);
 }
 
 /**
  * Fully repay a credit early
  * @param id Credit ID to repay
- * @param x_User_Id (optional) Injected by API Gateway — authenticated user ID
- * @param x_User_Role (optional) Injected by API Gateway — authenticated user role
  * @return Credit fully repaid and closed
  */
-export function useRepayMutation<TContext>(id: number, x_User_Id?: number | undefined, x_User_Role?: Types.XUserRole4 | undefined, options?: Omit<UseMutationOptions<Types.CreditResponse, unknown, void, TContext>, 'mutationKey' | 'mutationFn'>): UseMutationResult<Types.CreditResponse, unknown, void, TContext> {
-  const key = repayMutationKey(id, x_User_Id, x_User_Role);
+export function useRepayMutation<TContext>(id: number, options?: Omit<UseMutationOptions<Types.CreditResponse, unknown, void, TContext>, 'mutationKey' | 'mutationFn'>): UseMutationResult<Types.CreditResponse, unknown, void, TContext> {
+  const key = repayMutationKey(id);
   
   const metaContext = useContext(QueryMetaContext);
   options = addMetaToOptions(options, metaContext);
   
   return useMutation({
     ...options,
-    mutationFn: () => Client.repay(id, x_User_Id, x_User_Role),
+    mutationFn: () => Client.repay(id),
     mutationKey: key,
   });
 }
@@ -363,24 +288,22 @@ type Repay__MutationParameters = RepayQueryParameters
 /**
  * Fully repay a credit early
  * @param id Credit ID to repay
- * @param x_User_Id (optional) Injected by API Gateway — authenticated user ID
- * @param x_User_Role (optional) Injected by API Gateway — authenticated user role
  * @return Credit fully repaid and closed
  */
 export function useRepayMutationWithParameters<TContext>(options?: Omit<UseMutationOptions<Types.CreditResponse, unknown, Repay__MutationParameters, TContext>, 'mutationKey' | 'mutationFn'> & { parameters?: RepayQueryParameters}): UseMutationResult<Types.CreditResponse, unknown, Repay__MutationParameters, TContext> {
-  const key = repayMutationKey(options?.parameters?.id!, options?.parameters?.x_User_Id!, options?.parameters?.x_User_Role!);
+  const key = repayMutationKey(options?.parameters?.id!);
   
   const metaContext = useContext(QueryMetaContext);
   options = addMetaToOptions(options, metaContext);
   
 return useMutation({
   ...options, 
-  mutationFn: (data: Repay__MutationParameters) => Client.repay(data.id ?? options?.parameters?.id!, data.x_User_Id ?? options?.parameters?.x_User_Id!, data.x_User_Role ?? options?.parameters?.x_User_Role!),
+  mutationFn: (data: Repay__MutationParameters) => Client.repay(data.id ?? options?.parameters?.id!),
   mutationKey: key,
 });
 }
   
-export function tariffsAllUrl(x_User_Id?: number | undefined, x_User_Role?: Types.XUserRole5 | undefined): string {
+export function tariffsAllUrl(): string {
   let url_ = getBaseUrl() + "/tariffs";
   url_ = url_.replace(/[?&]$/, "");
   return url_;
@@ -395,142 +318,86 @@ export function setTariffsAllDefaultOptions(options: typeof tariffsAllDefaultOpt
   tariffsAllDefaultOptions = options;
 }
 
-export function tariffsAllQueryKey(dto: TariffsAllQueryParameters): QueryKey;
-export function tariffsAllQueryKey(x_User_Id?: number | undefined, x_User_Role?: Types.XUserRole5 | undefined): QueryKey;
+export function tariffsAllQueryKey(): QueryKey;
 export function tariffsAllQueryKey(...params: any[]): QueryKey {
-  if (params.length === 1 && isParameterObject(params[0])) {
-    const { x_User_Id, x_User_Role,  } = params[0] as TariffsAllQueryParameters;
-
-    return trimArrayEnd([
-        'Client',
-        'tariffsAll',
-        x_User_Id as any,
-        x_User_Role as any,
-      ]);
-  } else {
-    return trimArrayEnd([
-        'Client',
-        'tariffsAll',
-        ...params
-      ]);
-  }
+  return trimArrayEnd([
+      'Client',
+      'tariffsAll',
+    ]);
 }
 export function __tariffsAll(context: QueryFunctionContext, axiosConfig?: AxiosRequestConfig | undefined) {
   return Client.tariffsAll(
-      context.queryKey[2] as number | undefined,       context.queryKey[3] as Types.XUserRole5 | undefined,axiosConfig    );
+axiosConfig    );
 }
 
-export function useTariffsAllQuery<TSelectData = Types.TariffResponse[], TError = unknown>(dto: TariffsAllQueryParameters, options?: Omit<UseQueryOptions<Types.TariffResponse[], TError, TSelectData>, 'queryKey'>, axiosConfig?: Partial<AxiosRequestConfig>): UseQueryResult<TSelectData, TError>;
 /**
  * Get all available credit tariffs
- * @param x_User_Id (optional) Injected by API Gateway — authenticated user ID
- * @param x_User_Role (optional) Injected by API Gateway — authenticated user role
  * @return List of tariffs returned
  */
-export function useTariffsAllQuery<TSelectData = Types.TariffResponse[], TError = unknown>(x_User_Id?: number | undefined, x_User_Role?: Types.XUserRole5 | undefined, options?: Omit<UseQueryOptions<Types.TariffResponse[], TError, TSelectData>, 'queryKey'>, axiosConfig?: Partial<AxiosRequestConfig>): UseQueryResult<TSelectData, TError>;
+export function useTariffsAllQuery<TSelectData = Types.TariffResponse[], TError = unknown>(options?: Omit<UseQueryOptions<Types.TariffResponse[], TError, TSelectData>, 'queryKey'>, axiosConfig?: Partial<AxiosRequestConfig>): UseQueryResult<TSelectData, TError>;
 export function useTariffsAllQuery<TSelectData = Types.TariffResponse[], TError = unknown>(...params: any []): UseQueryResult<TSelectData, TError> {
   let options: UseQueryOptions<Types.TariffResponse[], TError, TSelectData> | undefined = undefined;
   let axiosConfig: AxiosRequestConfig |undefined = undefined;
-  let x_User_Id: any = undefined;
-  let x_User_Role: any = undefined;
   
-  if (params.length > 0) {
-    if (isParameterObject(params[0])) {
-      ({ x_User_Id, x_User_Role,  } = params[0] as TariffsAllQueryParameters);
-      options = params[1];
-      axiosConfig = params[2];
-    } else {
-      [x_User_Id, x_User_Role, options, axiosConfig] = params;
-    }
-  }
+
+  options = params[0] as any;
+  axiosConfig = params[1] as any;
 
   const metaContext = useContext(QueryMetaContext);
   options = addMetaToOptions(options, metaContext);
 
   return useQuery<Types.TariffResponse[], TError, TSelectData>({
     queryFn: axiosConfig ? (context) => __tariffsAll(context, axiosConfig) : __tariffsAll,
-    queryKey: tariffsAllQueryKey(x_User_Id, x_User_Role),
+    queryKey: tariffsAllQueryKey(),
     ...tariffsAllDefaultOptions as unknown as Omit<UseQueryOptions<Types.TariffResponse[], TError, TSelectData>, 'queryKey'>,
     ...options,
   });
 }
 /**
  * Get all available credit tariffs
- * @param x_User_Id (optional) Injected by API Gateway — authenticated user ID
- * @param x_User_Role (optional) Injected by API Gateway — authenticated user role
  * @return List of tariffs returned
  */
-export function setTariffsAllData(queryClient: QueryClient, updater: (data: Types.TariffResponse[] | undefined) => Types.TariffResponse[], x_User_Id?: number | undefined, x_User_Role?: Types.XUserRole5 | undefined) {
-  queryClient.setQueryData(tariffsAllQueryKey(x_User_Id, x_User_Role),
+export function setTariffsAllData(queryClient: QueryClient, updater: (data: Types.TariffResponse[] | undefined) => Types.TariffResponse[], ) {
+  queryClient.setQueryData(tariffsAllQueryKey(),
     updater
   );
 }
 
 /**
  * Get all available credit tariffs
- * @param x_User_Id (optional) Injected by API Gateway — authenticated user ID
- * @param x_User_Role (optional) Injected by API Gateway — authenticated user role
  * @return List of tariffs returned
  */
 export function setTariffsAllDataByQueryId(queryClient: QueryClient, queryKey: QueryKey, updater: (data: Types.TariffResponse[] | undefined) => Types.TariffResponse[]) {
   queryClient.setQueryData(queryKey, updater);
 }
     
-export function tariffsUrl(x_User_Id?: number | undefined, x_User_Role?: Types.XUserRole6 | undefined): string {
+export function tariffsUrl(): string {
   let url_ = getBaseUrl() + "/tariffs";
   url_ = url_.replace(/[?&]$/, "");
   return url_;
 }
 
-export function tariffsMutationKey(x_User_Id?: number | undefined, x_User_Role?: Types.XUserRole6 | undefined): MutationKey {
+export function tariffsMutationKey(): MutationKey {
   return trimArrayEnd([
       'Client',
       'tariffs',
-      x_User_Id as any,
-      x_User_Role as any,
     ]);
 }
 
 /**
  * Create a new credit tariff
- * @param x_User_Id (optional) Injected by API Gateway — authenticated user ID
- * @param x_User_Role (optional) Injected by API Gateway — authenticated user role
  * @param body (optional) 
  * @return Tariff created successfully
  */
-export function useTariffsMutation<TContext>(x_User_Id?: number | undefined, x_User_Role?: Types.XUserRole6 | undefined, options?: Omit<UseMutationOptions<Types.TariffResponse, unknown, Types.CreateTariffRequest, TContext>, 'mutationKey' | 'mutationFn'>): UseMutationResult<Types.TariffResponse, unknown, Types.CreateTariffRequest, TContext> {
-  const key = tariffsMutationKey(x_User_Id, x_User_Role);
+export function useTariffsMutation<TContext>(options?: Omit<UseMutationOptions<Types.TariffResponse, unknown, Types.CreateTariffRequest, TContext>, 'mutationKey' | 'mutationFn'>): UseMutationResult<Types.TariffResponse, unknown, Types.CreateTariffRequest, TContext> {
+  const key = tariffsMutationKey();
   
   const metaContext = useContext(QueryMetaContext);
   options = addMetaToOptions(options, metaContext);
   
   return useMutation({
     ...options,
-    mutationFn: (body: Types.CreateTariffRequest) => Client.tariffs(x_User_Id, x_User_Role, body),
+    mutationFn: (body: Types.CreateTariffRequest) => Client.tariffs(body),
     mutationKey: key,
   });
-}
-  
-type Tariffs__MutationParameters = TariffsQueryParameters & {
-  body: Types.CreateTariffRequest;
-}
-
-/**
- * Create a new credit tariff
- * @param x_User_Id (optional) Injected by API Gateway — authenticated user ID
- * @param x_User_Role (optional) Injected by API Gateway — authenticated user role
- * @param body (optional) 
- * @return Tariff created successfully
- */
-export function useTariffsMutationWithParameters<TContext>(options?: Omit<UseMutationOptions<Types.TariffResponse, unknown, Tariffs__MutationParameters, TContext>, 'mutationKey' | 'mutationFn'> & { parameters?: TariffsQueryParameters}): UseMutationResult<Types.TariffResponse, unknown, Tariffs__MutationParameters, TContext> {
-  const key = tariffsMutationKey(options?.parameters?.x_User_Id!, options?.parameters?.x_User_Role!);
-  
-  const metaContext = useContext(QueryMetaContext);
-  options = addMetaToOptions(options, metaContext);
-  
-return useMutation({
-  ...options, 
-  mutationFn: (data: Tariffs__MutationParameters) => Client.tariffs(data.x_User_Id ?? options?.parameters?.x_User_Id!, data.x_User_Role ?? options?.parameters?.x_User_Role!, data.body),
-  mutationKey: key,
-});
 }

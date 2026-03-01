@@ -19,9 +19,11 @@ export function UsersManagementPage() {
         />
       </div>
       <div className={styles.usersList}>
-        {usersQuery.data?.map((u) => (
-          <UserCard user={u} />
-        ))}
+        {usersQuery.data
+          ?.sort((u1, u2) => (u1.id ?? 0) - (u2.id ?? 0))
+          .map((u) => (
+            <UserCard key={u.id} user={u} type={"management"} />
+          ))}
       </div>
     </div>
   );

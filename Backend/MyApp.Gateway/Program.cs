@@ -23,98 +23,7 @@ builder.Services.AddReverseProxy()
             return ValueTask.CompletedTask;
         });
         
-        if (builderContext.Route.RouteId == "CoreRoute")
-        {
-            builderContext.AddResponseTransform(async transformContext =>
-            {
-                var response = transformContext.ProxyResponse;
-
-                if (response?.Content == null) return;
-
-                var json = await response.Content.ReadAsStringAsync();
-
-                var node = JsonNode.Parse(json);
-
-                if (node is not JsonObject obj)
-                {
-                    return;
-                }
-
-                obj["servers"] = new JsonArray
-                {
-                    new JsonObject { ["url"] = "/core" }
-                };
-
-                var modified = obj.ToJsonString(new JsonSerializerOptions { WriteIndented = false });
-
-                response.Content = new StringContent(
-                    modified,
-                    Encoding.UTF8,
-                    "application/json");
-            });
-        }
-        
-        if (builderContext.Route.RouteId == "CreditRoute")
-        {
-            builderContext.AddResponseTransform(async transformContext =>
-            {
-                var response = transformContext.ProxyResponse;
-
-                if (response?.Content == null) return;
-
-                var json = await response.Content.ReadAsStringAsync();
-
-                var node = JsonNode.Parse(json);
-
-                if (node is not JsonObject obj)
-                {
-                    return;
-                }
-
-                obj["servers"] = new JsonArray
-                {
-                    new JsonObject { ["url"] = "/credit" }
-                };
-
-                var modified = obj.ToJsonString(new JsonSerializerOptions { WriteIndented = false });
-
-                response.Content = new StringContent(
-                    modified,
-                    Encoding.UTF8,
-                    "application/json");
-            });
-        }
-        
-        if (builderContext.Route.RouteId == "UserRoute")
-        {
-            builderContext.AddResponseTransform(async transformContext =>
-            {
-                var response = transformContext.ProxyResponse;
-
-                if (response?.Content == null) return;
-
-                var json = await response.Content.ReadAsStringAsync();
-
-                var node = JsonNode.Parse(json);
-
-                if (node is not JsonObject obj)
-                {
-                    return;
-                }
-
-                obj["servers"] = new JsonArray
-                {
-                    new JsonObject { ["url"] = "/user" }
-                };
-
-                var modified = obj.ToJsonString(new JsonSerializerOptions { WriteIndented = false });
-
-                response.Content = new StringContent(
-                    modified,
-                    Encoding.UTF8,
-                    "application/json");
-            });
-        }
+        SwaggerResponseTransformUtil.AddTransformIfMatch(builderContext);
     });
 
 builder.Services.AddHttpClient("AuthClient", client =>
@@ -140,31 +49,23 @@ builder.Services.AddSingleton<RsaSecurityKey>(provider =>
     return new RsaSecurityKey(rsa);
 });
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        var key = builder.Services
-            .BuildServiceProvider()
-            .GetRequiredService<RsaSecurityKey>();
 
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = key,
-            ValidateIssuer = false,
-            ValidateAudience = false,
-            ValidateLifetime = true
-        };
-    });
-
-builder.Services.AddAuthorization();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-var app = builder.Build();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("DevCors", policy =>
+    {
+        policy
+            .WithOrigins("http://localhost:5173")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
+});
 
-app.UseAuthentication();
-app.UseAuthorization();
+var app = builder.Build();
 
 app.UseSwagger();
 
@@ -185,6 +86,8 @@ app.UseSwaggerUI(options =>
     options.RoutePrefix = "swagger";
 });
 
+app.UseCors("DevCors");
+app.UseMiddleware<JwtForwardingMiddleware>();
 app.MapReverseProxy();
 
 Console.WriteLine($"Environment: {builder.Environment.EnvironmentName}");

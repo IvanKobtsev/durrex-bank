@@ -2,6 +2,12 @@
 @use "src/styles/base" as *;
 @use "src/styles/mixins" as *;
 
+.helperText {
+  font-size: 14px;
+  color: #ff2a63;
+  margin-top: 5px;
+}
+
 .invisibleSpan {
   position: absolute;
   visibility: hidden;

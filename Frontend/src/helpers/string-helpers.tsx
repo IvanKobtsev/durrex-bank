@@ -10,8 +10,8 @@ export function splitCamelCase(
   const result =
     text !== undefined
       ? text
-          .replace(/([a-z])([A-Z])/g, '$1 $2')
-          .replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2')
+          .replace(/([a-z])([A-Z])/g, "$1 $2")
+          .replace(/([A-Z]+)([A-Z][a-z])/g, "$1 $2")
       : undefined;
 
   return capitalizeFirstLetter ? capitalizeFirstCharacter(result) : result;
@@ -43,7 +43,8 @@ export function camelCaseToKebabCase(input: string | null | undefined) {
  * <b>Example</b>: `GlobalParametersOptions[0].Options` becomes `globalParametersOptions[0].options`
  */
 export function toCamelCasePath(input: string): string {
-  const keyWithout$ = input.startsWith('$.') ? input.substring(2) : input;
+  console.log(input);
+  const keyWithout$ = input.startsWith("$.") ? input.substring(2) : input;
   return keyWithout$.replace(/[A-Za-z_][A-Za-z0-9_]*/g, (segment) => {
     return segment.charAt(0).toLowerCase() + segment.slice(1);
   });

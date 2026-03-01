@@ -14,6 +14,7 @@ import React, {
 import styles from "./Input.module.scss";
 import { mergeRefs } from "react-merge-refs";
 import { Field, FieldProps } from "../Field.tsx";
+import { replaceLineBreaksWithHtmlTags } from "../../../helpers/string-helpers.tsx";
 
 export type Props = React.InputHTMLAttributes<HTMLInputElement> & {
   containerRef?: Ref<HTMLDivElement>;
@@ -209,7 +210,7 @@ export const Input = React.forwardRef<HTMLInputElement, Props>(
         {badge}
         {!!(helperText || errorText) && (
           <div data-error={isError.toString()} className={styles.helperText}>
-            {helperText || errorText}
+            {helperText || replaceLineBreaksWithHtmlTags(errorText)}
           </div>
         )}
       </div>

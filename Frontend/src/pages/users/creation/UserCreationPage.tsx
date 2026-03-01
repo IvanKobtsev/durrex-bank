@@ -3,7 +3,6 @@ import {
   CreateUserRequest,
   CreateUserRequestRole,
 } from "services/user-api/user-api-client.types.ts";
-import { useForm } from "react-hook-form";
 import {
   registerPassword,
   registerString,
@@ -14,22 +13,28 @@ import { Input } from "components/uikit/inputs/Input";
 import { Button } from "components/uikit/buttons/Button.tsx";
 import { Field } from "components/uikit/Field.tsx";
 import React from "react";
+import { useAdvancedForm } from "helpers/form/useAdvancedForm.ts";
+import { FormError } from "components/uikit/FormError.tsx";
+import { useNavigate } from "react-router-dom";
+import { AppLinks } from "application/constants/appLinks.ts";
 
 export function UserCreationPage() {
+  const navigate = useNavigate();
   const createUserMutation = useUsersPOSTMutation({
     onError: () => {
       toast.error("Ошибка при создании пользователя.");
     },
     onSuccess: () => {
       toast.success("Пользователь успешно создан.");
+      navigate(AppLinks.Users.link());
     },
   });
 
-  const onSubmit = (data: CreateUserRequest) => {
-    createUserMutation.mutate(data);
+  const onSubmit = async (data: CreateUserRequest) => {
+    await createUserMutation.mutateAsync(data);
   };
 
-  const form = useForm<CreateUserRequest>({
+  const form = useAdvancedForm<CreateUserRequest>(onSubmit, {
     defaultValues: {
       email: "",
       username: "",
@@ -45,8 +50,9 @@ export function UserCreationPage() {
   return (
     <div className={styles.wrapper}>
       <div className={styles.header}>Создание пользователя</div>
+      <FormError>{translateOverallError(form.overallError)}</FormError>
 
-      <form className={styles.form} onSubmit={form.handleSubmit(onSubmit)}>
+      <form className={styles.form} onSubmit={form.handleSubmitDefault}>
         <Input
           {...registerString(form, "email")}
           fieldProps={{ title: "Email" }}
@@ -89,3 +95,12 @@ export function UserCreationPage() {
     </div>
   );
 }
+
+const translateOverallError = (error: string | undefined) => {
+  switch (error) {
+    case "Conflict":
+      return "Пользователь с таким email, именем или телефоном уже существует";
+    default:
+      return error;
+  }
+};

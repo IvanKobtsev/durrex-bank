@@ -94,5 +94,9 @@ export function extractError(errorsObj: any, name: string): string | undefined {
     const nextKeys = name.slice(name.indexOf(".") + 1);
     return extractError(errorsObj?.[currentKey], nextKeys);
   }
-  return errorsObj?.[name]?.message;
+  return prettifyErrorMessage(errorsObj?.[name]?.message);
+}
+
+function prettifyErrorMessage(message: string | null) {
+  return message?.split(";").join("\n");
 }

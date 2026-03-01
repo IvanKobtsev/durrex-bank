@@ -10,10 +10,10 @@ public class IssueCreditHandler(CreditDbContext db, ICoreServiceClient coreClien
         var tariff = await db.Tariffs.FindAsync([request.TariffId], ct)
             ?? throw new KeyNotFoundException($"Tariff {request.TariffId} not found.");
 
-        var monthlyRate = tariff.InterestRate / 12;
+        var minuteRate = tariff.InterestRate / (365 * 24 * 60);
         var payment = Math.Round(
-            request.Amount * monthlyRate
-                / (1 - (decimal)Math.Pow((double)(1 + monthlyRate), -tariff.TermMonths)),
+            request.Amount * minuteRate
+                / (1 - (decimal)Math.Pow((double)(1 + minuteRate), -tariff.TermMonths)),
             2);
 
         var issuedAt = DateTime.UtcNow;
@@ -29,7 +29,7 @@ public class IssueCreditHandler(CreditDbContext db, ICoreServiceClient coreClien
             Schedule = Enumerable.Range(1, tariff.TermMonths)
                 .Select(i => new PaymentScheduleEntry
                 {
-                    DueDate = issuedAt.AddMonths(i),
+                    DueDate = issuedAt.AddMinutes(i),
                     Amount = payment,
                 })
                 .ToList()

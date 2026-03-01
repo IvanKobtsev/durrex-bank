@@ -54,3 +54,19 @@
     gap: 8px;
   }
 }
+
+.history {
+  color: $primary;
+  font-weight: 500;
+  font-size: 30px;
+}
+
+.scheduleEntry {
+  padding: 10px;
+  border-radius: 10px;
+  background-color: color-mix(in srgb, lightblue 50%, transparent 0%);
+
+  &.missed {
+    background-color: color-mix(in srgb, red 50%, transparent 0%);
+  }
+}

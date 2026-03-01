@@ -96,7 +96,11 @@ export function decapitalizeFirstCharacter(
   return input ? input.charAt(0).toLowerCase() + input.slice(1) : undefined;
 }
 
-export function padWithZeros(value: string, targetLength: number): string {
+export function padWithZeros(
+  value: string | null | undefined,
+  targetLength: number,
+): string {
+  if (!value) return "";
   if (value.length >= targetLength) {
     return value;
   }

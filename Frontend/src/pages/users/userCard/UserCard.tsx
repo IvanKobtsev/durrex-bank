@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom";
 
 export interface UserCardProps {
   user: UserResponse;
-  type: "management" | "reference";
+  type: "management" | "reference" | "creditor";
 }
 
 export function UserCard({ user, type = "management" }: UserCardProps) {
@@ -47,7 +47,7 @@ export function UserCard({ user, type = "management" }: UserCardProps) {
           navigate(AppLinks.UserDetails.link({ userId: user.id! }))
         }
       >
-        {`${user.firstName} ${user.lastName} (${user.username}) — ${type === "management" ? translateRole(user.role) : "Владелец"}`}
+        {`${user.firstName} ${user.lastName} (${user.username}) — ${type === "management" ? translateRole(user.role) : type === "creditor" ? "Кредитор" : "Владелец"}`}
       </div>
       <div className={styles.rightWrapper}>
         {type === "management" &&

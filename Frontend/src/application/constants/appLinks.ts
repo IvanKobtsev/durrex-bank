@@ -1,6 +1,6 @@
 import { createRoute, RequiredNumberParam } from "react-router-url-params";
 
-export const Links = {
+export const AppLinks = {
   Login: createRoute("/login"),
   Users: createRoute("/users"),
   UserCreation: createRoute("/users/create"),

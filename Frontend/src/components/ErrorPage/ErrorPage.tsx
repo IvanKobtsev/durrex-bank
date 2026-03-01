@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import styles from "./ErrorPage.module.scss";
-import { Button, type ButtonProps } from "../Button/Button.tsx";
 import type { ReactNode } from "react";
+import { Button, ButtonProps } from "components/uikit/buttons/Button";
 
 interface ErrorPageProps {
   title?: ReactNode;

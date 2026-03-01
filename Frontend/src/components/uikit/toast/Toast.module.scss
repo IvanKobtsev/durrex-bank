@@ -1,0 +1,55 @@
+@use 'src/styles/variables' as *;
+
+.toastContent {
+  font-size: 14px !important;
+  line-height: 20px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  height: fit-content !important;
+  align-items: flex-start !important;
+}
+.toastContent > div:last-child {
+  padding-top: 3px;
+  margin-left: 2px;
+  margin-right: 8px;
+}
+
+.toast {
+  justify-content: center !important;
+  padding: 16px !important;
+  min-height: 56px !important;
+  height: fit-content !important;
+  width: 328px !important;
+
+  &.success {
+    color: green !important;
+    background: lightgreen !important;
+  }
+
+  &.error {
+    color: red !important;
+    background: pink !important;
+  }
+
+  &.warning {
+    color: yellow !important;
+    background: orange !important;
+  }
+}
+
+.closeButton {
+  cursor: pointer;
+}
+
+.closeButtonContainer {
+  height: 24px;
+}
+
+.iconContainer {
+  width: 24px;
+  height: 24px;
+}
+
+.wideToast {
+  width: 360px !important;
+}

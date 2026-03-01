@@ -1,0 +1,39 @@
+@use "src/styles/variables" as *;
+@use "src/styles/mixins" as *;
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
+  padding-right: 25%;
+  box-sizing: border-box;
+  width: 100vw;
+  height: 100vh;
+  background-color: #2d4547;
+  background-image: url("/src/assets/images/login-background-image.png");
+  background-size: cover;
+}
+
+.header {
+  @include container;
+  font-size: 28px;
+  color: $primary;
+  padding: 0;
+  width: 336px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 20px;
+  width: 336px;
+  height: 218px;
+  @include container;
+}

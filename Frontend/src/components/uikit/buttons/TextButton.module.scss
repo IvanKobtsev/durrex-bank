@@ -1,0 +1,103 @@
+@use 'src/styles/variables' as *;
+@use 'src/styles/mixins' as *;
+
+.link {
+  text-decoration: none;
+  padding: 0 !important;
+}
+.button {
+  display: flex;
+  align-items: center;
+  height: 24px;
+  font-family: $font-family !important;
+  font-style: normal;
+  @include p1sb;
+  padding: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  user-select: none;
+  text-align: center;
+  gap: 4px;
+}
+
+.anemic {
+  pointer-events: none;
+}
+
+.button[data-disabled='true'] {
+  cursor: default;
+  color: grey;
+  pointer-events: none !important;
+
+  & > svg path {
+    fill: grey;
+
+    &:hover {
+      fill: grey;
+    }
+  }
+}
+
+@mixin button(
+  $default-color,
+  $hover-color,
+  $active-color,
+  $hide-on-disable: false,
+  $disabled-color: grey
+) {
+  color: $default-color;
+
+  & > svg path {
+    fill: $default-color;
+    stroke: $default-color;
+    stroke-width: 0;
+    transition: 0.2s all;
+  }
+
+  &:hover {
+    color: $hover-color;
+
+    & > svg path {
+      fill: $hover-color;
+      stroke: $hover-color;
+    }
+  }
+
+  &:active {
+    color: $active-color;
+
+    & > svg path {
+      fill: $active-color;
+      stroke: $active-color;
+    }
+  }
+
+  &:disabled {
+    @if $hide-on-disable {
+      display: none;
+    }
+    cursor: default;
+    color: $disabled-color;
+    pointer-events: none !important;
+
+    & > svg path {
+      fill: $disabled-color;
+      stroke: $disabled-color;
+    }
+  }
+
+  &[data-disabled='true'] {
+    @extend :disabled;
+  }
+}
+
+.content-button {
+  padding: 0;
+  transition: 0.2s all;
+}
+
+.fullwidth-button {
+  @extend .content-button;
+  width: 100%;
+}

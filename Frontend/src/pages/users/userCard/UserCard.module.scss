@@ -1,0 +1,25 @@
+@use "src/styles/variables" as *;
+@use "src/styles/mixins" as *;
+
+.container {
+  @include inner-container;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #cd4868;
+
+  .rightWrapper,
+  .leftWrapper {
+    display: flex;
+    gap: 10px;
+  }
+
+  .leftWrapper {
+    font-size: 28px;
+  }
+}
+
+.redButton {
+  color: #fff !important;
+  background-color: #ff003e !important;
+}

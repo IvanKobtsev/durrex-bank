@@ -1,0 +1,43 @@
+@use "./variables" as *;
+@use "./mixins" as *;
+
+.none-select {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.base-input {
+  /* !important is needed to be applied to MaterialUI components */
+  @include p1;
+  background-color: $input-background !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: inset 4px 4px 4px rgba(0, 0, 0, 0.25);
+  box-sizing: border-box !important;
+  border-radius: 10px !important;
+  width: 100%;
+  height: $form-input-height;
+  font-family: $font-family;
+  font-weight: normal;
+  font-style: normal;
+  color: #fff !important;
+  padding: $input-padding $input-padding ($input-padding - 1) $input-padding;
+}
+
+.base-input::placeholder {
+  color: rgba($normal, 0.5);
+}
+
+.base-input:focus::placeholder {
+  color: rgba($normal, 0.2);
+}
+.inputErrorText {
+  width: 100%;
+  margin-top: 2px;
+  font-weight: normal;
+  font-size: 10px;
+  height: 12px;
+
+  color: rgba($danger, 0.5);
+  margin-bottom: -$errorTextMarginBottom;
+}

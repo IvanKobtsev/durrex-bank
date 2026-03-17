@@ -14,8 +14,8 @@ dependencies {
     api(stack.retrofit)
     ksp(stack.anvil.utils.compiler)
     implementation(stack.kotlinx.serialization.json)
-    implementation(project(":component:common"))
-    implementation(project(":component:util"))
+    implementation(project(":core:common"))
+    implementation(project(":core:util"))
 }
 anvil {
     useKsp(contributesAndFactoryGeneration = true)

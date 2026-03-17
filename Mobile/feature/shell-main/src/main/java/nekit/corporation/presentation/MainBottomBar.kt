@@ -77,7 +77,7 @@ fun MainBottomBar(viewModel: BottomBarViewModel) {
                 )
             }
             Caption(
-                string = stringResource(R.string.menu),
+                string = stringResource(R.string.history),
                 color = color
             )
         }

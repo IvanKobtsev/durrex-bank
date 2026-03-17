@@ -1,0 +1,6 @@
+include(":core")
+include(":core:api")
+include(":core:architecture")
+include(":core:common")
+include(":core:ui")
+include(":core:util")

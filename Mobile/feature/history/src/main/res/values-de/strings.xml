@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="menu">Menü</string>
+    <string name="history">Menü</string>
     <string name="my_loans">Meine Kredite</string>
     <string name="suggestions_for_you">Vorschläge für Sie</string>
     <string name="bank_offices">Bankfilialen</string>

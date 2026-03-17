@@ -1,4 +1,4 @@
-rootProject.name = "shift_project"
+rootProject.name = "durex_bank"
 
 pluginManagement {
     repositories {
@@ -21,8 +21,9 @@ dependencyResolutionManagement {
 }
 
 include(":app")
-apply(from = "component/settings-component.gradle.kts")
+apply(from = "core/settings-component.gradle.kts")
 apply(from = "components/settings-components.gradle.kts")
 apply(from = "feature/settings-feature.gradle.kts")
 include(":feature:onboarding-shared")
 include(":feature:language-shared")
+include(":feature:transaction-details")

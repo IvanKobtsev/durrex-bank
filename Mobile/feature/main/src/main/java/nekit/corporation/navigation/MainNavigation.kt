@@ -2,11 +2,13 @@ package nekit.corporation.navigation
 
 interface MainNavigation {
 
-    fun openLoanCreating(amount: Int, percent: Double, period: Int)
-
     fun openAllLoans()
 
+    fun openAllAccounts()
+
     fun openLoanById(id: Int)
+
+    fun openAccountById(id: Int)
 
     fun openOnboarding()
 

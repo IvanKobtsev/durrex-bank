@@ -18,13 +18,13 @@ import nekit.corporation.ui.component.BaseTitle
 import nekit.corporation.ui.theme.LoansAppTheme
 import nekit.corporation.history.R
 import nekit.corporation.presentation.all.accounts.AllAccountsViewModel
-import nekit.corporation.presentation.models.AllLoansState
-import nekit.corporation.ui.component.CreditRow
+import nekit.corporation.presentation.models.AllAccountsState
+import nekit.corporation.ui.component.AccountRow
 
 @Composable
 fun AllAccountsScreen(viewModel: AllAccountsViewModel) {
     val state = viewModel.screenState.collectAsStateWithLifecycle().value.currentState
-    if (state is AllLoansState.Component) {
+    if (state is AllAccountsState.Component) {
         Column(
             Modifier.padding(
                 top = WindowInsets.systemBars.asPaddingValues().calculateTopPadding(),
@@ -32,16 +32,17 @@ fun AllAccountsScreen(viewModel: AllAccountsViewModel) {
         ) {
             BaseTitle(
                 onClick = viewModel::onClose,
-                label = stringResource(R.string.my_loans),
+                label = stringResource(R.string.my_accounts),
             )
-            /*LazyColumn {
-                items(state.loans) {
-                    CreditRow(
-                        loanRowModel = it,
-                        onClick = { viewModel.onOpenLoan(it.id) }
+            LazyColumn {
+                items(state.accounts) { ac ->
+                    AccountRow(
+                        account = ac.id,
+                        amount = ac.balance,
+                        onClick = { viewModel.onOpenAccount(it) }
                     )
                 }
-            }*/
+            }
         }
     }
 

@@ -5,5 +5,5 @@ import nekit.corporation.architecture.presentation.Event
 
 sealed interface AuthEvent : Event {
 
-    data class ShowToast(@StringRes val stringResId: Int) : AuthEvent
+    data class ShowToast(@param:StringRes val stringResId: Int) : AuthEvent
 }

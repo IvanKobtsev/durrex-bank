@@ -10,6 +10,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import nekit.corporation.loan_details.R
+import nekit.corporation.loan_shared.domain.model.CreditDetail
 import nekit.corporation.ui.component.InfoRow
 import nekit.corporation.ui.theme.LocalAppColors
 
@@ -17,8 +18,10 @@ import nekit.corporation.ui.theme.LocalAppColors
 fun LoanDetailsCard(
     loanNumber: Int,
     tariff: String,
-    remainBalance: Double,
     amount: Double,
+    remainBalance: Double,
+    nextPaymentDate: String,
+    createAt: String,
     modifier: Modifier = Modifier,
 ) {
     val colors = LocalAppColors.current
@@ -30,6 +33,8 @@ fun LoanDetailsCard(
     ) {
         InfoRow(R.string.loan_number, "${stringResource(R.string.number)} $loanNumber")
         InfoRow(R.string.tariff, tariff)
+        InfoRow(R.string.create_at, createAt)
+        InfoRow(R.string.next_payment, nextPaymentDate)
         InfoRow(R.string.remain_balance, remainBalance.toString())
         InfoRow(R.string.amount, "$amount")
     }

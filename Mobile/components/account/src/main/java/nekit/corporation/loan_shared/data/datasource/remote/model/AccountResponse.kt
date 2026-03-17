@@ -11,7 +11,7 @@ data class AccountResponse(
     val ownerId: Int,
     val balance: Double,
     val currency: String,
-    val status: AccountStatus,
+    val status: Int,
     @SerialName("createdAt") @Contextual val createdAt: OffsetDateTime,
     @SerialName("closedAt")  @Contextual val closedAt: OffsetDateTime? = null
 )

@@ -19,9 +19,9 @@ dependencies {
     implementation(project(":feature:main"))
     implementation(project(":feature:history"))
 
-    implementation(project(":component:architecture"))
-    implementation(project(":component:common"))
-    implementation(project(":component:ui"))
+    implementation(project(":core:architecture"))
+    implementation(project(":core:common"))
+    implementation(project(":core:ui"))
 
     implementation(stack.cicerone)
 }

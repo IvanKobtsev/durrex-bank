@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="menu">Меню</string>
+    <string name="history">Меню</string>
     <string name="my_loans">Менин карыздарым</string>
     <string name="suggestions_for_you">Сиз үчүн сунуштар</string>
     <string name="bank_offices">Банк бөлүмдөрү</string>

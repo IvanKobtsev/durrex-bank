@@ -16,8 +16,8 @@ import javax.inject.Inject
 class OnboardingViewModel @Inject constructor(
     private val onboardingNavigation: OnboardingNavigation,
     private val updateSettingUseCase: UpdateSettingUseCase
-) :
-    StatefulViewModel<OnboardingState>() {
+) : StatefulViewModel<OnboardingState>() {
+
     override fun createInitialState(): OnboardingState {
         return OnboardingState(
             persistentListOf(

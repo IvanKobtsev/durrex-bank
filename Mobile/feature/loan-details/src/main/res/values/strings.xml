@@ -6,10 +6,18 @@
     <string name="first_name">Имя</string>
     <string name="second_name">Фамилия</string>
     <string name="phone">Номер телефона</string>
-
+    <string name="payments">Платежи</string>
     <string name="loan_number">Номер займа</string>
-    <string name="tariff">Дата оформления</string>
+    <string name="payment_number">Номер платежа</string>
+    <string name="due_date">Дата платежа</string>
+    <string name="tariff_name">Название тарифа</string>
+    <string name="tariff">Название тарифа</string>
+    <string name="create_at">Дата оформления</string>
+    <string name="paid">Оплачен</string>
+    <string name="is_not_paid">Просрочен</string>
+    <string name="next_payment">Следующий платеж</string>
     <string name="remain_balance">Оставшийся баланс</string>
+    <string name="paid_at">Оплачен в</string>
     <string name="percent">Процент</string>
     <string name="amount">Сумма</string>
 

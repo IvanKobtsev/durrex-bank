@@ -2,10 +2,8 @@ package nekit.corporation.presentation.models
 
 import kotlinx.collections.immutable.ImmutableList
 import nekit.corporation.architecture.presentation.ScreenState
-import nekit.corporation.domain.Currency
 import nekit.corporation.loan_shared.domain.model.Account
 import nekit.corporation.loan_shared.domain.model.Credit
-import nekit.corporation.models.LoanRowModel
 
 
 sealed interface MainState : ScreenState {

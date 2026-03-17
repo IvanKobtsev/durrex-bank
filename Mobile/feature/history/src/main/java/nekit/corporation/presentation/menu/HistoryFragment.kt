@@ -28,6 +28,7 @@ class HistoryFragment : Fragment(){
         savedInstanceState: Bundle?
     ): View {
         binding = MenuScreenBinding.inflate(inflater, container, false)
+        viewModel.init()
         return binding!!.root
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

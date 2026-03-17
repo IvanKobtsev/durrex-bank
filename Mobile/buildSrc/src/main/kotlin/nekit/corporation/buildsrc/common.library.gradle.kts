@@ -11,16 +11,12 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 
     kotlinOptions {
-        jvmTarget = "11"
-    }
-
-    buildFeatures {
-        buildConfig = true
+        jvmTarget = "21"
     }
 
     buildTypes {
@@ -29,13 +25,4 @@ android {
         }
     }
 
-    flavorDimensions += listOf("version")
-    productFlavors {
-        create("dev") {
-            dimension = "version"
-        }
-        create("live") {
-            dimension = "version"
-        }
-    }
 }

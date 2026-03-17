@@ -35,14 +35,14 @@ fun HistoryScreen(viewModel: HistoryViewModel) {
             .fillMaxSize()
     ) {
         BaseTopBar(
-            text = stringResource(R.string.menu),
+            text = stringResource(R.string.history),
             onIconClick = viewModel::openOnboarding
         )
         Spacer(Modifier.height(16.dp))
         LazyColumn {
             items(state.transactions) {
                 TransactionsRow(it) {
-                   // viewModel.on(it)
+                    viewModel.onTransactionClick(it.id)
                 }
             }
         }

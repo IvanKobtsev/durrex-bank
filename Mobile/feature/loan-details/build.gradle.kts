@@ -16,10 +16,10 @@ android {
 }
 
 dependencies {
-    implementation(project(":component:architecture"))
-    implementation(project(":component:common"))
-    implementation(project(":component:ui"))
-    implementation(project(":component:util"))
+    implementation(project(":core:architecture"))
+    implementation(project(":core:common"))
+    implementation(project(":core:ui"))
+    implementation(project(":core:util"))
 
     implementation(project(":feature:language-shared"))
 

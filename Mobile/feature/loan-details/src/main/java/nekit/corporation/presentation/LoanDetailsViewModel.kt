@@ -11,7 +11,7 @@ import nekit.corporation.loan_shared.domain.usecase.GetCreditDetailUseCase
 import nekit.corporation.navigation.LoanDetailsNavigation
 import nekit.corporation.presentation.model.LoanDetailsEvent
 import nekit.corporation.presentation.model.LoanDetailsState
-import nekit.corporation.user.domain.GetUserUseCase
+import nekit.corporation.presentation.model.LoanInteractions
 import nekit.corporation.util.domain.common.BadRequestFailure
 import nekit.corporation.util.domain.common.CommonBackendFailure
 import nekit.corporation.util.domain.common.NoConnectionFailure
@@ -22,23 +22,19 @@ import javax.inject.Inject
 
 class LoanDetailsViewModel @Inject constructor(
     private val getCreditByIdUseCase: GetCreditDetailUseCase,
-    private val userUserUseCase: GetUserUseCase,
     private val loanDetailsNavigation: LoanDetailsNavigation
-) : StatefulViewModel<LoanDetailsState>() {
+) : StatefulViewModel<LoanDetailsState>(),LoanInteractions {
 
     override fun createInitialState(): LoanDetailsState {
         return LoanDetailsState.Loading
     }
 
-    fun onBack() = loanDetailsNavigation.onBack()
+    override fun onBack() = loanDetailsNavigation.onBack()
 
     fun init(id: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             reduceError {
-                val user = userUserUseCase()
                 val credit = getCreditByIdUseCase(
-                    user.id,
-                    userRole = user.role.name,
                     creditId = id
                 )
 

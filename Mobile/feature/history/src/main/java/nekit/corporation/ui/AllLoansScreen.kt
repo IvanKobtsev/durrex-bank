@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
@@ -17,6 +18,7 @@ import nekit.corporation.history.R
 import nekit.corporation.presentation.all.loans.AllLoansViewModel
 import nekit.corporation.presentation.models.AllLoansState
 import nekit.corporation.ui.component.BaseTitle
+import nekit.corporation.ui.component.CreditRow
 import nekit.corporation.ui.theme.LoansAppTheme
 
 @Composable
@@ -33,12 +35,14 @@ fun AllLoansScreen(viewModel: AllLoansViewModel) {
                 label = stringResource(R.string.my_loans),
             )
             LazyColumn {
-               /* items(state.loans) {
+                items(state.loans) {
                     CreditRow(
-                        loanRowModel = it,
-                        onClick = { viewModel.onOpenLoan(it.id) }
+                        creditId = it.id,
+                        tariffName = it.tariffName,
+                        amount = it.amount,
+                        onClick = { viewModel.onOpenLoan(it) }
                     )
-                }*/
+                }
             }
         }
     }

@@ -17,7 +17,7 @@ data class CreditDetailResponse(
     val amount: Double,
     @SerialName("remainingBalance")
     val remainingBalance: Double,
-    val status: CreditStatus,
+    val status: Int,
     @SerialName("issuedAt") @Contextual
     val issuedAt: Instant,
     @SerialName("nextPaymentDate") @Contextual

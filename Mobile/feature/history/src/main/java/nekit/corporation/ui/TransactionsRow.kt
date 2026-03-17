@@ -16,10 +16,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import nekit.corporation.ui.component.Body2Text
 import nekit.corporation.history.R
+import nekit.corporation.loan_shared.domain.model.Transaction
+import nekit.corporation.loan_shared.domain.model.TransactionTypeDomain
 import nekit.corporation.ui.theme.LoansAppTheme
 import nekit.corporation.ui.theme.LocalAppColors
-import nekit.corporation.user.domain.model.Transaction
-import nekit.corporation.user.domain.model.TransactionTypeDomain
 import java.time.Instant
 
 @Composable

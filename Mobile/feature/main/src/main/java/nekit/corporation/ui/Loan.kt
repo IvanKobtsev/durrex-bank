@@ -18,9 +18,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import nekit.corporation.domain.Currency
 import nekit.corporation.main.R
-import nekit.corporation.ui.component.BasicButton
+import nekit.corporation.presentation.models.Currency
+import nekit.corporation.ui.component.PrimaryButton
 import nekit.corporation.ui.component.BodyText
 import nekit.corporation.ui.component.Caption
 import nekit.corporation.ui.component.Headline2
@@ -91,7 +91,7 @@ fun Loan(
                 ) {
                     Currency.entries.forEach { currency ->
                         DropdownMenuItem(
-                            text = { BodyText(currency.symbol) },
+                            text = { BodyText(currency.symbol, color = colors.fontPrimary) },
                             onClick = {
                                 onItemSelect(currency)
                             },
@@ -101,7 +101,7 @@ fun Loan(
             }
         }
 
-        BasicButton(
+        PrimaryButton(
             text = stringResource(R.string.open_button),
             onClick = onButtonClick,
             isEnable = true,

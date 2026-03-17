@@ -2,6 +2,7 @@ package nekit.corporation.ui
 
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -20,9 +21,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.persistentListOf
 import nekit.corporation.architecture.presentation.EventQueue
-import nekit.corporation.domain.Currency
 import nekit.corporation.ui.component.BaseTopBar
 import nekit.corporation.main.R
+import nekit.corporation.presentation.models.Currency
 import nekit.corporation.presentation.models.MainEvent
 import nekit.corporation.presentation.models.MainState
 import nekit.corporation.presentation.models.MainViewModelInteraction
@@ -66,6 +67,11 @@ fun MainScreen(state: MainState, eventQueue: EventQueue, interaction: MainViewMo
                     LoanBanner(
                         Modifier
                             .padding(horizontal = 16.dp)
+                            .clickable(
+                                interactionSource = null,
+                                indication = null,
+                                onClick = interaction::onCreateCreditClick
+                            )
                             .fillMaxWidth()
                     )
                 }
@@ -116,7 +122,7 @@ fun MainScreen(state: MainState, eventQueue: EventQueue, interaction: MainViewMo
                     )
                 }
                 item {
-                    if (state.credits.isEmpty()) {
+                    if (state.accounts.isEmpty()) {
                         Spacer(Modifier.height(8.dp))
                         Caption(
                             string = stringResource(R.string.my_accounts_placeholder),
@@ -124,10 +130,10 @@ fun MainScreen(state: MainState, eventQueue: EventQueue, interaction: MainViewMo
                             modifier = Modifier.padding(horizontal = 16.dp)
                         )
                     } else {
-                        CreditsCard(
-                            loans = state.credits,
-                            onButtonClick = interaction::onShowAllLoansClick,
-                            onRowClick = interaction::onLoanClick
+                        AccountCard(
+                            loans = state.accounts,
+                            onButtonClick = interaction::onShowAllAccountsClick,
+                            onRowClick = interaction::onAccountClick
                         )
                     }
                 }
@@ -170,6 +176,10 @@ fun PreviewMainScreen() {
                     TODO("Not yet implemented")
                 }
 
+                override fun onShowAllAccountsClick() {
+                    TODO("Not yet implemented")
+                }
+
                 override fun onLoanClick(id: Int) {
                     TODO("Not yet implemented")
                 }
@@ -183,6 +193,10 @@ fun PreviewMainScreen() {
                 }
 
                 override fun onOpenCurrencyMenu() {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onAccountClick(id: Int) {
                     TODO("Not yet implemented")
                 }
 

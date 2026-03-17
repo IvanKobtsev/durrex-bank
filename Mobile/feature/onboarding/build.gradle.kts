@@ -15,10 +15,10 @@ android {
 }
 
 dependencies {
-    implementation(project(":component:architecture"))
-    implementation(project(":component:common"))
-    implementation(project(":component:util"))
-    implementation(project(":component:ui"))
+    implementation(project(":core:architecture"))
+    implementation(project(":core:common"))
+    implementation(project(":core:util"))
+    implementation(project(":core:ui"))
     implementation(project(":feature:onboarding-shared"))
     ksp(stack.anvil.utils.compiler)
 

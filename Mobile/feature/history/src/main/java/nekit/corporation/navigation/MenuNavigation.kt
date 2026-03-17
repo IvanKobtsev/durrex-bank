@@ -6,11 +6,5 @@ interface MenuNavigation {
 
     fun openLoans()
 
-    fun openSuggestions()
-
-    fun openBankOffices()
-
-    fun openHelp()
-
-    fun openLanguage()
+    fun openDetails(accountId:Int,transactionId:Long)
 }

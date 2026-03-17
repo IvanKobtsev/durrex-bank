@@ -27,28 +27,36 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.collections.immutable.persistentListOf
+import nekit.corporation.architecture.presentation.EventQueue
+import nekit.corporation.loan_details.R
+import nekit.corporation.loan_shared.domain.model.CreditDetail
+import nekit.corporation.loan_shared.domain.model.CreditStatusDomain
+import nekit.corporation.loan_shared.domain.model.PaymentScheduleEntry
+import nekit.corporation.presentation.model.LoanDetailsEvent
 import nekit.corporation.presentation.model.LoanDetailsState
+import nekit.corporation.presentation.model.LoanInteractions
 import nekit.corporation.ui.component.BaseIconButton
+import nekit.corporation.ui.component.Body2Text
+import nekit.corporation.ui.component.BodyText
 import nekit.corporation.ui.component.Caption
 import nekit.corporation.ui.component.Headline2
+import nekit.corporation.ui.component.LoadingScreen
 import nekit.corporation.ui.theme.LoansAppTheme
 import nekit.corporation.ui.theme.LocalAppColors
-import nekit.corporation.loan_details.R
-import nekit.corporation.models.LoanUiState
-import nekit.corporation.presentation.LoanDetailsViewModel
-import nekit.corporation.presentation.model.LoanDetailsEvent
-import nekit.corporation.ui.component.Body2Text
-import nekit.corporation.ui.component.LoadingScreen
-import nekit.corporation.utils.getName
+import nekit.corporation.util.domain.common.toDate
+import java.time.Instant
 
 @Composable
-fun LoanDetailsScreen(viewModel: LoanDetailsViewModel) {
+fun LoanDetailsScreen(
+    state: LoanDetailsState,
+    interactions: LoanInteractions,
+    events: EventQueue
+) {
     val colors = LocalAppColors.current
-    val state = viewModel.screenState.collectAsStateWithLifecycle().value.currentState
     val context = LocalContext.current
 
-    viewModel.screenEvents.CollectEvent {
+    events.CollectEvent {
         if (it is LoanDetailsEvent) {
             when (it) {
                 is LoanDetailsEvent.ShowToast -> Toast.makeText(
@@ -66,7 +74,7 @@ fun LoanDetailsScreen(viewModel: LoanDetailsViewModel) {
             Column {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     BaseIconButton(
-                        onClick = viewModel::onBack,
+                        onClick = interactions::onBack,
                         modifier = Modifier
                             .padding(16.dp)
                             .padding(
@@ -92,6 +100,8 @@ fun LoanDetailsScreen(viewModel: LoanDetailsViewModel) {
                             tariff = state.credit.tariffName ?: "",
                             remainBalance = state.credit.remainingBalance,
                             amount = state.credit.amount,
+                            nextPaymentDate = state.credit.nextPaymentDate?.toDate().toString(),
+                            createAt = state.credit.issuedAt.toDate(),
                         )
                     }
                     item {
@@ -105,7 +115,7 @@ fun LoanDetailsScreen(viewModel: LoanDetailsViewModel) {
                             Row(modifier = Modifier.fillMaxWidth()) {
                                 Caption(
                                     string = stringResource(R.string.state),
-                                    color = colors.fontSecondary
+                                    color = colors.fontPrimary
                                 )
                                 Spacer(Modifier.weight(1f))
                                 Body2Text(
@@ -116,9 +126,21 @@ fun LoanDetailsScreen(viewModel: LoanDetailsViewModel) {
                         }
                         Spacer(Modifier.height(16.dp))
                     }
+                    item {
+                        BodyText(stringResource(R.string.payments), color = colors.fontPrimary)
+                        Spacer(Modifier.height(16.dp))
+                    }
                     state.credit.schedule?.let {
                         items(it) {
-
+                            PaymentCard(
+                                id = it.id,
+                                dueDate = it.dueDate.toDate(),
+                                amount = it.amount,
+                                isPaid = it.isPaid,
+                                paidAt = it.paidAt?.toDate(),
+                                modifier = Modifier
+                            )
+                            Spacer(Modifier.height(16.dp))
                         }
                     }
                 }
@@ -128,10 +150,47 @@ fun LoanDetailsScreen(viewModel: LoanDetailsViewModel) {
 }
 
 
-@Preview
+@Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun PreviewLoanDetailsScreen() {
     LoansAppTheme {
-        //LoanDetailsScreen()
+        LoanDetailsScreen(
+            state = LoanDetailsState.Content(
+                CreditDetail(
+                    id = 123132,
+                    clientId = 12345,
+                    accountId = 132453,
+                    tariffName = "afsgds",
+                    amount = 123.23,
+                    remainingBalance = 123.455,
+                    status = CreditStatusDomain.ACTIVE,
+                    issuedAt = Instant.now(),
+                    nextPaymentDate = Instant.now(),
+                    schedule = persistentListOf(
+                        PaymentScheduleEntry(
+                            id = 1214,
+                            dueDate = Instant.now(),
+                            amount = 124.44,
+                            isPaid = true,
+                            paidAt = Instant.now()
+                        ),
+                        PaymentScheduleEntry(
+                            id = 1214,
+                            dueDate = Instant.now(),
+                            amount = 124.44,
+                            isPaid = false,
+                            paidAt = null
+                        ),
+                    )
+                )
+            ),
+            interactions = object : LoanInteractions {
+                override fun onBack() {
+                    TODO("Not yet implemented")
+                }
+
+            },
+            events = EventQueue()
+        )
     }
 }

@@ -17,7 +17,7 @@ import nekit.corporation.auth.R
 import nekit.corporation.auth.presentation.model.AuthState
 import nekit.corporation.auth.presentation.model.Field
 import nekit.corporation.auth.presentation.model.Password
-import nekit.corporation.ui.component.BasicButton
+import nekit.corporation.ui.component.PrimaryButton
 import nekit.corporation.ui.component.BasicInputField
 import nekit.corporation.ui.theme.LoansAppTheme
 
@@ -53,7 +53,7 @@ fun SingInScreen(state: AuthState.SignInState, signInInteract: SignInInteract) {
             else
                 PasswordVisualTransformation()
         )
-        BasicButton(
+        PrimaryButton(
             text = stringResource(R.string.sign_up_action),
             onClick = signInInteract::onSignInClick,
             isEnable = state.isSignInButtonEnable,

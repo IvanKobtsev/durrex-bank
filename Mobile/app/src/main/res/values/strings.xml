@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Durex банк</string>
+
+    <!-- Errors -->
+    <string name="error_no_connection">Нет соединения с интернетом</string>
+    <string name="error_no_connection_description">Проверьте интернет соединение и повторите попытку</string>
+    <string name="error_something_went_wrong">Что-то пошло не так</string>
+    <string name="error_something_went_wrong_description">Попробуйте повторить позже</string>
+    <string name="error_unknown_error">Неизвестная ошибка</string>
+    <string name="error_unauthorized">Ошибка авторизации, вернитесь на главный экран и войдите в систему</string>
+    <string name="error_forbidden">Доступ запрещён</string>
+    <string name="error_bad_request">Некорректный запрос</string>
+    <string name="error_not_found">Не найдено</string>
+    <string name="error_backend">Ошибка сервера</string>
+</resources>

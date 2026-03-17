@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="rub" translatable="false">₽</string>
-    <string name="menu">Меню</string>
+    <string name="history">Меню</string>
     <string name="my_loans">Мои займы</string>
+    <string name="my_accounts">Мои счета</string>
     <string name="suggestions_for_you">Предложения для Вас</string>
     <string name="bank_offices">Отделения банка</string>
     <string name="help">Помощь</string>

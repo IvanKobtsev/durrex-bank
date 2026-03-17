@@ -8,26 +8,23 @@ import nekit.corporation.architecture.presentation.StatefulViewModel
 import nekit.corporation.loan_shared.domain.usecase.GetCreditsUseCase
 import nekit.corporation.navigation.AllLoansNavigation
 import nekit.corporation.presentation.models.AllLoansState
-import nekit.corporation.user.domain.UserRepository
 import javax.inject.Inject
 
 class AllLoansViewModel @Inject constructor(
     private val allLoansNavigation: AllLoansNavigation,
-    private val userRepository: UserRepository,
     private val getLoansUseCase: GetCreditsUseCase
 ) : StatefulViewModel<AllLoansState>() {
 
     override fun createInitialState(): AllLoansState {
-        return currentScreenState
+        return AllLoansState.Loading
     }
 
-    init {
+    fun init() {
         viewModelScope.launch(Dispatchers.IO) {
             updateState {
                 AllLoansState.Loading
             }
-            val user = userRepository.getUser()
-            val loans = getLoansUseCase(user.id)
+            val loans = getLoansUseCase()
             updateState {
                 AllLoansState.Component(
                     loans = loans.toImmutableList()

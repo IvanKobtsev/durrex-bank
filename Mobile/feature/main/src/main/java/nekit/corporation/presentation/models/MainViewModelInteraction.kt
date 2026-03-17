@@ -1,7 +1,5 @@
 package nekit.corporation.presentation.models
 
-import nekit.corporation.domain.Currency
-
 interface MainViewModelInteraction {
 
     fun openOnboarding()
@@ -13,6 +11,8 @@ interface MainViewModelInteraction {
 
     fun onShowAllLoansClick()
 
+    fun onShowAllAccountsClick()
+
     fun onLoanClick(id: Int)
 
     fun onDismissCurrency()
@@ -20,4 +20,6 @@ interface MainViewModelInteraction {
     fun onSelectCurrency(currency: Currency)
 
     fun onOpenCurrencyMenu()
+
+    fun onAccountClick(id: Int)
 }

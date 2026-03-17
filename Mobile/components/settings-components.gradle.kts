@@ -1,4 +1,5 @@
 include(":components:account")
-include(":components:user")
-include(":components:tariff")
+include(":components:auth-shared")
 include(":components:loan")
+include(":components:tariff")
+include(":components:user")

@@ -8,11 +8,10 @@ import retrofit2.http.POST
 
 interface TariffApi {
    
-    @GET("tariffs")
-    suspend fun getTariffs(
-    ): List<TariffResponse>
+    @GET("credit/tariffs")
+    suspend fun getTariffs(): List<TariffResponse>
 
-    @POST("tariffs")
+    @POST("credit/tariffs")
     suspend fun createTariff(
         @Body request: CreateTariffRequest
     ): TariffResponse

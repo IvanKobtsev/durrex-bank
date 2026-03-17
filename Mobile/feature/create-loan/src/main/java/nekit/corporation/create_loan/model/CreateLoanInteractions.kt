@@ -1,5 +1,7 @@
 package nekit.corporation.create_loan.model
 
+import nekit.corporation.loan_shared.domain.model.Account
+
 interface CreateLoanInteractions {
 
     fun onBackClick()
@@ -8,7 +10,9 @@ interface CreateLoanInteractions {
 
     fun onExpandedTariffChange(isOpen: Boolean)
 
-    fun onSelectAccount(account: String)
+    fun onExpandedAccountChange(isOpen: Boolean)
+
+    fun onSelectAccount(account: AccountUi)
 
     fun onCreateCredit()
 

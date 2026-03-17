@@ -13,21 +13,17 @@ import javax.inject.Inject
 
 class AllAccountsViewModel @Inject constructor(
     private val allActionsNavigation: AllAccountsNavigation,
-    private val userRepository: UserRepository,
     private val accountRepository: AccountRepository,
 ) : StatefulViewModel<AllAccountsState>() {
 
     override fun createInitialState(): AllAccountsState {
-        return currentScreenState
+        return AllAccountsState.Loading
     }
 
-    init {
+    fun init() {
         viewModelScope.launch(Dispatchers.IO) {
-            updateState {
-                AllAccountsState.Loading
-            }
-            val user = userRepository.getUser()
-            val accounts = accountRepository.getAllAccounts(user.id)
+
+            val accounts = accountRepository.getAllAccounts()
             updateState {
                 AllAccountsState.Component(
                     accounts = accounts.toImmutableList()

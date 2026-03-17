@@ -26,7 +26,7 @@ import nekit.corporation.create_loan.model.CreateLoanInteractions
 import nekit.corporation.create_loan.model.CreateLoanState
 import nekit.corporation.tariff.domain.model.Tariff
 import nekit.corporation.ui.component.BaseIconButton
-import nekit.corporation.ui.component.BasicButton
+import nekit.corporation.ui.component.PrimaryButton
 import nekit.corporation.ui.component.BasicInputField
 import nekit.corporation.ui.component.BodyText
 import nekit.corporation.ui.component.DropText
@@ -41,6 +41,7 @@ fun CreateLoanScreen(state: CreateLoanState, interactions: CreateLoanInteraction
     Column(
         Modifier
             .padding(horizontal = 16.dp)
+            .padding(WindowInsets.systemBars.asPaddingValues())
             .fillMaxSize()
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -72,20 +73,26 @@ fun CreateLoanScreen(state: CreateLoanState, interactions: CreateLoanInteraction
                 onExpandedChange = interactions::onExpandedTariffChange,
                 onSelect = interactions::onSelectTariff,
                 label = stringResource(R.string.select_tariff),
+                getDisplayText = { state.selectedTariff.name ?: "" },
                 modifier = Modifier.fillMaxWidth()
             )
         }
 
         Spacer(Modifier.height(16.dp))
+        val balance = stringResource(R.string.balance)
         state.selectedAccount?.let {
             DropText(
-                selected = "id: ${it.id}\n${stringResource(R.string.balance)}: ${it.balance} ${it.currency}",
-                variants = state.tariffs.map { tariff -> tariff.name ?: "" }.toImmutableList(),
+                selected = it,
+                variants = state.accounts,
                 expanded = state.isAccountOpen,
-                onExpandedChange = interactions::onExpandedTariffChange,
-                onSelect = interactions::onSelectTariff,
+                onExpandedChange = interactions::onExpandedAccountChange,
+                onSelect = interactions::onSelectAccount,
                 label = stringResource(R.string.select_account),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                getDisplayText = { account ->
+                    "id: ${account.id}\n" +
+                            "${balance}: ${account.balance} ${account.currency}"
+                },
             )
         }
 
@@ -101,10 +108,9 @@ fun CreateLoanScreen(state: CreateLoanState, interactions: CreateLoanInteraction
             visualTransformation = NumberVisualTransformation()
         )
         Spacer(Modifier.weight(1f))
-        BasicButton(
+        PrimaryButton(
             text = stringResource(R.string.create_loan),
             onClick = interactions::onCreateCredit,
-            isEnable = true,
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(Modifier.height(16.dp))
@@ -169,7 +175,11 @@ private fun PreviewCreateLoanScreen() {
                     TODO("Not yet implemented")
                 }
 
-                override fun onSelectAccount(account: String) {
+                override fun onExpandedAccountChange(isOpen: Boolean) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onSelectAccount(account: AccountUi) {
                     TODO("Not yet implemented")
                 }
 

@@ -5,8 +5,9 @@ import nekit.corporation.tariff.data.remote.model.CreateTariffRequest
 import nekit.corporation.tariff.data.remote.model.toDomain
 import nekit.corporation.tariff.domain.TariffRepository
 import nekit.corporation.tariff.domain.model.Tariff
+import javax.inject.Inject
 
-class TariffRepositoryImpl(
+class TariffRepositoryImpl @Inject constructor(
     private val api: TariffApi
 ) : TariffRepository {
 

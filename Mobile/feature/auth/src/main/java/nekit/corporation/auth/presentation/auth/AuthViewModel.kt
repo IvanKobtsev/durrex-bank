@@ -28,6 +28,7 @@ import nekit.corporation.auth.presentation.model.Password
 import nekit.corporation.auth.navigation.AuthNavigation
 import nekit.corporation.auth.presentation.sign.`in`.SignInInteract
 import nekit.corporation.auth.presentation.sign.up.SignUpInteract
+import nekit.corporation.loan_shared.domain.repository.AccountRepository
 import nekit.corporation.onboarding_shared.domain.usecase.GetSettingsUseCase
 import nekit.corporation.util.domain.common.BadRequestFailure
 import nekit.corporation.util.domain.common.CommonBackendFailure
@@ -46,7 +47,8 @@ class AuthViewModel @Inject constructor(
     private val loginUseCase: LoginUseCase,
     private val getSettingsUseCase: GetSettingsUseCase,
     private val getCredentialsUseCase: GetCredentialsUseCase,
-    private val authNavigation: AuthNavigation
+    private val authNavigation: AuthNavigation,
+    private val accountRepository: AccountRepository,
 ) : StatefulViewModel<AuthState>(), SignUpInteract, SignInInteract {
     init {
         observeSignUpState()
@@ -54,12 +56,18 @@ class AuthViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             reduceError {
                 val credentials = getCredentialsUseCase()
-                if (credentials == null)
+                try {
+                    accountRepository.getAllAccounts()
+                    if (credentials == null)
+                        onSignInOpen()
+                    else if (!getSettingsUseCase.execute().isShowedOnboarding)
+                        authNavigation.openOnboarding()
+                    else
+                        authNavigation.openMain()
+                } catch (_: Throwable) {
                     onSignInOpen()
-                else if (!getSettingsUseCase.execute().isShowedOnboarding)
-                    authNavigation.openOnboarding()
-                else
-                    authNavigation.openMain()
+                }
+
             }
         }
     }
@@ -95,7 +103,7 @@ class AuthViewModel @Inject constructor(
                 observeSignUpEmail()
             }
             copy(
-                phone = this.email.copy(
+                email = this.email.copy(
                     text = email,
                     isObserverActive = true
                 )
@@ -109,7 +117,7 @@ class AuthViewModel @Inject constructor(
                 observeSignUpFirstName()
             }
             copy(
-                phone = this.firstName.copy(
+                firstName = this.firstName.copy(
                     text = firstName,
                     isObserverActive = true
                 )
@@ -123,7 +131,7 @@ class AuthViewModel @Inject constructor(
                 observeSignUpLastName()
             }
             copy(
-                phone = this.lastName.copy(
+                lastName = this.lastName.copy(
                     text = lastName,
                     isObserverActive = true
                 )
@@ -370,7 +378,7 @@ class AuthViewModel @Inject constructor(
     }
 
     private fun observeSignUpPhone() = with(viewModelScope) {
-        launch(Dispatchers.Default + SupervisorJob()) {
+        /*launch(Dispatchers.Default + SupervisorJob()) {
             screenState.map { it.currentState }
                 .filterIsInstance<AuthState.SignUpState>()
                 .distinctUntilChanged { lastValue, newValue ->
@@ -390,7 +398,7 @@ class AuthViewModel @Inject constructor(
                         cancel()
                     }
                 }
-        }
+        }*/
     }
 
     private fun observeSignUpEmail() = with(viewModelScope) {

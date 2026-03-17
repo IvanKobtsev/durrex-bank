@@ -5,7 +5,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.runtime.getValue
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import nekit.corporation.di.LoanDetailsFragmentInjector
 import nekit.corporation.loan_details.databinding.LoanDetailsScreenBinding
 import nekit.corporation.ui.LoanDetailsScreen
@@ -38,7 +40,8 @@ class LoanDetailsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding?.loanDetailsScreen?.setContent {
             LoansAppTheme {
-                LoanDetailsScreen(viewModel)
+                val state by viewModel.screenState.collectAsStateWithLifecycle()
+                LoanDetailsScreen(state.currentState, viewModel, viewModel.screenEvents)
             }
         }
     }

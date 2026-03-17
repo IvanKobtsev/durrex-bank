@@ -9,7 +9,7 @@ import java.time.OffsetDateTime
 data class TransactionResponse(
     val id: Long,
     val accountId: Int,
-    val type: TransactionType,
+    val type: Int,
     val amount: Double,
     val balanceBefore: Double,
     val balanceAfter: Double,

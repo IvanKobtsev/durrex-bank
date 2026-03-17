@@ -18,51 +18,49 @@ import retrofit2.http.Query
 
 interface AccountsApi {
 
-    @POST("api/accounts")
+    @POST("core/api/accounts")
     suspend fun createAccount(
         @Body request: CreateAccountCommand
     ): AccountResponse
 
-    @GET("api/accounts")
-    suspend fun getAccounts(
-        @Query("ownerId") ownerId: Int? = null
-    ): List<AccountResponse>
+    @GET("core/api/accounts")
+    suspend fun getAccounts(): List<AccountResponse>
 
-    @GET("api/accounts/{id}")
+    @GET("core/api/accounts/{id}")
     suspend fun getAccount(
         @Path("id") id: Int
     ): AccountResponse
 
-    @DELETE("api/accounts/{id}")
+    @DELETE("core/api/accounts/{id}")
     suspend fun deleteAccount(
         @Path("id") id: Int
     ): AccountResponse
 
-    @POST("api/accounts/{id}/deposit")
+    @POST("core/api/accounts/{id}/deposit")
     suspend fun deposit(
         @Path("id") id: Int,
         @Body request: DepositRequest
     ): TransactionResponse
 
-    @POST("api/accounts/{id}/withdraw")
+    @POST("core/api/accounts/{id}/withdraw")
     suspend fun withdraw(
         @Path("id") id: Int,
         @Body request: WithdrawRequest
     ): TransactionResponse
 
-    @POST("api/accounts/{id}/transfer")
+    @POST("core/api/accounts/{id}/transfer")
     suspend fun transfer(
         @Path("id") id: Int,
         @Body request: TransferRequest
     ): TransactionResponse
 
-    @POST("api/accounts/{id}/debit")
+    @POST("core/api/accounts/{id}/debit")
     suspend fun debit(
         @Path("id") id: Int,
         @Body request: DebitRequest
     ): TransactionResponse
 
-    @GET("api/accounts/{id}/transactions")
+    @GET("core/api/accounts/{id}/transactions")
     suspend fun getTransactions(
         @Path("id") id: Int,
         @Query("page") page: Int = 1,

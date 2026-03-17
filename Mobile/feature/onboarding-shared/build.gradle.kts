@@ -10,7 +10,7 @@ android {
 }
 
 dependencies {
-    implementation(project(":component:common"))
+    implementation(project(":core:common"))
     ksp(stack.anvil.utils.compiler)
     api(stack.data.store)
     implementation(stack.kotlinx.serialization.json)

@@ -13,10 +13,8 @@ fun CreditResponse.toDomain() = Credit(
     tariffName = tariffName,
     amount = amount,
     remainingBalance = remainingBalance,
-    status = when (status) {
-        CreditStatus.ACTIVE -> CreditStatusDomain.ACTIVE
-        CreditStatus.CLOSED -> CreditStatusDomain.CLOSED
-    },
+    status =
+        CreditStatusDomain.entries[status],
     issuedAt = issuedAt
 )
 
@@ -27,10 +25,7 @@ fun CreditDetailResponse.toDomain() = CreditDetail(
     tariffName = tariffName,
     amount = amount,
     remainingBalance = remainingBalance,
-    status = when (status) {
-        CreditStatus.ACTIVE -> CreditStatusDomain.ACTIVE
-        CreditStatus.CLOSED -> CreditStatusDomain.CLOSED
-    },
+    status = CreditStatusDomain.entries[status],
     issuedAt = issuedAt,
     nextPaymentDate = nextPaymentDate,
     schedule = schedule?.map { it.toDomain() }

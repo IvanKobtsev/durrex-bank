@@ -10,7 +10,7 @@ object Screens {
         MainFragment()
     }
 
-    fun menu() = FragmentScreen {
+    fun history() = FragmentScreen {
         HistoryFragment()
     }
 }

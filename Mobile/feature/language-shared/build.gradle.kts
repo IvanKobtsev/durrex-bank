@@ -11,7 +11,7 @@ android {
 }
 
 dependencies {
-    implementation(project(":component:common"))
+    implementation(project(":core:common"))
 }
 
 anvil {

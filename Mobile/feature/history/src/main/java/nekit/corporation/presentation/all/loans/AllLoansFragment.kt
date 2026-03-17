@@ -30,6 +30,7 @@ class AllLoansFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = MenuScreenBinding.inflate(inflater, container, false)
+        viewModel.init()
         return binding!!.root
     }
 

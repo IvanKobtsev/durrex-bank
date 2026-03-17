@@ -4,6 +4,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class CreateAccountCommand(
-    val ownerId: Int,
     val currency: String = "RUB"
 )

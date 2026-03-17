@@ -16,19 +16,18 @@ android {
 }
 
 dependencies {
-    api(stack.credentials.auth)
-    api(stack.credentials)
-    api(stack.tink)
-    api(stack.data.store)
 
-    api(stack.retrofit)
     ksp(stack.anvil.utils.compiler)
 
     implementation(project(":feature:onboarding-shared"))
-    implementation(project(":component:architecture"))
-    implementation(project(":component:common"))
-    implementation(project(":component:util"))
-    implementation(project(":component:ui"))
+
+    implementation(project(":core:architecture"))
+    implementation(project(":core:common"))
+    implementation(project(":core:util"))
+    implementation(project(":core:ui"))
+
+    implementation(project(":components:auth-shared"))
+    implementation(project(":components:account"))
 }
 anvil {
     useKsp(contributesAndFactoryGeneration = true)

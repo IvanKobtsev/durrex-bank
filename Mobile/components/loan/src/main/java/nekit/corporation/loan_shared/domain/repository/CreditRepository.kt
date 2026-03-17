@@ -16,8 +16,6 @@ interface CreditRepository {
     ): List<Credit>
 
     suspend fun getCreditDetail(
-        userId: Int,
-        userRole: String,
         creditId: Int
     ): CreditDetail
 

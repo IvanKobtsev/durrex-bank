@@ -1,14 +1,23 @@
 package nekit.corporation.presentation.model
 
+import nekit.corporation.loan_shared.domain.model.Transaction
+import nekit.corporation.loan_shared.domain.model.TransactionTypeDomain
+
 interface AccountDetailsInteractions {
 
     fun onBack()
 
-    fun onDebitClick()
+    fun onApplyClick()
 
-    fun onDepositClick()
+    fun onSumChange(sum: String)
 
-    fun onDepositSumChange(deposit: String)
+    fun onDeleteClick()
 
-    fun onDebiSumChange(debit: String)
+    fun onSelectOperation(operation: TransactionTypeDomain)
+
+    fun onDismiss()
+
+    fun onOpen()
+
+    fun onTransactionOpen(transaction: Transaction)
 }

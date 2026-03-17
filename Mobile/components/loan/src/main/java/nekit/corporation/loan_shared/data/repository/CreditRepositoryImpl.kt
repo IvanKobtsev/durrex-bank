@@ -27,11 +27,9 @@ class CreditRepositoryImpl @Inject constructor(
         api.getCredits(clientId).map { it.toDomain() }
 
     override suspend fun getCreditDetail(
-        userId: Int,
-        userRole: String,
         creditId: Int
     ): CreditDetail =
-        api.getCreditDetail(userId).toDomain()
+        api.getCreditDetail(creditId).toDomain()
 
     override suspend fun repayCredit(
         userId: Int,

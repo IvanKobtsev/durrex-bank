@@ -11,22 +11,22 @@ import retrofit2.http.Query
 
 interface LoanApi {
 
-    @POST("credits")
+    @POST("credit/credits")
     suspend fun issueCredit(
         @Body request: IssueCreditRequest
     ): CreditResponse
 
-    @GET("credits")
+    @GET("credit/credits")
     suspend fun getCredits(
         @Query("clientId") clientId: Int
     ): List<CreditResponse>
 
-    @GET("credits/{id}")
+    @GET("credit/credits/{id}")
     suspend fun getCreditDetail(
         @Path("id") id: Int
     ): CreditDetailResponse
 
-    @POST("credits/{id}/repay")
+    @POST("credit/credits/{id}/repay")
     suspend fun repayCredit(
         @Path("id") id: Int
     ): CreditResponse

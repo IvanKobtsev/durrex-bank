@@ -3,7 +3,7 @@ package nekit.corporation.presentation
 import nekit.corporation.architecture.presentation.StatefulViewModel
 import nekit.corporation.navigation.MainBottomBarRouter
 import nekit.corporation.navigation.Screens.main
-import nekit.corporation.navigation.Screens.menu
+import nekit.corporation.navigation.Screens.history
 import nekit.corporation.presentation.model.BottomBarState
 import nekit.corporation.presentation.model.MainBottomBarTabs
 import javax.inject.Inject
@@ -26,7 +26,7 @@ class BottomBarViewModel @Inject constructor(
         }
         when (tab) {
             MainBottomBarTabs.Main -> mainBottomBarRouter.replaceScreen(main())
-            MainBottomBarTabs.Menu -> mainBottomBarRouter.replaceScreen(menu())
+            MainBottomBarTabs.Menu -> mainBottomBarRouter.replaceScreen(history())
         }
     }
 }

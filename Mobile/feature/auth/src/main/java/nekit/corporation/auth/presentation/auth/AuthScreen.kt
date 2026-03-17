@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -71,8 +72,8 @@ fun AuthScreen(viewModel: AuthViewModel) {
     Column(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
-                .weight(1f)
                 .fillMaxWidth()
+                .weight(1f)
                 .background(colors.fontPrimary),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
@@ -86,8 +87,8 @@ fun AuthScreen(viewModel: AuthViewModel) {
                         .fillMaxHeight()
                         .offset(x = 8.dp)
                 ) {
-                    LogoText(stringResource(R.string.shift), colors.fontInvert)
-                    LogoText(stringResource(R.string.loans), colors.fontInvert)
+                    LogoText(stringResource(R.string.durex), colors.fontInvert)
+                    LogoText(stringResource(R.string.bank), colors.fontInvert)
                 }
 
                 Image(
@@ -104,27 +105,23 @@ fun AuthScreen(viewModel: AuthViewModel) {
                 )
             }
         }
-        Box(
+
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
         ) {
-            Column(
-                modifier = Modifier
-                    .verticalScroll(rememberScrollState())
+            AnimatedVisibility(
+                visible = state is AuthState.SignUpState || state is AuthState.SignInState,
+                enter = slideInVertically(),
+                exit = slideOutVertically(),
             ) {
-                AnimatedVisibility(
-                    visible = state is AuthState.SignUpState || state is AuthState.SignInState,
-                    enter = slideInVertically(),
-                    exit = slideOutVertically(),
-                ) {
-                    AuthBottomSheet(
-                        state = state,
-                        signUpInteract = viewModel,
-                        signInInteract = viewModel,
-                        onSignUpClick = viewModel::onSignUpOpen,
-                        onSignInClick = viewModel::onSignInOpen
-                    )
-                }
+                AuthBottomSheet(
+                    state = state,
+                    signUpInteract = viewModel,
+                    signInInteract = viewModel,
+                    onSignUpClick = viewModel::onSignUpOpen,
+                    onSignInClick = viewModel::onSignInOpen
+                )
             }
         }
     }
@@ -142,16 +139,17 @@ fun AuthBottomSheet(
     Box(
         modifier = Modifier
             .background(colors.fontPrimary)
-            .height(IntrinsicSize.Max)
+            .wrapContentHeight()
     ) {
         Column(
             modifier = Modifier
                 .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
                 .background(colors.bgPrimary)
+                .verticalScroll(rememberScrollState())
+
         ) {
             Row(
-                modifier = Modifier
-                    .height(IntrinsicSize.Max),
+                modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Body2Text(

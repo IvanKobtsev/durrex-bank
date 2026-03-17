@@ -13,6 +13,14 @@
     <string name="percent">Процент</string>
     <string name="amount">Сумма</string>
 
+
+    <string name="id">Id</string>
+    <string name="sum">Сумма</string>
+    <string name="type">Тип</string>
+    <string name="add_operation">Добавить опреацию</string>
+    <string name="operations">Опреации</string>
+    <string name="operation_sum">Сумма опреации</string>
+    <string name="apply">Применить</string>
     <string name="state">Статус</string>
     <string name="state_description">Когда займ примет статус «Одобрен», Вам нужно будет подойти с паспортом в отделение банка для подписания договора и получить деньги</string>
     <string name="rub">₽</string>

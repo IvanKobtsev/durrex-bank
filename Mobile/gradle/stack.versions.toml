@@ -1,53 +1,50 @@
 [versions]
 
-agp = "8.13.0"
+agp = "9.0.1"
 fragmentKtx = "1.8.9"
-fragment = "2.9.6"
-kotlin = "2.0.0"
-kotlin-ksp = "2.0.21-1.0.27"
-coreKtx = "1.17.0"
+fragment = "2.9.7"
+kotlin = "2.3.20"
+kotlin-ksp = "2.3.2"
+coreKtx = "1.18.0"
 junit = "4.13.2"
 junitVersion = "1.3.0"
 espressoCore = "3.7.0"
 kotlinxCollectionsImmutable = "0.4.0"
-kotlinxSerializationJson = "1.6.0"
-composeBom = "2025.10.01"
+kotlinxSerializationJson = "1.10.0"
+composeBom = "2026.03.00"
 appcompat = "1.7.1"
-lifecycleViewmodelKtx = "2.9.4"
-lifecycleViewmodelSavedstate = "2.9.4"
-loggingInterceptor = "4.11.0"
+lifecycleViewmodelKtx = "2.10.0"
+lifecycleViewmodelSavedstate = "2.10.0"
+loggingInterceptor = "5.3.2"
 material = "1.13.0"
 material3 = "1.4.0"
 
 #DI
-anvil = "0.4.1"
+anvil = "2.7.0"
 anvil-utils = "0.4.0"
 dagger = "2.57.2"
+metro = "0.11.4"
 
 #utils
 gson = "2.13.2"
 credentials = "1.5.0"
-tink = "1.19.0"
+tink = "1.20.0"
 lionscribe-libphonenumber = "8.12.18.1"
 
 retrofit = "3.0.0"
 
 #store
 room = "2.8.4"
-data-strore = "1.1.7"
+data-strore = "1.2.1"
 
 #navigation
 cicerone = "7.1"
 
-runtime = "1.9.4"
-ui = "1.9.4"
-foundationLayout = "1.9.4"
-animation = "1.9.4"
-uiToolingPreview = "1.9.4"
-uiTooling = "1.9.4"
+
 annotationJvm = "1.9.1"
 coroutine = "1.10.2"
-compose = "1.9.1"
+composeTool = "1.10.5"
+compose = "1.10.2"
 
 
 [libraries]
@@ -60,7 +57,7 @@ androidx-fragment-ui = { module = "androidx.navigation:navigation-ui-ktx", versi
 
 #navigation
 cicerone = { module = "com.github.terrakok:cicerone", version.ref = "cicerone" }
-
+kotlin-reflect = {module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin"}
 
 
 #ViewModel
@@ -68,11 +65,11 @@ androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-view
 androidx-lifecycle-viewmodel-savedstate = { module = "androidx.lifecycle:lifecycle-viewmodel-savedstate", version.ref = "lifecycleViewmodelSavedstate" }
 
 #DI
-anvil-utils-annotations = { group = "me.gulya.anvil", name = "annotations", version.ref = "anvil-utils" }
-anvil-utils-compiler = { group = "me.gulya.anvil", name = "compiler", version.ref = "anvil-utils" }
-anvil-annotations = { group = "dev.zacsweers.anvil", name = "annotations-optional", version.ref = "anvil" }
-dagger-compiler = { module = "com.google.dagger:dagger-compiler", version.ref = "dagger" }
-dagger = { module = "com.google.dagger:dagger", version.ref = "dagger" }
+#anvil-utils-annotations = { group = "me.gulya.anvil", name = "annotations", version.ref = "anvil-utils" }
+#anvil-utils-compiler = { group = "me.gulya.anvil", name = "compiler", version.ref = "anvil-utils" }
+#anvil-annotations = { group = "dev.zacsweers.anvil", name = "annotations-optional", version.ref = "anvil" }
+#dagger-compiler = { module = "com.google.dagger:dagger-compiler", version.ref = "dagger" }
+#dagger = { module = "com.google.dagger:dagger", version.ref = "dagger" }
 
 androidx-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -108,13 +105,13 @@ credentials = { group = "androidx.credentials", name = "credentials", version.re
 credentials-auth = { group = "androidx.credentials", name = "credentials-play-services-auth", version.ref = "credentials" }
 tink = { group = "com.google.crypto.tink", name = "tink-android", version.ref = "tink" }
 
-androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
-androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "runtime" }
-androidx-compose-ui-ui = { group = "androidx.compose.ui", name = "ui", version.ref = "ui" }
-androidx-compose-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "foundationLayout" }
-androidx-compose-animation = { group = "androidx.compose.animation", name = "animation", version.ref = "animation" }
-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview", version.ref = "uiToolingPreview" }
-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "uiTooling" }
+androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "composeTool" }
+androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "composeTool" }
+androidx-compose-ui-ui = { group = "androidx.compose.ui", name = "ui", version.ref = "composeTool" }
+androidx-compose-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "composeTool" }
+androidx-compose-animation = { group = "androidx.compose.animation", name = "animation", version.ref = "composeTool" }
+ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview", version.ref = "composeTool" }
+ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "composeTool" }
 androidx-annotation-jvm = { group = "androidx.annotation", name = "annotation-jvm", version.ref = "annotationJvm" }
 
 # plugins
@@ -126,12 +123,14 @@ jetbrains-kotlin-serialization = { module = "org.jetbrains.kotlin.plugin.seriali
 
 
 [plugins]
+metro = {id ="dev.zacsweers.metro", version.ref = "metro"}
+android-library = { id = "com.android.library" , version.ref = "agp" }
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose" }
 kotlin-kapt = { id = "org.jetbrains.kotlin.kapt" }
-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization" }
 kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize" }
 room = { id = "androidx.room", version.ref = "room" }
 kotlin-ksp = { id = "com.google.devtools.ksp", version.ref = "kotlin-ksp" }
-anvil = { id = "dev.zacsweers.anvil", version.ref = "anvil" }
+anvil = { id = "com.squareup.anvil", version.ref = "anvil" }

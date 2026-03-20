@@ -1,14 +1,13 @@
 plugins {
-    common.library
+    id("android-application-convention")
     `kotlin-composecompiler`
-    alias(stack.plugins.anvil)
     alias(stack.plugins.kotlin.ksp)
 }
 
 android {
     namespace = "nekit.corporation.ui"
 
-    buildFeatures{
+    buildFeatures {
         compose = true
     }
 }
@@ -25,17 +24,13 @@ dependencies {
     api(stack.material)
     api(stack.ui)
     api(stack.ui.tooling.preview)
+    implementation("androidx.core:core-ktx:1.18.0")
     debugImplementation(stack.ui.tooling)
 
     implementation(stack.lionscribe.libphonenumber)
 
-    implementation(project(":feature:language-shared"))
     implementation(project(":core:util"))
     implementation(project(":core:common"))
 
     api(stack.kotlinx.collections.immutable)
-}
-anvil {
-    useKsp(contributesAndFactoryGeneration = true)
-    generateDaggerFactories = true
 }

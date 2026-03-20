@@ -5,13 +5,18 @@ import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.lifecycle.lifecycleScope
 import com.example.shift_project.R
 import com.example.shift_project.databinding.LaunchScreenBinding
 import com.example.shift_project.presentation.App.Companion.INSTANCE
-import com.example.shift_project.presentation.di.AppDaggerComponent
+import com.example.shift_project.presentation.model.toLocaleListCompat
 import com.example.shift_project.presentation.navigation.Screens.auth
 import com.github.terrakok.cicerone.androidx.AppNavigator
 import com.google.i18n.phonenumbers.PhoneNumberUtil
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import nekit.corporation.auth.di.AuthFragmentInjector
 import nekit.corporation.auth.presentation.auth.AuthFragment
 import nekit.corporation.create_loan.CreateCreditFragment
@@ -33,16 +38,18 @@ import nekit.corporation.presentation.all.accounts.AllAccountsFragment
 import nekit.corporation.presentation.all.loans.AllLoansFragment
 import nekit.corporation.presentation.menu.HistoryFragment
 import nekit.corporation.transaction_details.di.TransactionDetailsFragmentInjector
-import nekit.corporation.transaction_details.navigation.TransactionDetailsNavigation
 import nekit.corporation.transaction_details.presentation.TransactionDetailsFragment
+import nekit.corporation.user.domain.SettingsManager
 import java.util.Locale
+import javax.inject.Inject
 import kotlin.getValue
 
 class MainActivity : AppCompatActivity(), AuthFragmentInjector, OnboardingFragmentInjector,
     HistoryFragmentInjector, MainFragmentInjector, MainBottomBarInjector,
     LoanDetailsFragmentInjector, AllLoansFragmentInjector, TransactionDetailsFragmentInjector,
     AllAccountsFragmentInjector, CreateCreditInjector, AccountDetailsFragmentInjector {
-
+    @Inject
+    lateinit var settingsManager: SettingsManager
     override fun attachBaseContext(newBase: Context) {
         PhoneNumberUtil.getInstance(newBase)
         super.attachBaseContext(LocaleManager.getLocalizedContext(newBase))
@@ -78,6 +85,13 @@ class MainActivity : AppCompatActivity(), AuthFragmentInjector, OnboardingFragme
         INSTANCE.navigatorHolder.setNavigator(ciceroneNavigator)
         if (savedInstanceState == null) {
             INSTANCE.router.newRootScreen(auth())
+        }
+        lifecycleScope.launch {
+            settingsManager.settings.map { it?.language }
+                .distinctUntilChanged()
+                .collect { language ->
+                    language?.let { AppCompatDelegate.setApplicationLocales(it.toLocaleListCompat()) }
+                }
         }
     }
 

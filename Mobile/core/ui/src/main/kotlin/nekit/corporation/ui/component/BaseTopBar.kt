@@ -16,7 +16,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import nekit.corporation.ui.R
-import nekit.corporation.ui.theme.LoansAppTheme
+import nekit.corporation.ui.theme.DurexBankTheme
 import nekit.corporation.ui.theme.LocalAppColors
 
 @Composable
@@ -54,7 +54,7 @@ fun BaseTopBar(text: String, onIconClick: () -> Unit) {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun PreviewMainTopBar() {
-    LoansAppTheme {
+    DurexBankTheme {
         BaseTopBar("Main") {
 
         }

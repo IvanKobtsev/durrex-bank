@@ -3,9 +3,13 @@ package nekit.corporation.architecture.presentation
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import nekit.corporation.architecture.R
 import nekit.corporation.util.domain.common.ValidationError
 
@@ -59,6 +63,54 @@ abstract class StatefulViewModel<State : ScreenState> : ViewModel() {
             ValidationError.InvalidEmail -> R.string.email_constraint
             ValidationError.InvalidSurname -> R.string.surname_constraint
         }
+    }
+
+    protected suspend fun <T> fallback(
+        action: suspend () -> T,
+        onComplete: suspend (T) -> Unit,
+        onFailure: suspend (Throwable) -> Unit = {},
+        maxTries: Int = 4,
+        dispatcher: CoroutineDispatcher = Dispatchers.IO
+    ) = withContext(dispatcher) {
+        var retryTime = 500L
+        var completed = false
+        var currentTry = 1
+        while (!completed) {
+            runCatching { action() }
+                .onFailure {
+                    onFailure(it)
+                }
+                .onSuccess {
+                    onComplete(it)
+                    completed = true
+                }
+            delay(retryTime)
+            retryTime = (retryTime * 2).coerceAtMost(10000)
+            if (currentTry < maxTries) {
+                currentTry++
+            } else {
+                completed = true
+            }
+        }
+    }
+
+    protected suspend fun <T> fallback(
+        action: suspend () -> T,
+        onFailure: suspend (Throwable) -> Unit = {},
+        maxTries: Int = 4,
+    ): T? {
+        var retryTime = 500L
+        repeat(maxTries) { attempt ->
+            try {
+                return action()
+            } catch (e: Exception) {
+                onFailure(e)
+                if (attempt == maxTries - 1) throw e
+                delay(retryTime)
+                retryTime = (retryTime * 2).coerceAtMost(10000)
+            }
+        }
+        return null
     }
 
     abstract fun createInitialState(): State

@@ -18,6 +18,7 @@ import nekit.corporation.data.remote.serializer.OffsetDateTimeSerializer
 import nekit.corporation.loan_shared.data.datasource.remote.api.AccountsApi
 import nekit.corporation.loan_shared.data.datasource.remote.api.LoanApi
 import nekit.corporation.tariff.data.remote.TariffApi
+import nekit.corporation.user.data.remote.SettingsApi
 import nekit.corporation.user.data.remote.UserApi
 import okhttp3.Cache
 import okhttp3.MediaType.Companion.toMediaType
@@ -111,4 +112,8 @@ object NetworkModule {
     @Provides
     fun provideTariffService(@AuthRetrofit retrofit: Retrofit): TariffApi =
         retrofit.create<TariffApi>()
+
+    @Provides
+    fun provideSettingsService(@AuthRetrofit retrofit: Retrofit): SettingsApi =
+        retrofit.create<SettingsApi>()
 }

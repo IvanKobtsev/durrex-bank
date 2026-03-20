@@ -11,7 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.tooling.preview.Preview
-import nekit.corporation.ui.theme.LoansAppTheme
+import nekit.corporation.ui.theme.DurexBankTheme
 import nekit.corporation.ui.theme.LocalAppColors
 
 @Composable
@@ -36,7 +36,7 @@ fun LoadingScreen(modifier: Modifier = Modifier) {
 @Composable
 @Preview(showBackground = true, showSystemUi = true)
 fun PreviewLoadingScreen() {
-    LoansAppTheme {
+    DurexBankTheme {
         LoadingScreen(modifier = Modifier.fillMaxSize())
     }
 }

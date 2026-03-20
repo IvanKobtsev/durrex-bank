@@ -5,6 +5,7 @@ import nekit.corporation.loan_shared.domain.model.CreateAccount
 import nekit.corporation.loan_shared.domain.model.Debit
 import nekit.corporation.loan_shared.domain.model.Deposit
 import nekit.corporation.loan_shared.domain.model.Transaction
+import nekit.corporation.loan_shared.domain.model.Transfer
 import nekit.corporation.loan_shared.domain.model.Withdraw
 
 interface AccountRepository {
@@ -16,6 +17,8 @@ interface AccountRepository {
     suspend fun closeAccount(id: Int)
 
     suspend fun getAllAccounts(): List<Account>
+
+    suspend fun createTransfer(accountId: Int, transfer: Transfer): Transaction
 
     suspend fun withdraw(accountId: Int, withdraw: Withdraw)
 

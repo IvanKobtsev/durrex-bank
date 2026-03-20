@@ -1,7 +1,6 @@
 plugins {
-    common.library
+    id("android-application-convention")
     `kotlinx-serialization`
-    alias(stack.plugins.anvil)
     alias(stack.plugins.kotlin.ksp)
 }
 
@@ -11,11 +10,7 @@ android {
 
 dependencies {
     implementation(project(":core:common"))
-    ksp(stack.anvil.utils.compiler)
     api(stack.data.store)
     implementation(stack.kotlinx.serialization.json)
-}
-anvil {
-    useKsp(contributesAndFactoryGeneration = true)
-    generateDaggerFactories = true
+    implementation("androidx.core:core-ktx:1.18.0")
 }

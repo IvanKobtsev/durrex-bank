@@ -21,7 +21,7 @@ val LocalAppColors = staticCompositionLocalOf { LightAppColors }
 
 @SuppressLint("LocalContextConfigurationRead")
 @Composable
-fun LoansAppTheme(
+fun DurexBankTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {

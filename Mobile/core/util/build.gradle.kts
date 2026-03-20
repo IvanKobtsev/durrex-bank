@@ -1,5 +1,5 @@
 plugins {
-    common.library
+    id("android-application-convention")
 }
 
 android {
@@ -8,4 +8,5 @@ android {
 
 dependencies {
     implementation(stack.androidx.annotation.jvm)
+    implementation("androidx.core:core-ktx:1.18.0")
 }

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ru">Русский</string>
+    <string name="en">НЕг русский</string>
+    <string name="kyr">Кыргызский</string>
+
+    <string name="dark">Темная</string>
+    <string name="light">Светлая</string>
+</resources>

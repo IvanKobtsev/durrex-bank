@@ -1,7 +1,6 @@
 plugins {
-    common.library
+    id("android-application-convention")
     alias(stack.plugins.kotlin.ksp)
-    alias(stack.plugins.anvil)
     `kotlinx-serialization`
 }
 
@@ -12,7 +11,7 @@ android {
 dependencies {
     implementation(project(":core:util"))
     implementation(project(":core:common"))
-    implementation(project(":feature:auth"))
+    implementation(projects.feature.auth.authApi)
 
     implementation(project(":components:account"))
     implementation(project(":components:auth-shared"))
@@ -34,10 +33,4 @@ dependencies {
     implementation(stack.kotlinx.serialization.json)
 
     //DI
-    ksp(stack.anvil.utils.compiler)
-}
-
-anvil {
-    useKsp(contributesAndFactoryGeneration = true)
-    generateDaggerFactories = true
 }

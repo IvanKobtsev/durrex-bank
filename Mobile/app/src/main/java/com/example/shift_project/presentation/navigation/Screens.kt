@@ -1,7 +1,6 @@
 package com.example.shift_project.presentation.navigation
 
 import android.os.Bundle
-import android.provider.Settings.Global.putInt
 import com.github.terrakok.cicerone.androidx.FragmentScreen
 import nekit.corporation.auth.presentation.auth.AuthFragment
 import nekit.corporation.create_loan.CreateCreditFragment
@@ -12,7 +11,6 @@ import nekit.corporation.presentation.ShellMainHostFragment
 import nekit.corporation.presentation.all.accounts.AllAccountsFragment
 import nekit.corporation.presentation.all.loans.AllLoansFragment
 import nekit.corporation.transaction_details.presentation.TransactionDetailsFragment
-import nekit.corporation.transaction_details.ui.TransactionDetailsScreen
 
 object Screens {
 

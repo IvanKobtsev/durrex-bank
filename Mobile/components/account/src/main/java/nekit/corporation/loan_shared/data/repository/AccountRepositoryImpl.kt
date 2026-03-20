@@ -11,9 +11,11 @@ import nekit.corporation.loan_shared.domain.model.Deposit
 import nekit.corporation.loan_shared.domain.model.Withdraw
 import nekit.corporation.loan_shared.data.datasource.remote.model.toDepositRequest
 import nekit.corporation.loan_shared.data.datasource.remote.model.toDomain
+import nekit.corporation.loan_shared.data.datasource.remote.model.toTransferRequest
 import nekit.corporation.loan_shared.data.datasource.remote.model.toWithdrawRequest
 import nekit.corporation.loan_shared.domain.model.Debit
 import nekit.corporation.loan_shared.domain.model.Transaction
+import nekit.corporation.loan_shared.domain.model.Transfer
 import nekit.corporation.loan_shared.domain.repository.AccountRepository
 
 
@@ -35,6 +37,10 @@ class AccountRepositoryImpl @Inject constructor(
 
     override suspend fun getAllAccounts(): List<Account> {
         return api.getAccounts().map { it.toAccount() }
+    }
+
+    override suspend fun createTransfer(accountId: Int, transfer: Transfer): Transaction {
+        return api.transfer(accountId, transfer.toTransferRequest()).toDomain()
     }
 
     override suspend fun withdraw(accountId: Int, withdraw: Withdraw) {

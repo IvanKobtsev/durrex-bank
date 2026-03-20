@@ -2,7 +2,6 @@ package com.example.shift_project.presentation
 
 import android.app.Application
 import android.content.Context
-import com.example.shift_project.presentation.di.AppDaggerComponent
 import com.example.shift_project.presentation.di.DaggerAppDaggerComponent
 import com.github.terrakok.cicerone.Cicerone
 import com.github.terrakok.cicerone.Router

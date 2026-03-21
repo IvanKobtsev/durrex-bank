@@ -11,5 +11,7 @@ public record TransactionResponse(
     decimal BalanceAfter,
     int? RelatedAccountId,
     string? Description,
-    DateTimeOffset CreatedAt
+    DateTimeOffset CreatedAt,
+    decimal? ExchangeRate,
+    string? SourceCurrency
 );

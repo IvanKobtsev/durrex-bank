@@ -115,9 +115,55 @@ public class CreditsController(IMediator mediator, ICurrentUserContext currentUs
         return Ok(credit);
     }
 
+    /// <summary>List overdue schedule entries for a client (employees and internal calls only)</summary>
+    [HttpGet("overdue")]
+    [ProducesResponseType(typeof(IReadOnlyList<OverduePaymentResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> GetOverdue([FromQuery] int clientId, CancellationToken ct)
+    {
+        if (currentUser.IsClient)
+            return StatusCode(StatusCodes.Status403Forbidden);
+        var result = await mediator.Send(new GetOverduePaymentsQuery(clientId), ct);
+        return Ok(result);
+    }
+
+    /// <summary>List overdue schedule entries for the authenticated client</summary>
+    [HttpGet("overdue/me")]
+    [ProducesResponseType(typeof(IReadOnlyList<OverduePaymentResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> GetMyOverdue(CancellationToken ct)
+    {
+        if (!currentUser.IsClient || currentUser.UserId is null)
+            return StatusCode(StatusCodes.Status403Forbidden);
+        var result = await mediator.Send(new GetOverduePaymentsQuery(currentUser.UserId.Value), ct);
+        return Ok(result);
+    }
+
+    /// <summary>Credit rating for a client (employees and internal calls only)</summary>
+    [HttpGet("rating")]
+    [ProducesResponseType(typeof(CreditRatingResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> GetRating([FromQuery] int clientId, CancellationToken ct)
+    {
+        if (currentUser.IsClient)
+            return StatusCode(StatusCodes.Status403Forbidden);
+        return Ok(await mediator.Send(new GetCreditRatingQuery(clientId), ct));
+    }
+
+    /// <summary>Credit rating for the authenticated client</summary>
+    [HttpGet("rating/me")]
+    [ProducesResponseType(typeof(CreditRatingResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> GetMyRating(CancellationToken ct)
+    {
+        if (!currentUser.IsClient || currentUser.UserId is null)
+            return StatusCode(StatusCodes.Status403Forbidden);
+        return Ok(await mediator.Send(new GetCreditRatingQuery(currentUser.UserId.Value), ct));
+    }
+
     /// <summary>Fully repay a credit early</summary>
     /// <remarks>
-    /// Debits the remaining balance from the client's account via CoreService and closes the credit.
+    /// Debits the remaining balance from the client's account (via CoreService queue) and closes the credit.
     /// Clients may only repay their own credits. Employees may repay any credit.
     /// </remarks>
     /// <param name="id">Credit ID to repay</param>

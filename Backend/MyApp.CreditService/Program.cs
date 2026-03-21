@@ -3,7 +3,6 @@ using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using MyApp.CreditService.Auth;
-using MyApp.CreditService.Infrastructure;
 using MyApp.CreditService.Middleware;
 using MyApp.CreditService.Services;
 using MyApp.CreditService.Swagger;
@@ -11,11 +10,6 @@ using MyApp.CreditService.Swagger;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
-
-builder.Services.AddTransient<CoreServiceApiKeyHandler>();
-builder.Services.AddHttpClient<ICoreServiceClient, CoreServiceClient>(c =>
-    c.BaseAddress = new Uri(builder.Configuration["Services:CoreService:BaseUrl"]!))
-    .AddHttpMessageHandler<CoreServiceApiKeyHandler>();
 
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
 

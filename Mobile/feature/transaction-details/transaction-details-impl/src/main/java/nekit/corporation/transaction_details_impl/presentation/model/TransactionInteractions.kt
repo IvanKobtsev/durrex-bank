@@ -1,4 +1,4 @@
-package nekit.corporation.transaction_details.presentation.model
+package nekit.corporation.transaction_details_impl.presentation.model
 
 interface TransactionInteractions {
 

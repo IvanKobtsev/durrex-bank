@@ -3,15 +3,14 @@ plugins {
     alias(stack.plugins.kotlin.compose)
     alias(stack.plugins.kotlin.serialization)
     alias(stack.plugins.kotlin.ksp)
+    alias(stack.plugins.metro)
 }
 
 android {
     namespace = "com.example.shift_project"
-    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.shift_project"
-        minSdk = 28
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -30,10 +29,6 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
 
     buildFeatures {
         compose = true
@@ -46,33 +41,49 @@ android {
             excludes += "META-INF/*"
         }
     }
+
 }
 
 dependencies {
-    implementation(stack.lionscribe.libphonenumber)
-//    implementation(project(":feature:account-details"))
-//    implementation(project(":feature:auth"))
-//    implementation(project(":feature:create-loan"))
-//    implementation(project(":feature:history"))
-//    implementation(project(":feature:language-shared"))
-//    implementation(project(":feature:loan-details"))
-//    implementation(project(":feature:main"))
-//    implementation(project(":feature:onboarding-shared"))
-//    implementation(project(":feature:shell-main"))
-//    implementation(project(":feature:transaction-details"))
-//
-//
-//    implementation(project(":components:account"))
-//    implementation(project(":components:auth-shared"))
-//    implementation(project(":components:loan"))
-//    implementation(project(":components:tariff"))
-//    implementation(project(":components:user"))
+    implementation(projects.components.account)
+    implementation(projects.components.authShared)
+    implementation(projects.components.languageComponent)
+    implementation(projects.components.loan)
+    implementation(projects.components.onboardingComponent)
+    implementation(projects.components.tariff)
+    implementation(projects.components.user)
 
-    //implementation(project(":core:common"))
-    //implementation(project(":core:ui"))
-    //implementation(project(":core:architecture"))
-    //implementation(project(":core:api"))
-    //implementation(project(":core:util"))
+    implementation(projects.core.api)
+    implementation(projects.core.architecture)
+    implementation(projects.core.common)
+    implementation(projects.core.ui)
+    implementation(projects.core.util)
+
+    implementation(projects.feature.accountDetails.accountDetailsApi)
+    implementation(projects.feature.accountDetails.accountDetailsImpl)
+    implementation(projects.feature.auth.authApi)
+    implementation(projects.feature.auth.authImpl)
+    implementation(projects.feature.createLoan.createLoanApi)
+    implementation(projects.feature.createLoan.createLoanImpl)
+    implementation(projects.feature.history.historyApi)
+    implementation(projects.feature.history.historyImpl)
+    implementation(projects.feature.loanDetails.loanDetailsApi)
+    implementation(projects.feature.loanDetails.loanDetailsImpl)
+    implementation(projects.feature.main.mainApi)
+    implementation(projects.feature.main.mainImpl)
+    implementation(projects.feature.onboarding.onboardingApi)
+    implementation(projects.feature.onboarding.onboardingImpl)
+    implementation(projects.feature.profile.profileApi)
+    implementation(projects.feature.profile.profileImpl)
+    implementation(projects.feature.shellMain.shellMainApi)
+    implementation(projects.feature.shellMain.shellMainImpl)
+    implementation(projects.feature.transaction.transactionApi)
+    implementation(projects.feature.transaction.transactionImpl)
+    implementation(projects.feature.transactionDetails.transactionDetailsApi)
+    implementation(projects.feature.transactionDetails.transactionDetailsImpl)
+
+    implementation(stack.lionscribe.libphonenumber)
+
     implementation(stack.androidx.fragment.ktx)
     implementation(stack.androidx.ui.tooling)
     implementation(stack.androidx.appcompat)
@@ -84,9 +95,8 @@ dependencies {
     implementation(stack.androidx.fragment.navigation)
     implementation(stack.androidx.fragment.ui)
     implementation(stack.cicerone)
-    //  ksp(stack.dagger.compiler)
-    implementation("dev.zacsweers.metro:metrox-android:0.11.4")
-    implementation("dev.zacsweers.metro:metrox-viewmodel:0.11.4")
-    implementation("dev.zacsweers.metro:metrox-viewmodel-compose:0.11.4")
+    implementation(stack.metro.android)
+    implementation(stack.metro.viewmodel)
+    implementation(stack.metro.viewmodel.compose)
     implementation("androidx.core:core-ktx:1.18.0")
 }

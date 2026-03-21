@@ -1,4 +1,4 @@
-package nekit.corporation.transaction.compose
+package nekit.corporation.transaction_impl.compose
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
@@ -26,8 +26,9 @@ import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.persistentListOf
 import nekit.corporation.transaction.model.TransactionInteractions
 import nekit.corporation.transaction.model.TransactionState
-import nekit.corporation.transaction.R
+import nekit.corporation.transaction.compose.UserDetailsCard
 import nekit.corporation.transaction.model.AccountUi
+import nekit.corporation.transaction_impl.R
 import nekit.corporation.ui.component.AccountDetailsCard
 import nekit.corporation.ui.component.PrimaryInputField
 import nekit.corporation.ui.component.Headline2

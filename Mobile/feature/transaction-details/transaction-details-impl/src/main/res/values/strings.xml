@@ -7,4 +7,9 @@
     <string name="balanceBefore">Баланс после</string>
     <string name="balanceAfter">Баланс до</string>
     <string name="description">Описание</string>
+
+
+    <string name="not_found_error">Не найдено такой займ,что то пошло не так</string>
+    <string name="strange_error">Произошла ошибка, но фиксики уже пшли ее чинить</string>
+    <string name="no_connections_error">Бип буп бип, проблемы с соедиением</string>
 </resources>

@@ -1,10 +1,10 @@
-package nekit.corporation.onboarding.presentation.model
+package nekit.corporation.onboarding_impl.presentation.model
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 
 internal data class Page(
-    @DrawableRes val image: Int,
-    @StringRes val label: Int,
-    @StringRes val description: Int
+    @param:DrawableRes val image: Int,
+    @param:StringRes val label: Int,
+    @param:StringRes val description: Int
 )

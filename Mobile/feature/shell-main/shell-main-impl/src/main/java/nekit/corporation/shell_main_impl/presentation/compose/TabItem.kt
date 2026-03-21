@@ -1,4 +1,4 @@
-package nekit.corporation.presentation.compose
+package nekit.corporation.shell_main_impl.presentation.compose
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,16 +13,15 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
-import nekit.corporation.presentation.model.MainBottomBarTabs
-import nekit.corporation.shell_main.R
+import nekit.corporation.shell_main_api.model.Tab
 import nekit.corporation.ui.component.Caption
 import nekit.corporation.ui.theme.LocalAppColors
 
 @Composable
-fun RowScope.TabItem(
+internal fun RowScope.TabItem(
     isSelected: Boolean,
-    tab: MainBottomBarTabs,
-    onClick: (MainBottomBarTabs) -> Unit
+    tab: Tab,
+    onClick: (Tab) -> Unit
 ) {
     val colors = LocalAppColors.current
     Column(

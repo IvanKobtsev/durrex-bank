@@ -1,4 +1,4 @@
-package nekit.corporation.ui
+package nekit.corporation.history_impl.ui
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
@@ -12,15 +12,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import nekit.corporation.history.R
-import nekit.corporation.presentation.all.loans.AllLoansViewModel
-import nekit.corporation.presentation.models.AllLoansState
+import nekit.corporation.history_impl.R
+import nekit.corporation.history_impl.presentation.all.loans.AllLoansViewModel
+import nekit.corporation.history_impl.presentation.models.AllLoansState
 import nekit.corporation.ui.component.BaseTitle
 import nekit.corporation.ui.component.CreditRow
 import nekit.corporation.ui.theme.DurexBankTheme
 
 @Composable
-fun AllLoansScreen(viewModel: AllLoansViewModel) {
+internal fun AllLoansScreen(viewModel: AllLoansViewModel) {
     val state = viewModel.screenState.collectAsStateWithLifecycle().value.currentState
     if (state is AllLoansState.Component) {
         Column(

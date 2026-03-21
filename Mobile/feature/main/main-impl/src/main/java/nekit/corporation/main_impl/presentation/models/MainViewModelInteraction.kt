@@ -1,6 +1,6 @@
-package nekit.corporation.presentation.models
+package nekit.corporation.main_impl.presentation.models
 
-interface MainViewModelInteraction {
+internal interface MainViewModelInteraction {
 
     fun openOnboarding()
 

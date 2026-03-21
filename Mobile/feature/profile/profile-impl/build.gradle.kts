@@ -1,7 +1,8 @@
 plugins {
-    id("android-application-convention")
+    id("android-library-convention")
     `kotlin-composecompiler`
     alias(stack.plugins.kotlin.ksp)
+    alias(stack.plugins.metro)
 }
 
 android {
@@ -20,6 +21,8 @@ dependencies {
     implementation(projects.core.ui)
 
     implementation(projects.feature.profile.profileApi)
+    implementation(projects.feature.shellMain.shellMainApi)
+
     implementation(projects.components.user)
-    implementation("androidx.core:core-ktx:1.18.0")
+    implementation(projects.components.languageComponent)
 }

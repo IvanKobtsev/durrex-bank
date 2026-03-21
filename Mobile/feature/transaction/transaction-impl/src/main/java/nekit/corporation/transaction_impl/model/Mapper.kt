@@ -12,5 +12,6 @@ fun Account.toUi() = AccountUi(
 fun User.toUi() = UserUi(
     id = id,
     firstName = firstName,
-    lastName = lastName
+    lastName = lastName,
+    phone = telephoneNumber
 )

@@ -1,4 +1,4 @@
-package nekit.corporation.ui
+package nekit.corporation.main_impl.ui
 
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -22,11 +22,11 @@ import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.persistentListOf
 import nekit.corporation.architecture.presentation.EventQueue
 import nekit.corporation.ui.component.BaseTopBar
-import nekit.corporation.main.R
-import nekit.corporation.presentation.models.Currency
-import nekit.corporation.presentation.models.MainEvent
-import nekit.corporation.presentation.models.MainState
-import nekit.corporation.presentation.models.MainViewModelInteraction
+import nekit.corporation.main_impl.presentation.models.Currency
+import nekit.corporation.main_impl.presentation.models.MainEvent
+import nekit.corporation.main_impl.presentation.models.MainState
+import nekit.corporation.main_impl.presentation.models.MainViewModelInteraction
+import nekit.corporation.main_impl.R
 import nekit.corporation.ui.component.Caption
 import nekit.corporation.ui.component.Headline2
 import nekit.corporation.ui.component.LoadingScreen
@@ -35,7 +35,7 @@ import nekit.corporation.ui.theme.DurexBankTheme
 import nekit.corporation.ui.theme.LocalAppColors
 
 @Composable
-fun MainScreen(state: MainState, eventQueue: EventQueue, interaction: MainViewModelInteraction) {
+internal fun MainScreen(state: MainState, eventQueue: EventQueue, interaction: MainViewModelInteraction) {
     val colors = LocalAppColors.current
     val context = LocalContext.current
 

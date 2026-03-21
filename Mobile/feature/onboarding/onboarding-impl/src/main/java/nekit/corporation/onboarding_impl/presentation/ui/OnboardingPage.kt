@@ -1,4 +1,4 @@
-package nekit.corporation.`onboarding-impl`
+package nekit.corporation.onboarding_impl.presentation.ui
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
@@ -18,6 +18,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.persistentListOf
+import nekit.corporation.onboarding_impl.R
 import nekit.corporation.ui.component.Headline
 import nekit.corporation.ui.component.HighlightedText
 import nekit.corporation.ui.theme.LocalAppColors

@@ -1,8 +1,9 @@
 plugins {
-    id("android-application-convention")
+    id("android-library-convention")
     `kotlin-composecompiler`
     `kotlinx-serialization`
     alias(stack.plugins.kotlin.ksp)
+    alias(stack.plugins.metro)
 }
 
 android {
@@ -23,11 +24,16 @@ dependencies {
     implementation(project(":core:ui"))
     implementation(project(":core:util"))
 
-    implementation(project(":feature:language-shared"))
-
+    implementation(projects.components.languageComponent)
     implementation(project(":components:loan"))
     implementation(project(":components:account"))
     implementation(project(":components:user"))
-    implementation("androidx.core:core-ktx:1.18.0")
 
+    implementation(projects.feature.main.mainApi)
+    implementation(projects.feature.onboarding.onboardingApi)
+    implementation(projects.feature.createLoan.createLoanApi)
+    implementation(projects.feature.accountDetails.accountDetailsApi)
+    implementation(projects.feature.history.historyApi)
+    implementation(projects.feature.loanDetails.loanDetailsApi)
+    implementation(projects.feature.shellMain.shellMainApi)
 }

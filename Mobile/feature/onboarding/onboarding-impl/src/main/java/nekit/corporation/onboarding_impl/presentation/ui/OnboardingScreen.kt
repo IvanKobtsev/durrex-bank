@@ -1,4 +1,4 @@
-package nekit.corporation.onboarding.presentation.ui
+package nekit.corporation.onboarding_impl.presentation.ui
 
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -34,10 +34,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import nekit.corporation.onboarding.OnboardingPage
-import nekit.corporation.onboarding.R
-import nekit.corporation.onboarding.presentation.model.OnboardingEvent
-import nekit.corporation.onboarding.presentation.OnboardingViewModel
+import nekit.corporation.onboarding_impl.presentation.model.OnboardingEvent
+import nekit.corporation.onboarding_impl.R
+import nekit.corporation.onboarding_impl.presentation.OnboardingViewModel
 import nekit.corporation.ui.component.Body2Text
 import nekit.corporation.ui.theme.DurexBankTheme
 import nekit.corporation.ui.theme.LocalAppColors

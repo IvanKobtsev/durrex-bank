@@ -1,4 +1,4 @@
-package nekit.corporation.ui
+package nekit.corporation.history_impl.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -17,14 +17,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import nekit.corporation.history_impl.R
 import nekit.corporation.ui.component.BaseTopBar
-import nekit.corporation.presentation.menu.HistoryViewModel
+import nekit.corporation.history_impl.presentation.menu.HistoryViewModel
 import nekit.corporation.ui.theme.DurexBankTheme
 import nekit.corporation.ui.theme.LocalAppColors
-import nekit.corporation.history.R
 
 @Composable
-fun HistoryScreen(viewModel: HistoryViewModel) {
+internal fun HistoryScreen(viewModel: HistoryViewModel) {
     val colors = LocalAppColors.current
     val state = viewModel.screenState.collectAsStateWithLifecycle().value.currentState
 

@@ -1,9 +1,10 @@
 package nekit.corporation.auth.domain.usecase
 
+import dev.zacsweers.metro.Inject
 import nekit.corporation.auth.domain.repository.AuthRepository
-import javax.inject.Inject
 
-class GetCredentialsUseCase @Inject constructor(
+@Inject
+class GetCredentialsUseCase(
     private val authRepository: AuthRepository,
 ) {
 

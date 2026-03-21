@@ -11,3 +11,9 @@ fun Language.getRes() = when (this) {
     Language.En -> R.string.en
     Language.Kyr -> R.string.kyr
 }
+
+fun Language.getCode() = when(this){
+    Language.Ru -> "ru"
+    Language.En -> "en"
+    Language.Kyr -> "kr"
+}

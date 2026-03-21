@@ -1,7 +1,5 @@
 plugins {
-    id("android-application-convention")
-    `kotlin-composecompiler`
-    alias(stack.plugins.kotlin.ksp)
+    id("android-library-convention")
 }
 
 android {
@@ -10,5 +8,4 @@ android {
 
 dependencies {
     api(stack.cicerone)
-    implementation("androidx.core:core-ktx:1.18.0")
 }

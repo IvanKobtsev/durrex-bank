@@ -1,4 +1,4 @@
-package nekit.corporation.ui
+package nekit.corporation.loan_details_impl.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -9,12 +9,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import nekit.corporation.loan_details.R
+import nekit.corporation.loan_details_impl.R
 import nekit.corporation.ui.component.InfoRow
 import nekit.corporation.ui.theme.LocalAppColors
 
 @Composable
-fun PaymentCard(
+internal fun PaymentCard(
     id: Int,
     dueDate: String,
     amount: Double,

@@ -1,6 +1,6 @@
 @file:Suppress("DEPRECATION")
 
-package nekit.corporation.transaction_details.ui
+package nekit.corporation.transaction_details_impl.ui
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
@@ -25,10 +25,10 @@ import androidx.compose.ui.unit.dp
 import nekit.corporation.architecture.presentation.EventQueue
 import nekit.corporation.loan_shared.domain.model.Transaction
 import nekit.corporation.loan_shared.domain.model.TransactionTypeDomain
-import nekit.corporation.transaction_details.R
-import nekit.corporation.transaction_details.presentation.model.TransactionDetailsEvent
-import nekit.corporation.transaction_details.presentation.model.TransactionDetailsState
-import nekit.corporation.transaction_details.presentation.model.TransactionInteractions
+import nekit.corporation.transaction_details_impl.presentation.model.TransactionDetailsEvent
+import nekit.corporation.transaction_details_impl.presentation.model.TransactionDetailsState
+import nekit.corporation.transaction_details_impl.presentation.model.TransactionInteractions
+import nekit.corporation.transaction_details_impl.R
 import nekit.corporation.ui.component.BaseIconButton
 import nekit.corporation.ui.component.Headline2
 import nekit.corporation.ui.component.LoadingScreen
@@ -37,7 +37,7 @@ import nekit.corporation.ui.theme.LocalAppColors
 import java.time.Instant
 
 @Composable
-fun TransactionDetailsScreen(
+internal fun TransactionDetailsScreen(
     state: TransactionDetailsState,
     interactions: TransactionInteractions,
     events: EventQueue

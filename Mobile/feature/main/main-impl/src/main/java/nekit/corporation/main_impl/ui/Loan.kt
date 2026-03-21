@@ -1,4 +1,4 @@
-package nekit.corporation.ui
+package nekit.corporation.main_impl.ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -18,8 +18,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import nekit.corporation.main.R
-import nekit.corporation.presentation.models.Currency
+import nekit.corporation.main_impl.presentation.models.Currency
+import nekit.corporation.main_impl.R
 import nekit.corporation.ui.component.PrimaryButton
 import nekit.corporation.ui.component.BodyText
 import nekit.corporation.ui.component.Caption
@@ -29,7 +29,7 @@ import nekit.corporation.ui.theme.LocalAppColors
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Loan(
+internal fun Loan(
     onButtonClick: () -> Unit,
     expanded: Boolean,
     selectedCurrency: Currency,

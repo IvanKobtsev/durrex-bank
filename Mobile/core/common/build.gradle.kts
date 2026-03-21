@@ -1,6 +1,7 @@
 plugins {
-    id("android-application-convention")
+    id("android-library-convention")
     alias(stack.plugins.kotlin.ksp)
+    alias(stack.plugins.metro)
 }
 
 android {
@@ -10,4 +11,8 @@ android {
 dependencies {
     implementation(project(":core:architecture"))
     implementation("androidx.core:core-ktx:1.18.0")
+    api(stack.metro.android)
+    api(stack.metro.viewmodel)
+    api(stack.metro.viewmodel.compose)
+    api(stack.androidx.fragment.ktx)
 }

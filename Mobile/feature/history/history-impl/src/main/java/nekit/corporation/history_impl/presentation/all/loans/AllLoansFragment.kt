@@ -1,50 +1,42 @@
-package nekit.corporation.presentation.all.loans
+package nekit.corporation.history_impl.presentation.all.loans
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
-import javax.inject.Inject
-import nekit.corporation.di.AllLoansFragmentInjector
-import nekit.corporation.history.databinding.MenuScreenBinding
-import nekit.corporation.ui.AllLoansScreen
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
+import dev.zacsweers.metro.AppScope
+import dev.zacsweers.metro.ContributesIntoMap
+import dev.zacsweers.metro.Inject
+import nekit.corporation.common.FragmentKey
+import nekit.corporation.history_impl.ui.AllLoansScreen
 import nekit.corporation.ui.theme.DurexBankTheme
 
-class AllLoansFragment : Fragment() {
+@ContributesIntoMap(AppScope::class)
+@FragmentKey(AllLoansFragment::class)
+@Inject
+class AllLoansFragment(
+    private val viewModelFactory: ViewModelProvider.Factory
+) : Fragment() {
 
-    @Inject
-    lateinit var viewModel: AllLoansViewModel
-
-    private var binding: MenuScreenBinding? = null
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        (requireActivity() as AllLoansFragmentInjector).inject(this)
-
-    }
+    override val defaultViewModelProviderFactory: ViewModelProvider.Factory
+        get() = viewModelFactory
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = MenuScreenBinding.inflate(inflater, container, false)
+        val viewModel by viewModels<AllLoansViewModel>()
         viewModel.init()
-        return binding!!.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        binding?.menuScreen?.setContent {
-            DurexBankTheme {
-                AllLoansScreen(viewModel)
+        return ComposeView(requireContext()).apply {
+            setContent {
+                DurexBankTheme {
+                    AllLoansScreen(viewModel)
+                }
             }
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        binding = null
     }
 }

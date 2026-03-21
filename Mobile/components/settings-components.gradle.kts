@@ -1,5 +1,7 @@
 include(":components:account")
 include(":components:auth-shared")
+include(":components:language-component")
 include(":components:loan")
+include(":components:onboarding-component")
 include(":components:tariff")
 include(":components:user")

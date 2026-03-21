@@ -1,9 +1,10 @@
 package nekit.corporation.loan_shared.domain.usecase
 
+import dev.zacsweers.metro.Inject
 import nekit.corporation.loan_shared.domain.repository.CreditRepository
-import javax.inject.Inject
 
-class GetCreditsUseCase @Inject constructor(
+@Inject
+class GetCreditsUseCase(
     private val repository: CreditRepository
 ) {
 

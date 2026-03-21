@@ -1,9 +1,10 @@
 package nekit.corporation.tariff.domain.usecase
 
+import dev.zacsweers.metro.Inject
 import nekit.corporation.tariff.domain.TariffRepository
-import javax.inject.Inject
 
-class GetTariffsUseCase @Inject constructor(
+@Inject
+class GetTariffsUseCase(
     private val repository: TariffRepository
 ) {
 

@@ -1,12 +1,20 @@
 package nekit.corporation.profile
 
+import android.content.Context
 import androidx.annotation.StringRes
 import androidx.lifecycle.viewModelScope
+import dev.zacsweers.metro.AppScope
+import dev.zacsweers.metro.ClassKey
+import dev.zacsweers.metro.ContributesIntoMap
+import dev.zacsweers.metro.Inject
+import dev.zacsweers.metro.binding
+import dev.zacsweers.metrox.viewmodel.ViewModelKey
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import nekit.corporation.architecture.presentation.StatefulViewModel
+import nekit.corporation.language_shared.data.datasorce.local.LocaleManager
 import nekit.corporation.profile.model.SettingsUi
 import nekit.corporation.profile.model.toAccountModel
 import nekit.corporation.profile.model.toDomain
@@ -18,14 +26,19 @@ import nekit.corporation.profile_impl.R
 import nekit.corporation.user.domain.SettingsManager
 import nekit.corporation.user.domain.model.Language
 import nekit.corporation.user.domain.model.Scheme
+import nekit.corporation.user.domain.model.getCode
 import nekit.corporation.user.domain.usecase.GetSettingsUseCase
 import nekit.corporation.user.domain.usecase.GetUserUseCase
 import nekit.corporation.user.domain.usecase.SaveSettingsUseCase
 import nekit.corporation.util.domain.common.NoConnectionFailure
-import javax.inject.Inject
 
-
-internal class ProfileViewModel @Inject constructor(
+@Inject
+@ViewModelKey(ProfileViewModel::class)
+@ContributesIntoMap(
+    AppScope::class,
+    binding = binding<@ClassKey(ProfileViewModel::class) ProfileInteractions>()
+)
+internal class ProfileViewModel(
     private val getUserUseCase: GetUserUseCase,
     private val getSettingsUseCase: GetSettingsUseCase,
     private val saveSettingsUseCase: SaveSettingsUseCase,
@@ -73,7 +86,8 @@ internal class ProfileViewModel @Inject constructor(
         updateSetting({ it.copy(scheme = scheme) }, R.string.change_scheme_error)
     }
 
-    override fun onLanguageChange(language: Language) {
+    override fun onLanguageChange(context: Context, language: Language) {
+        LocaleManager.setLocale(context, language.getCode())
         updateSetting({ it.copy(language = language) }, R.string.change_language_error)
     }
 

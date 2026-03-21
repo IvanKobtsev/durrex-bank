@@ -1,8 +1,9 @@
 plugins {
-    id("android-application-convention")
+    id("android-library-convention")
     `kotlin-composecompiler`
     `kotlinx-serialization`
     alias(stack.plugins.kotlin.ksp)
+    alias(stack.plugins.metro)
 }
 
 android {
@@ -23,5 +24,7 @@ dependencies {
     implementation(project(":core:util"))
 
     implementation(project(":components:account"))
-    implementation("androidx.core:core-ktx:1.18.0")
+
+    implementation(projects.feature.transactionDetails.transactionDetailsApi)
+    implementation(projects.feature.auth.authApi)
 }

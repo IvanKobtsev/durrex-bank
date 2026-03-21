@@ -1,8 +1,6 @@
-package nekit.corporation.create_loan.model
+package nekit.corporation.create_loan_impl.model
 
-import nekit.corporation.loan_shared.domain.model.Account
-
-interface CreateLoanInteractions {
+internal interface CreateLoanInteractions {
 
     fun onBackClick()
 

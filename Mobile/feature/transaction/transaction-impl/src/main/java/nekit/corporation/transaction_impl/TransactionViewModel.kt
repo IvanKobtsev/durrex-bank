@@ -1,7 +1,12 @@
-package nekit.corporation.transaction
+package nekit.corporation.transaction_impl
 
 import androidx.lifecycle.viewModelScope
-import kotlinx.collections.immutable.ImmutableList
+import dev.zacsweers.metro.AppScope
+import dev.zacsweers.metro.ClassKey
+import dev.zacsweers.metro.ContributesIntoMap
+import dev.zacsweers.metro.Inject
+import dev.zacsweers.metro.binding
+import dev.zacsweers.metrox.viewmodel.ViewModelKey
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
@@ -21,6 +26,9 @@ import nekit.corporation.user.domain.usecase.GetUserUseCase
 import nekit.corporation.util.domain.common.NotFoundFailure
 
 @OptIn(FlowPreview::class)
+@Inject
+@ViewModelKey(TransactionViewModel::class)
+@ContributesIntoMap(AppScope::class, binding<@ClassKey(TransactionViewModel::class) TransactionInteractions>())
 class TransactionViewModel(
     private val getAccountsUseCase: GetAccountsUseCase,
     private val getAccountByIdUseCase: GetAccountByIdUseCase,
@@ -33,7 +41,7 @@ class TransactionViewModel(
         return TransactionState.DEFAULT
     }
 
-    fun init() {
+    init {
         viewModelScope.launch(Dispatchers.IO) {
             val accounts = getAccountsUseCase()
             val user = getUserUseCase()
@@ -60,7 +68,7 @@ class TransactionViewModel(
                             recipient = user.toUi()
                         )
                     }
-                } catch (e: NotFoundFailure) {
+                } catch (_: NotFoundFailure) {
                     updateState {
                         copy(
                             accountToError = R.string.account_not_found_exception

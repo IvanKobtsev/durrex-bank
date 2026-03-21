@@ -1,5 +1,5 @@
-package nekit.corporation.presentation.models
+package nekit.corporation.main_impl.presentation.models
 
-enum class Currency(val symbol: String) {
+internal enum class Currency(val symbol: String) {
     RUB("₽"), JPY("¥"), FRF("₣"), EUR("€")
 }

@@ -15,6 +15,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
+import nekit.corporation.language_shared.data.datasorce.local.LocaleManager
 import java.util.Locale
 
 val LocalAppColors = staticCompositionLocalOf { LightAppColors }

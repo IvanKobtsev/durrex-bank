@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import nekit.corporation.transaction.R
+import nekit.corporation.transaction_impl.R
 import nekit.corporation.ui.component.InfoRow
 import nekit.corporation.ui.theme.LocalAppColors
 

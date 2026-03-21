@@ -1,4 +1,4 @@
-package nekit.corporation.presentation.models
+package nekit.corporation.main_impl.presentation.models
 
 import kotlinx.collections.immutable.ImmutableList
 import nekit.corporation.architecture.presentation.ScreenState
@@ -6,7 +6,7 @@ import nekit.corporation.loan_shared.domain.model.Account
 import nekit.corporation.loan_shared.domain.model.Credit
 
 
-sealed interface MainState : ScreenState {
+internal sealed interface MainState : ScreenState {
 
     data object Loading : MainState
 

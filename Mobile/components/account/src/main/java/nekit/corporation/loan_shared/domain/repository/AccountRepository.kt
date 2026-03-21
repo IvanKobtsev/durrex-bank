@@ -1,5 +1,6 @@
 package nekit.corporation.loan_shared.domain.repository
 
+import kotlinx.coroutines.flow.Flow
 import nekit.corporation.loan_shared.domain.model.Account
 import nekit.corporation.loan_shared.domain.model.CreateAccount
 import nekit.corporation.loan_shared.domain.model.Debit
@@ -12,7 +13,7 @@ interface AccountRepository {
 
     suspend fun createAccount(model: CreateAccount)
 
-    suspend fun getAccount(id:Int): Account
+    suspend fun getAccount(id: Int): Account
 
     suspend fun closeAccount(id: Int)
 
@@ -28,4 +29,5 @@ interface AccountRepository {
 
     suspend fun getTransactions(accountId: Int): List<Transaction>
 
+    fun getTransactionHubEvents():  Flow<Result<Unit>>
 }

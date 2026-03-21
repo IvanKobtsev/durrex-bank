@@ -1,6 +1,6 @@
-package nekit.corporation.create_loan.model
+package nekit.corporation.create_loan_impl.model
 
-data class AccountUi(
+internal data class AccountUi(
     val id: Int,
     val balance: Double,
     val currency: String,

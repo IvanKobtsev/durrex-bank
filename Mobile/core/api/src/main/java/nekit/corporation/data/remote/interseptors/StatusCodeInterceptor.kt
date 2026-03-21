@@ -1,5 +1,6 @@
 package nekit.corporation.data.remote.interseptors
 
+import dev.zacsweers.metro.Inject
 import nekit.corporation.util.domain.common.BadRequestFailure
 import nekit.corporation.util.domain.common.NotFoundFailure
 import nekit.corporation.util.domain.common.UnknownFailure
@@ -9,7 +10,6 @@ import nekit.corporation.util.domain.common.ServerFailure
 import okhttp3.Interceptor
 import okhttp3.Response
 import java.net.HttpURLConnection
-import javax.inject.Inject
 
 class StatusCodeInterceptor @Inject constructor(private val json: Json) : Interceptor {
 

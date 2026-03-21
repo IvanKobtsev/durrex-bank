@@ -1,6 +1,6 @@
 @file:Suppress("DEPRECATION")
 
-package nekit.corporation.ui
+package nekit.corporation.loan_details_impl.ui
 
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -29,13 +29,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.persistentListOf
 import nekit.corporation.architecture.presentation.EventQueue
-import nekit.corporation.loan_details.R
+import nekit.corporation.loan_details_impl.R
 import nekit.corporation.loan_shared.domain.model.CreditDetail
 import nekit.corporation.loan_shared.domain.model.CreditStatusDomain
 import nekit.corporation.loan_shared.domain.model.PaymentScheduleEntry
-import nekit.corporation.presentation.model.LoanDetailsEvent
-import nekit.corporation.presentation.model.LoanDetailsState
-import nekit.corporation.presentation.model.LoanInteractions
+import nekit.corporation.loan_details_impl.presentation.model.LoanDetailsEvent
+import nekit.corporation.loan_details_impl.presentation.model.LoanDetailsState
+import nekit.corporation.loan_details_impl.presentation.model.LoanInteractions
 import nekit.corporation.ui.component.BaseIconButton
 import nekit.corporation.ui.component.Body2Text
 import nekit.corporation.ui.component.BodyText
@@ -48,7 +48,7 @@ import nekit.corporation.util.domain.common.toDate
 import java.time.Instant
 
 @Composable
-fun LoanDetailsScreen(
+internal fun LoanDetailsScreen(
     state: LoanDetailsState,
     interactions: LoanInteractions,
     events: EventQueue

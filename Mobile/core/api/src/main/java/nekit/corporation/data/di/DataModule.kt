@@ -1,16 +1,14 @@
 package nekit.corporation.data.di
 
 import android.content.Context
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import nekit.corporation.common.AppScope
+import dev.zacsweers.metro.AppScope
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 import nekit.corporation.data.local.AppDataBase
 import nekit.corporation.data.local.Database
 
-@Module
 @ContributesTo(AppScope::class)
-object DataModule {
+interface DataModule {
 
     @Provides
     fun provideAppDatabase(appContext: Context): AppDataBase =

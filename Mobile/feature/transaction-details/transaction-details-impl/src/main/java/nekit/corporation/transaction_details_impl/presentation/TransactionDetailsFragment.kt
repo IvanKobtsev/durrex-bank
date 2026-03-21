@@ -1,4 +1,4 @@
-package nekit.corporation.transaction_details.presentation
+package nekit.corporation.transaction_details_impl.presentation
 
 import android.content.Context
 import android.os.Bundle
@@ -6,24 +6,32 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import nekit.corporation.transaction_details.di.TransactionDetailsFragmentInjector
-import nekit.corporation.transaction_details.databinding.TransactionDetailsScreenBinding
-import nekit.corporation.transaction_details.ui.TransactionDetailsScreen
-import javax.inject.Inject
+import dev.zacsweers.metro.AppScope
+import dev.zacsweers.metro.ContributesIntoMap
+import dev.zacsweers.metro.Inject
+import nekit.corporation.common.FragmentKey
+import nekit.corporation.transaction_details_impl.ui.TransactionDetailsScreen
 import nekit.corporation.ui.theme.DurexBankTheme
 
-class TransactionDetailsFragment : Fragment() {
+@ContributesIntoMap(AppScope::class)
+@FragmentKey(TransactionDetailsFragment::class)
+@Inject
+internal class TransactionDetailsFragment(
+    private val viewModelFactory: ViewModelProvider.Factory
+) : Fragment() {
+
+    override val defaultViewModelProviderFactory: ViewModelProvider.Factory
+        get() = viewModelFactory
 
     @Inject
-    lateinit var viewModel: TransactionDetailsViewModel
-
-    private var binding: TransactionDetailsScreenBinding? = null
+    private lateinit var viewModel: TransactionDetailsViewModel
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        (requireActivity() as TransactionDetailsFragmentInjector).inject(this)
         val accountId = requireArguments().getInt(ID_ARG_ACCOUNT)
         val transactionId = requireArguments().getLong(ID_ARG_TRANSACTION)
         viewModel.init(accountId, transactionId)
@@ -33,23 +41,14 @@ class TransactionDetailsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = TransactionDetailsScreenBinding.inflate(inflater, container, false)
-        return binding!!.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        binding?.transactionDetailsScreen?.setContent {
-            DurexBankTheme {
-                val state by viewModel.screenState.collectAsStateWithLifecycle()
-                TransactionDetailsScreen(state.currentState, viewModel, viewModel.screenEvents)
+        return ComposeView(requireContext()).apply {
+            setContent {
+                DurexBankTheme {
+                    val state by viewModel.screenState.collectAsStateWithLifecycle()
+                    TransactionDetailsScreen(state.currentState, viewModel, viewModel.screenEvents)
+                }
             }
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        binding = null
     }
 
     companion object {

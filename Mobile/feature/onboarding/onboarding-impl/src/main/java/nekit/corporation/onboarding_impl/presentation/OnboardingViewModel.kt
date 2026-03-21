@@ -1,20 +1,26 @@
-package nekit.corporation.onboarding.presentation
+package nekit.corporation.onboarding_impl.presentation
 
 import androidx.lifecycle.viewModelScope
+import dev.zacsweers.metro.AppScope
+import dev.zacsweers.metro.ContributesIntoMap
+import dev.zacsweers.metro.Inject
+import dev.zacsweers.metrox.viewmodel.ViewModelKey
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import nekit.corporation.architecture.presentation.StatefulViewModel
-import nekit.corporation.`onboarding-impl`.R
-import nekit.corporation.onboarding.presentation.model.OnboardingEvent
-import nekit.corporation.onboarding.presentation.model.OnboardingState
-import nekit.corporation.onboarding.presentation.model.Page
-import nekit.corporation.onboarding.navigation.OnboardingNavigation
+import nekit.corporation.onboarding_impl.presentation.model.OnboardingState
+import nekit.corporation.onboarding_impl.presentation.model.OnboardingEvent
+import nekit.corporation.onboarding_impl.presentation.model.Page
+import nekit.corporation.onboarding_impl.navigation.OnboardingNavigator
+import nekit.corporation.onboarding_impl.R
 import nekit.corporation.onboarding_shared.domain.usecase.UpdateSettingUseCase
-import javax.inject.Inject
 
-internal class OnboardingViewModel @Inject constructor(
-    private val onboardingNavigation: OnboardingNavigation,
+@Inject
+@ViewModelKey(OnboardingViewModel::class)
+@ContributesIntoMap(AppScope::class)
+internal class OnboardingViewModel(
+    private val onboardingNavigator: OnboardingNavigator,
     private val updateSettingUseCase: UpdateSettingUseCase
 ) : StatefulViewModel<OnboardingState>() {
 
@@ -44,7 +50,7 @@ internal class OnboardingViewModel @Inject constructor(
     fun onContinueClick() {
         if (screenState.value.currentState.currentPage == screenState.value.currentState.pages.size - 1) {
             onOnboardingFinish()
-            onboardingNavigation.openMain()
+            onboardingNavigator.openMain()
         } else {
             val newPage = screenState.value.currentState.currentPage + 1
             updateState {
@@ -64,7 +70,7 @@ internal class OnboardingViewModel @Inject constructor(
 
     fun onSkipClick() {
         onOnboardingFinish()
-        onboardingNavigation.openMain()
+        onboardingNavigator.openMain()
     }
 
     fun onSwipe(currentPage: Int) {

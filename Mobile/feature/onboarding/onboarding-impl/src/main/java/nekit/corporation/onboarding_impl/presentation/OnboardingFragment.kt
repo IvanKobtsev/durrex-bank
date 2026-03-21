@@ -1,48 +1,41 @@
-package nekit.corporation.onboarding.presentation
+package nekit.corporation.onboarding_impl.presentation
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
-import nekit.corporation.onboarding.presentation.ui.OnboardingScreen
-import nekit.corporation.onboarding.databinding.FragmentOnboardingBinding
-import nekit.corporation.onboarding.presentation.di.OnboardingFragmentInjector
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
+import dev.zacsweers.metro.AppScope
+import dev.zacsweers.metro.ContributesIntoMap
+import dev.zacsweers.metro.Inject
+import nekit.corporation.common.FragmentKey
+import nekit.corporation.onboarding_impl.presentation.ui.OnboardingScreen
 import nekit.corporation.ui.theme.DurexBankTheme
-import javax.inject.Inject
 
-internal class OnboardingFragment : Fragment() {
+@ContributesIntoMap(AppScope::class)
+@FragmentKey(OnboardingFragment::class)
+@Inject
+internal class OnboardingFragment(
+    private val viewModelFactory: ViewModelProvider.Factory
+) : Fragment() {
 
-    @Inject
-    lateinit var viewModel: OnboardingViewModel
-
-    private var binding: FragmentOnboardingBinding? = null
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        (requireActivity() as OnboardingFragmentInjector).inject(this)
-    }
+    override val defaultViewModelProviderFactory: ViewModelProvider.Factory
+        get() = viewModelFactory
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentOnboardingBinding.inflate(inflater, container, false)
-        return binding!!.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        binding?.onboardingScreen?.setContent {
-            DurexBankTheme {
-                OnboardingScreen(viewModel)
+        val viewModel by viewModels<OnboardingViewModel>()
+        return ComposeView(requireContext()).apply {
+            setContent {
+                DurexBankTheme {
+                    OnboardingScreen(viewModel)
+                }
             }
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        binding = null
     }
 }

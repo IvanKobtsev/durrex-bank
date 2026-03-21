@@ -1,10 +1,11 @@
 package nekit.corporation.user.domain.usecase
 
+import dev.zacsweers.metro.Inject
 import nekit.corporation.user.domain.UserRepository
 import nekit.corporation.user.domain.model.User
-import javax.inject.Inject
 
-class GetUserUseCase @Inject constructor(
+@Inject
+class GetUserUseCase (
     private val userRepository: UserRepository
 ) {
 

@@ -1,4 +1,4 @@
-package nekit.corporation.ui
+package nekit.corporation.history_impl.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -14,8 +14,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import nekit.corporation.history_impl.R
 import nekit.corporation.ui.component.Body2Text
-import nekit.corporation.history.R
 import nekit.corporation.loan_shared.domain.model.Transaction
 import nekit.corporation.loan_shared.domain.model.TransactionTypeDomain
 import nekit.corporation.ui.theme.DurexBankTheme
@@ -23,7 +23,7 @@ import nekit.corporation.ui.theme.LocalAppColors
 import java.time.Instant
 
 @Composable
-fun TransactionsRow(transaction: Transaction, onIconClick: () -> Unit) {
+internal fun TransactionsRow(transaction: Transaction, onIconClick: () -> Unit) {
     val colors = LocalAppColors.current
 
     Row(
@@ -50,7 +50,7 @@ fun TransactionsRow(transaction: Transaction, onIconClick: () -> Unit) {
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun PreviewTransactionsRow() {
+private fun PreviewTransactionsRow() {
     DurexBankTheme {
         TransactionsRow(
             Transaction(

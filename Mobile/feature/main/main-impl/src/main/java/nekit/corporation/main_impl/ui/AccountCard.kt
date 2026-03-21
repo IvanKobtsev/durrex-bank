@@ -1,4 +1,4 @@
-package nekit.corporation.ui
+package nekit.corporation.main_impl.ui
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,15 +12,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.ImmutableList
 import nekit.corporation.loan_shared.domain.model.Account
-import nekit.corporation.loan_shared.domain.model.Credit
-import nekit.corporation.ui.component.EnableButton
-import nekit.corporation.ui.component.CreditRow
-import nekit.corporation.main.R
+import nekit.corporation.main_impl.R
 import nekit.corporation.ui.component.AccountRow
+import nekit.corporation.ui.component.EnableButton
 import nekit.corporation.ui.theme.LocalAppColors
 
 @Composable
-fun AccountCard(
+internal fun AccountCard(
     loans: ImmutableList<Account>,
     onRowClick: (Int) -> Unit,
     onButtonClick: () -> Unit,

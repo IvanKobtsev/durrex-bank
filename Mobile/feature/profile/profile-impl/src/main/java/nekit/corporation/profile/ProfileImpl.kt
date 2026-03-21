@@ -1,15 +1,17 @@
 package nekit.corporation.profile
 
-import com.github.terrakok.cicerone.Screen
+import androidx.lifecycle.ViewModelProvider
 import com.github.terrakok.cicerone.androidx.FragmentScreen
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.AppScope
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.Inject
 import nekit.corporation.ProfileApi
-import nekit.corporation.common.AppScope
 
+@Inject
 @ContributesBinding(AppScope::class)
-class ProfileImpl : ProfileApi {
+class ProfileImpl(
+    private val viewModelFactory: ViewModelProvider.Factory
+) : ProfileApi {
 
-    override fun profile(): Screen {
-        return FragmentScreen { ProfileFragment() }
-    }
+    override fun profile() = FragmentScreen { ProfileFragment(viewModelFactory) }
 }

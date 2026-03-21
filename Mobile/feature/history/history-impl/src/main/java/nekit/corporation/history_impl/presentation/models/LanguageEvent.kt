@@ -1,8 +1,8 @@
-package nekit.corporation.presentation.models
+package nekit.corporation.history_impl.presentation.models
 
 import nekit.corporation.architecture.presentation.Event
 
-sealed interface LanguageEvent : Event {
+internal sealed interface LanguageEvent : Event {
 
     data object LanguageApplied : LanguageEvent
 }

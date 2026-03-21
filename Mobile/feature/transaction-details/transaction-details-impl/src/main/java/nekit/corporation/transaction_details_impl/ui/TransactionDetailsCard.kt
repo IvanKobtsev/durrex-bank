@@ -1,4 +1,4 @@
-package nekit.corporation.transaction_details.ui
+package nekit.corporation.transaction_details_impl.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -9,12 +9,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import nekit.corporation.loan_shared.domain.model.TransactionTypeDomain
-import nekit.corporation.transaction_details.R
+import nekit.corporation.transaction_details_impl.R
 import nekit.corporation.ui.component.InfoRow
 import nekit.corporation.ui.theme.LocalAppColors
 
 @Composable
-fun TransactionDetailsCard(
+internal fun TransactionDetailsCard(
     id: Long,
     type: TransactionTypeDomain,
     amount: Double,

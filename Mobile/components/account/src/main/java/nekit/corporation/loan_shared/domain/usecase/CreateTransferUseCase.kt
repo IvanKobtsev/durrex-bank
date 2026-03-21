@@ -1,11 +1,12 @@
 package nekit.corporation.loan_shared.domain.usecase
 
+import dev.zacsweers.metro.Inject
 import nekit.corporation.loan_shared.domain.model.Transaction
 import nekit.corporation.loan_shared.domain.model.Transfer
 import nekit.corporation.loan_shared.domain.repository.AccountRepository
-import javax.inject.Inject
 
-class CreateTransferUseCase @Inject constructor(
+@Inject
+class CreateTransferUseCase(
     val accountRepository: AccountRepository
 ) {
 

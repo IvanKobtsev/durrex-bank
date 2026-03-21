@@ -20,9 +20,6 @@ material = "1.13.0"
 material3 = "1.4.0"
 
 #DI
-anvil = "2.7.0"
-anvil-utils = "0.4.0"
-dagger = "2.57.2"
 metro = "0.11.4"
 
 #utils
@@ -50,7 +47,6 @@ compose = "1.10.2"
 [libraries]
 androidx-compose-material = { module = "androidx.compose.material:material" }
 androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
-androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragmentKtx" }
 androidx-fragment-navigation = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "fragment" }
 androidx-fragment-ui = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "fragment" }
@@ -65,11 +61,9 @@ androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-view
 androidx-lifecycle-viewmodel-savedstate = { module = "androidx.lifecycle:lifecycle-viewmodel-savedstate", version.ref = "lifecycleViewmodelSavedstate" }
 
 #DI
-#anvil-utils-annotations = { group = "me.gulya.anvil", name = "annotations", version.ref = "anvil-utils" }
-#anvil-utils-compiler = { group = "me.gulya.anvil", name = "compiler", version.ref = "anvil-utils" }
-#anvil-annotations = { group = "dev.zacsweers.anvil", name = "annotations-optional", version.ref = "anvil" }
-#dagger-compiler = { module = "com.google.dagger:dagger-compiler", version.ref = "dagger" }
-#dagger = { module = "com.google.dagger:dagger", version.ref = "dagger" }
+metro-android = { group = "dev.zacsweers.metro", name = "metrox-android", version.ref = "metro" }
+metro-viewmodel = { group = "dev.zacsweers.metro", name = "metrox-viewmodel", version.ref = "metro" }
+metro-viewmodel-compose = { group = "dev.zacsweers.metro", name = "metrox-viewmodel-compose", version.ref = "metro" }
 
 androidx-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -84,7 +78,6 @@ kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 kotlinx-coroutine = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutine" }
 lionscribe-libphonenumber = { group = "com.lionscribe.open.libphonenumber", name = "libphonenumber", version.ref = "lionscribe-libphonenumber" }
-
 #Network
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 retrofit-conventer = { module = "com.squareup.retrofit2:converter-kotlinx-serialization", version.ref = "retrofit" }
@@ -105,7 +98,7 @@ credentials = { group = "androidx.credentials", name = "credentials", version.re
 credentials-auth = { group = "androidx.credentials", name = "credentials-play-services-auth", version.ref = "credentials" }
 tink = { group = "com.google.crypto.tink", name = "tink-android", version.ref = "tink" }
 
-androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "composeTool" }
+androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
 androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "composeTool" }
 androidx-compose-ui-ui = { group = "androidx.compose.ui", name = "ui", version.ref = "composeTool" }
 androidx-compose-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "composeTool" }
@@ -126,11 +119,8 @@ jetbrains-kotlin-serialization = { module = "org.jetbrains.kotlin.plugin.seriali
 metro = {id ="dev.zacsweers.metro", version.ref = "metro"}
 android-library = { id = "com.android.library" , version.ref = "agp" }
 android-application = { id = "com.android.application", version.ref = "agp" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose" }
-kotlin-kapt = { id = "org.jetbrains.kotlin.kapt" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization" }
 kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize" }
 room = { id = "androidx.room", version.ref = "room" }
 kotlin-ksp = { id = "com.google.devtools.ksp", version.ref = "kotlin-ksp" }
-anvil = { id = "com.squareup.anvil", version.ref = "anvil" }

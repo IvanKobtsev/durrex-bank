@@ -1,6 +1,12 @@
-package nekit.corporation.presentation
+package nekit.corporation.main_impl.presentation
 
 import androidx.lifecycle.viewModelScope
+import dev.zacsweers.metro.AppScope
+import dev.zacsweers.metro.ClassKey
+import dev.zacsweers.metro.ContributesIntoMap
+import dev.zacsweers.metro.Inject
+import dev.zacsweers.metro.binding
+import dev.zacsweers.metrox.viewmodel.ViewModelKey
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
@@ -11,14 +17,18 @@ import nekit.corporation.architecture.presentation.StatefulViewModel
 import nekit.corporation.loan_shared.domain.model.CreateAccount
 import nekit.corporation.loan_shared.domain.repository.AccountRepository
 import nekit.corporation.loan_shared.domain.usecase.GetCreditsUseCase
-import nekit.corporation.navigation.MainNavigation
-import nekit.corporation.presentation.models.Currency
-import nekit.corporation.presentation.models.MainState
-import nekit.corporation.presentation.models.MainViewModelInteraction
-import javax.inject.Inject
+import nekit.corporation.main_impl.navigation.MainNavigation
+import nekit.corporation.main_impl.presentation.models.Currency
+import nekit.corporation.main_impl.presentation.models.MainState
+import nekit.corporation.main_impl.presentation.models.MainViewModelInteraction
 
-
-class MainViewModel @Inject constructor(
+@Inject
+@ViewModelKey(MainViewModel::class)
+@ContributesIntoMap(
+    AppScope::class,
+    binding<@ClassKey(MainViewModel::class) MainViewModelInteraction>()
+)
+internal class MainViewModel(
     private val mainNavigation: MainNavigation,
     private val accountRepository: AccountRepository,
     private val getCreditsUseCase: GetCreditsUseCase,

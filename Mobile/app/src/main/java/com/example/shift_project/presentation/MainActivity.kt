@@ -1,55 +1,49 @@
 package com.example.shift_project.presentation
 
+import android.app.Activity
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.fragment.app.FragmentFactory
 import androidx.lifecycle.lifecycleScope
 import com.example.shift_project.R
 import com.example.shift_project.databinding.LaunchScreenBinding
 import com.example.shift_project.presentation.App.Companion.INSTANCE
 import com.example.shift_project.presentation.model.toLocaleListCompat
-import com.example.shift_project.presentation.navigation.Screens.auth
 import com.github.terrakok.cicerone.androidx.AppNavigator
 import com.google.i18n.phonenumbers.PhoneNumberUtil
+import dev.zacsweers.metro.AppScope
+import dev.zacsweers.metro.ContributesIntoMap
+import dev.zacsweers.metro.Inject
+import dev.zacsweers.metro.binding
+import dev.zacsweers.metrox.android.ActivityKey
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import nekit.corporation.auth.di.AuthFragmentInjector
-import nekit.corporation.auth.presentation.auth.AuthFragment
-import nekit.corporation.create_loan.CreateCreditFragment
-import nekit.corporation.create_loan.navigation.CreateCreditInjector
-import nekit.corporation.di.AccountDetailsFragmentInjector
-import nekit.corporation.di.AllAccountsFragmentInjector
-import nekit.corporation.di.AllLoansFragmentInjector
-import nekit.corporation.di.HistoryFragmentInjector
-import nekit.corporation.di.LoanDetailsFragmentInjector
-import nekit.corporation.di.MainBottomBarInjector
-import nekit.corporation.di.MainFragmentInjector
-import nekit.corporation.onboarding.presentation.di.OnboardingFragmentInjector
-import nekit.corporation.onboarding.presentation.OnboardingFragment
-import nekit.corporation.presentation.AccountDetailsFragment
-import nekit.corporation.presentation.LoanDetailsFragment
-import nekit.corporation.presentation.MainFragment
-import nekit.corporation.presentation.ShellMainHostFragment
-import nekit.corporation.presentation.all.accounts.AllAccountsFragment
-import nekit.corporation.presentation.all.loans.AllLoansFragment
-import nekit.corporation.presentation.menu.HistoryFragment
-import nekit.corporation.transaction_details.di.TransactionDetailsFragmentInjector
-import nekit.corporation.transaction_details.presentation.TransactionDetailsFragment
+import nekit.corporation.auth_api.AuthApi
+import nekit.corporation.language_shared.data.datasorce.local.LocaleManager
 import nekit.corporation.user.domain.SettingsManager
 import java.util.Locale
-import javax.inject.Inject
 import kotlin.getValue
 
-class MainActivity : AppCompatActivity(), AuthFragmentInjector, OnboardingFragmentInjector,
-    HistoryFragmentInjector, MainFragmentInjector, MainBottomBarInjector,
-    LoanDetailsFragmentInjector, AllLoansFragmentInjector, TransactionDetailsFragmentInjector,
-    AllAccountsFragmentInjector, CreateCreditInjector, AccountDetailsFragmentInjector {
+@ContributesIntoMap(AppScope::class, binding<Activity>())
+@ActivityKey(MainActivity::class)
+@Inject
+class MainActivity(
+    private val fragmentFactory: FragmentFactory,
+    private val settingsManager: SettingsManager
+) : AppCompatActivity() {
+
+    init {
+        supportFragmentManager.fragmentFactory = fragmentFactory
+    }
+
     @Inject
-    lateinit var settingsManager: SettingsManager
+    private lateinit var authApi: AuthApi
+
     override fun attachBaseContext(newBase: Context) {
         PhoneNumberUtil.getInstance(newBase)
         super.attachBaseContext(LocaleManager.getLocalizedContext(newBase))
@@ -65,8 +59,6 @@ class MainActivity : AppCompatActivity(), AuthFragmentInjector, OnboardingFragme
         )
     }
 
-    lateinit var component: AppDaggerComponent
-
     private val ciceroneNavigator by lazy {
         AppNavigator(this, R.id.main_container, supportFragmentManager)
     }
@@ -75,8 +67,6 @@ class MainActivity : AppCompatActivity(), AuthFragmentInjector, OnboardingFragme
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        INSTANCE.component.inject(this)
-        component = INSTANCE.component
 
         binding = LaunchScreenBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -84,7 +74,7 @@ class MainActivity : AppCompatActivity(), AuthFragmentInjector, OnboardingFragme
 
         INSTANCE.navigatorHolder.setNavigator(ciceroneNavigator)
         if (savedInstanceState == null) {
-            INSTANCE.router.newRootScreen(auth())
+            INSTANCE.router.newRootScreen(authApi.auth())
         }
         lifecycleScope.launch {
             settingsManager.settings.map { it?.language }
@@ -107,49 +97,5 @@ class MainActivity : AppCompatActivity(), AuthFragmentInjector, OnboardingFragme
 
     override fun onStart() {
         super.onStart()
-    }
-
-    override fun inject(fragment: AuthFragment) {
-        component.inject(fragment)
-    }
-
-    override fun inject(fragment: OnboardingFragment) {
-        component.inject(fragment)
-    }
-
-    override fun inject(fragment: MainFragment) {
-        component.inject(fragment)
-    }
-
-    override fun inject(fragment: ShellMainHostFragment) {
-        component.inject(fragment)
-    }
-
-    override fun inject(fragment: LoanDetailsFragment) {
-        component.inject(fragment)
-    }
-
-    override fun inject(fragment: CreateCreditFragment) {
-        component.inject(fragment)
-    }
-
-    override fun inject(fragment: HistoryFragment) {
-        component.inject(fragment)
-    }
-
-    override fun inject(fragment: AllLoansFragment) {
-        component.inject(fragment)
-    }
-
-    override fun inject(fragment: AllAccountsFragment) {
-        component.inject(fragment)
-    }
-
-    override fun inject(fragment: AccountDetailsFragment) {
-        component.inject(fragment)
-    }
-
-    override fun inject(fragment: TransactionDetailsFragment) {
-        component.inject(fragment)
     }
 }

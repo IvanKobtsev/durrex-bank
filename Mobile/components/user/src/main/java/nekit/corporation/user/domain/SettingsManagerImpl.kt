@@ -1,18 +1,17 @@
 package nekit.corporation.user.domain
 
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.optional.SingleIn
-import dagger.BindsInstance
-import jakarta.inject.Inject
-import jakarta.inject.Singleton
+import dev.zacsweers.metro.AppScope
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.Inject
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import nekit.corporation.common.AppScope
 import nekit.corporation.user.domain.model.Settings
 
+
 @SingleIn(AppScope::class)
-@ContributesBinding(AppScope::class)
-class SettingsManagerImpl @Inject constructor() : SettingsManager {
+@ContributesBinding(AppScope::class, binding = binding<SettingsManager>())
+class SettingsManagerImpl @Inject constructor(): SettingsManager {
 
     override val settings: MutableStateFlow<Settings?> = MutableStateFlow(null)
 

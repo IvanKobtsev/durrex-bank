@@ -1,5 +1,6 @@
 package nekit.corporation.profile.mvvm
 
+import android.content.Context
 import kotlinx.coroutines.flow.SharedFlow
 import nekit.corporation.user.domain.model.Language
 import nekit.corporation.user.domain.model.Scheme
@@ -11,7 +12,7 @@ internal interface ProfileInteractions {
 
     fun onSchemeClick()
 
-    fun onLanguageChange(language: Language)
+    fun onLanguageChange(context: Context, language: Language)
 
     fun onLanguageClick()
 }

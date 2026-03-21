@@ -1,34 +1,33 @@
-package nekit.corporation.presentation
+package nekit.corporation.shell_main_impl.presentation
 
+import dev.zacsweers.metro.AppScope
+import dev.zacsweers.metro.ContributesIntoMap
+import dev.zacsweers.metro.Inject
+import dev.zacsweers.metrox.viewmodel.ViewModelKey
 import nekit.corporation.architecture.presentation.StatefulViewModel
-import nekit.corporation.navigation.MainBottomBarRouter
-import nekit.corporation.navigation.Screens.main
-import nekit.corporation.navigation.Screens.history
-import nekit.corporation.navigation.Screens.profile
-import nekit.corporation.presentation.model.BottomBarState
-import nekit.corporation.presentation.model.MainBottomBarTabs
-import javax.inject.Inject
+import nekit.corporation.shell_main_api.model.Tab
+import nekit.corporation.shell_main_impl.navigation.MainBottomBarNavigator
+import nekit.corporation.shell_main_impl.presentation.model.BottomBarState
 
-class BottomBarViewModel @Inject constructor(
-    private val mainBottomBarRouter: MainBottomBarRouter
+@Inject
+@ViewModelKey(BottomBarViewModel::class)
+@ContributesIntoMap(AppScope::class)
+internal class BottomBarViewModel(
+    private val mainBottomBarNavigator: MainBottomBarNavigator
 ) : StatefulViewModel<BottomBarState>() {
 
     override fun createInitialState(): BottomBarState {
         return BottomBarState(
-            selectedTab = MainBottomBarTabs.Main
+            selectedTab = Tab.Main
         )
     }
 
-    fun onTabClick(tab: MainBottomBarTabs) {
+    fun onTabClick(tab: Tab) {
         updateState {
             copy(
                 selectedTab = tab
             )
         }
-        when (tab) {
-            MainBottomBarTabs.Main -> mainBottomBarRouter.replaceScreen(main())
-            MainBottomBarTabs.Menu -> mainBottomBarRouter.replaceScreen(history())
-            MainBottomBarTabs.Profile -> mainBottomBarRouter.replaceScreen(profile())
-        }
+        mainBottomBarNavigator.toTab(tab)
     }
 }

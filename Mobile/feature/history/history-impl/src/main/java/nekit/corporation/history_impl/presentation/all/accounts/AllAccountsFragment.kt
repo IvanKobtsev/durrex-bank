@@ -1,51 +1,43 @@
-package nekit.corporation.presentation.all.accounts
+package nekit.corporation.history_impl.presentation.all.accounts
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
-import nekit.corporation.di.AllAccountsFragmentInjector
-import nekit.corporation.history.databinding.MenuScreenBinding
-import nekit.corporation.ui.AllAccountsScreen
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
+import dev.zacsweers.metro.AppScope
+import dev.zacsweers.metro.ContributesIntoMap
+import dev.zacsweers.metro.Inject
+import nekit.corporation.common.FragmentKey
+import nekit.corporation.history_impl.ui.AllAccountsScreen
 import nekit.corporation.ui.theme.DurexBankTheme
-import javax.inject.Inject
 
 @Suppress("DEPRECATION")
-class AllAccountsFragment : Fragment() {
+@ContributesIntoMap(AppScope::class)
+@FragmentKey(AllAccountsFragment::class)
+@Inject
+class AllAccountsFragment(
+    private val viewModelFactory: ViewModelProvider.Factory
+) : Fragment() {
 
-    @Inject
-    lateinit var viewModel: AllAccountsViewModel
-
-    private var binding: MenuScreenBinding? = null
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        (requireActivity() as AllAccountsFragmentInjector).inject(this)
-
-    }
+    override val defaultViewModelProviderFactory: ViewModelProvider.Factory
+        get() = viewModelFactory
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = MenuScreenBinding.inflate(inflater, container, false)
+        val viewModel by viewModels<AllAccountsViewModel>()
         viewModel.init()
-        return binding!!.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        binding?.menuScreen?.setContent {
-            DurexBankTheme {
-                AllAccountsScreen(viewModel)
+        return ComposeView(requireContext()).apply {
+            setContent {
+                DurexBankTheme {
+                    AllAccountsScreen(viewModel)
+                }
             }
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        binding = null
     }
 }

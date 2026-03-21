@@ -26,4 +26,9 @@
     <string name="specific_suggestions_for_you">Специальное предложение</string>
     <string name="specific_suggestions_for_you_description">Погасите займ досрочно и мы увеличим лимит для следующего займа</string>
     <string name="nearest_banks">Ближайшее отделение банка</string>
+
+
+    <string name="auth_error">Ошибка авторизации</string>
+    <string name="network_error">Ошибка соединения</string>
+    <string name="strange_error">Странная ошибка</string>
 </resources>

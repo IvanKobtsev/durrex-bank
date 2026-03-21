@@ -1,7 +1,8 @@
 plugins {
-    id("android-application-convention")
+    id("android-library-convention")
     `kotlinx-serialization`
     alias(stack.plugins.kotlin.ksp)
+    alias(stack.plugins.metro)
 }
 
 android {
@@ -14,5 +15,4 @@ dependencies {
     implementation(stack.kotlinx.coroutine)
     implementation(project(":core:common"))
     implementation(project(":core:util"))
-    implementation("androidx.core:core-ktx:1.18.0")
 }

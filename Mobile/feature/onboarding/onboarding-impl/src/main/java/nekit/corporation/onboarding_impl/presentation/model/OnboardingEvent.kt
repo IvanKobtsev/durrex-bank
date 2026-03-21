@@ -1,4 +1,4 @@
-package nekit.corporation.onboarding.presentation.model
+package nekit.corporation.onboarding_impl.presentation.model
 
 import nekit.corporation.architecture.presentation.Event
 

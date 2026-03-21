@@ -1,5 +1,5 @@
 plugins {
-    id("android-application-convention")
+    id("android-library-convention")
     `kotlin-composecompiler`
     alias(stack.plugins.kotlin.ksp)
 }
@@ -31,6 +31,9 @@ dependencies {
 
     implementation(project(":core:util"))
     implementation(project(":core:common"))
+
+    implementation(projects.components.languageComponent)
+    implementation(projects.components.user)
 
     api(stack.kotlinx.collections.immutable)
 }

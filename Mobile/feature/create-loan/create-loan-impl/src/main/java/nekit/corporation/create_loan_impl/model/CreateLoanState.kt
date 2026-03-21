@@ -1,10 +1,10 @@
-package nekit.corporation.create_loan.model
+package nekit.corporation.create_loan_impl.model
 
 import kotlinx.collections.immutable.ImmutableList
 import nekit.corporation.architecture.presentation.ScreenState
 import nekit.corporation.tariff.domain.model.Tariff
 
-data class CreateLoanState(
+internal data class CreateLoanState(
     val selectedAccount: AccountUi?,
     val selectedTariff: Tariff?,
     val tariffs: ImmutableList<Tariff>,

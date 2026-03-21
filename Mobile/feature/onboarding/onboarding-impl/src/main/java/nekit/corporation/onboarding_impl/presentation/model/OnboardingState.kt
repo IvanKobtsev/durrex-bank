@@ -1,4 +1,4 @@
-package nekit.corporation.`onboarding-impl`.presentation.model
+package nekit.corporation.onboarding_impl.presentation.model
 
 import kotlinx.collections.immutable.ImmutableList
 import nekit.corporation.architecture.presentation.ScreenState

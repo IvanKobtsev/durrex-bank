@@ -1,6 +1,6 @@
-package nekit.corporation.presentation.model
+package nekit.corporation.loan_details_impl.presentation.model
 
-interface LoanInteractions {
+internal interface LoanInteractions {
 
     fun onBack()
 }

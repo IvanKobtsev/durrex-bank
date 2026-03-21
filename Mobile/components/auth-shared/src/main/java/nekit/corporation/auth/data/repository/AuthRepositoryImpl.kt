@@ -1,6 +1,6 @@
 package nekit.corporation.auth.data.repository
 
-import android.util.Log
+import dev.zacsweers.metro.Inject
 import kotlinx.coroutines.flow.first
 import nekit.corporation.auth.data.datasource.local.AuthDataStore
 import nekit.corporation.auth.data.datasource.remote.AuthApi
@@ -12,9 +12,9 @@ import nekit.corporation.auth.domain.toAuthDto
 import nekit.corporation.auth.domain.toRegisterDto
 import nekit.corporation.auth.domain.toToken
 import nekit.corporation.auth.domain.toTokenLocal
-import javax.inject.Inject
 
-class AuthRepositoryImpl @Inject constructor(
+@Inject
+class AuthRepositoryImpl(
     private val authDataStore: AuthDataStore,
     private val authApi: AuthApi
 ) : AuthRepository {

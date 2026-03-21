@@ -158,8 +158,8 @@ public class AccountsController : ControllerBase
             var denied = EnforceClientOwnership(account.OwnerId);
             if (denied is not null) return denied;
         }
-        var (source, _) = await _mediator.Send(new TransferCommand(id, req.TargetAccountId, req.Amount, req.Description), ct);
-        return Ok(source);
+        var tx = await _mediator.Send(new TransferCommand(id, req.TargetAccountId, req.Amount, req.Description), ct);
+        return Ok(tx);
     }
 
     // POST /api/accounts/{id}/debit  — internal, called by CreditService only

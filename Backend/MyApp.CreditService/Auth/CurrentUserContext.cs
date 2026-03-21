@@ -8,6 +8,7 @@ public interface ICurrentUserContext
     CallerRole Role { get; }
     bool IsEmployee => Role == CallerRole.Employee;
     bool IsClient   => Role == CallerRole.Client;
+    bool IsInternal => Role == CallerRole.Internal;
 }
 
 public sealed class CurrentUserContext : ICurrentUserContext

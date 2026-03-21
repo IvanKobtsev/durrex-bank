@@ -1,3 +1,4 @@
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using MyApp.CreditService.Models;
@@ -13,6 +14,10 @@ public class CreditDbContext(DbContextOptions<CreditDbContext> options) : DbCont
         modelBuilder.ApplyConfiguration(new CreditConfiguration());
         modelBuilder.ApplyConfiguration(new TariffConfiguration());
         modelBuilder.ApplyConfiguration(new PaymentScheduleEntryConfiguration());
+
+        modelBuilder.AddInboxStateEntity();
+        modelBuilder.AddOutboxMessageEntity();
+        modelBuilder.AddOutboxStateEntity();
     }
 }
 

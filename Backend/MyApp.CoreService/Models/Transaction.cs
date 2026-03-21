@@ -13,6 +13,8 @@ public class Transaction
     public int? RelatedAccountId { get; set; }
     public string? Description { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
+    public decimal? ExchangeRate { get; set; }
+    public string? SourceCurrency { get; set; }
 
     public Account Account { get; set; } = null!;
 }

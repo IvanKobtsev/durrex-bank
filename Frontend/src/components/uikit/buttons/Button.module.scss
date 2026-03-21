@@ -16,10 +16,9 @@
   text-align: center;
   cursor: pointer;
   user-select: none;
-  transition: 0.2s all;
   outline: none !important;
   color: $primary !important;
-  background-color: #5c4457 !important;
+  background-color: var(--button-bg) !important;
   @include button;
 }
 

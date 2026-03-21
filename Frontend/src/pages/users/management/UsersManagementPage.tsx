@@ -4,13 +4,14 @@ import { useUsersAllQuery } from "services/user-api/user-api-client/Query.ts";
 import { UserCard } from "../userCard/UserCard.tsx";
 import { useNavigate } from "react-router-dom";
 import { AppLinks } from "application/constants/appLinks.ts";
+import { PageWrapper } from "components/PageWrapper/PageWrapper.tsx";
 
 export function UsersManagementPage() {
   const navigate = useNavigate();
   const usersQuery = useUsersAllQuery();
 
   return (
-    <div className={styles.wrapper}>
+    <PageWrapper>
       <div className={styles.header}>
         Управление пользователями
         <Button
@@ -25,6 +26,6 @@ export function UsersManagementPage() {
             <UserCard key={u.id} user={u} type={"management"} />
           ))}
       </div>
-    </div>
+    </PageWrapper>
   );
 }

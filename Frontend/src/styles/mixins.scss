@@ -58,26 +58,27 @@
   letter-spacing: 0;
 }
 
-@mixin container {
+@mixin page-container {
   padding: 18px;
-  background-color: #66646b;
+  background-color: var(--container-bg);
   box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.5);
   border-radius: 10px;
   box-sizing: border-box;
+  height: fit-content;
 }
 
 @mixin inner-container {
   padding: 18px;
-  background-color: #66646b;
-  box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.25);
+  background-color: var(--container-bg);
+  box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.1);
   border-radius: 10px;
   box-sizing: border-box;
 }
 
 @mixin button {
   padding: 18px;
-  background-color: #66646b;
-  box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.25);
+  background-color: var(--container-bg);
+  box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.1);
   border-radius: 10px;
   box-sizing: border-box;
 }

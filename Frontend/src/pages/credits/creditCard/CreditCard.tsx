@@ -1,28 +1,19 @@
-import styles from "pages/users/userCard/UserCard.module.scss";
-import { AppLinks } from "application/constants/appLinks.ts";
-import { useNavigate } from "react-router-dom";
+import styles from "./CreditCard.module.scss";
 import { padWithZeros } from "helpers/string-helpers.tsx";
-import clsx from "clsx";
 import { CreditResponse } from "services/credit-api/credit-api-client.types.ts";
+import { EntityCard } from "components/EntityCard/EntityCard.tsx";
+import { AppLinks } from "application/constants/appLinks";
 
 export function CreditCard({ credit }: { credit: CreditResponse }) {
-  const navigate = useNavigate();
-
   return (
-    <div className={clsx(styles.container)}>
-      <div
-        className={styles.leftWrapper}
-        onClick={() =>
-          navigate(AppLinks.CreditDetails.link({ creditId: credit.id! }))
-        }
-      >
-        {`Кредит #${padWithZeros(credit.id!.toString(), 10)}`}
-      </div>
-      <div className={styles.rightWrapper}>
+    <EntityCard
+      leftSide={`Кредит #${padWithZeros(credit.id!.toString(), 10)}`}
+      rightSide={
         <div className={styles.balance}>
           {/*Осталось оплатить: {credit.remainingBalance}*/}
         </div>
-      </div>
-    </div>
+      }
+      link={AppLinks.CreditDetails.link({ creditId: credit.id! })}
+    />
   );
 }

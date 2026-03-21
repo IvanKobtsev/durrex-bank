@@ -5,7 +5,6 @@ import { Button, ButtonProps } from "components/uikit/buttons/Button";
 
 interface ErrorPageProps {
   title?: ReactNode;
-  message?: ReactNode;
   image?: ReactNode;
   primaryButton?: ButtonProps;
   secondaryButton?: ButtonProps;
@@ -13,7 +12,6 @@ interface ErrorPageProps {
 
 export function ErrorPage({
   title,
-  message,
   image,
   primaryButton,
   secondaryButton,
@@ -22,7 +20,6 @@ export function ErrorPage({
     <div className={styles.ErrorPage}>
       {image}
       {title && <div className={styles.title}>{title}</div>}
-      {message && <div className={styles.message}>{message}</div>}
       {primaryButton && (
         <Button
           {...primaryButton}
@@ -32,7 +29,7 @@ export function ErrorPage({
       {secondaryButton && (
         <Button
           {...secondaryButton}
-          className={clsx(styles.primaryButton, secondaryButton.className)}
+          className={clsx(styles.secondaryButton, secondaryButton.className)}
         />
       )}
     </div>

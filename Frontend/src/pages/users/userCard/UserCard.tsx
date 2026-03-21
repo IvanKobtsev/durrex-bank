@@ -9,7 +9,7 @@ import {
 import { toast } from "react-toastify";
 import { queryClient } from "services/query-client-helper.ts";
 import { AppLinks } from "application/constants/appLinks.ts";
-import { useNavigate } from "react-router-dom";
+import { EntityCard } from "components/EntityCard/EntityCard.tsx";
 
 export interface UserCardProps {
   user: UserResponse;
@@ -17,7 +17,6 @@ export interface UserCardProps {
 }
 
 export function UserCard({ user, type = "management" }: UserCardProps) {
-  const navigate = useNavigate();
   const blockUserMutation = useBlockMutation(user.id!, {
     onError: () => {
       toast.error("Ошибка при блокировке пользователя.");
@@ -40,33 +39,26 @@ export function UserCard({ user, type = "management" }: UserCardProps) {
   });
 
   return (
-    <div className={styles.container}>
-      <div
-        className={styles.leftWrapper}
-        onClick={() =>
-          navigate(AppLinks.UserDetails.link({ userId: user.id! }))
-        }
-      >
-        {`${user.firstName} ${user.lastName} (${user.username}) — ${type === "management" ? translateRole(user.role) : type === "creditor" ? "Кредитор" : "Владелец"}`}
-      </div>
-      <div className={styles.rightWrapper}>
-        {type === "management" &&
-          (user.isBlocked ? (
-            <Button
-              className={styles.redButton}
-              title={"Разблокировать"}
-              onClick={() => unblockUserMutation.mutateAsync()}
-            />
-          ) : (
-            <Button
-              className={styles.redButton}
-              title={"Заблокировать"}
-              onClick={() => blockUserMutation.mutateAsync()}
-            />
-          ))}
-        {/*<Button className={styles.redButton} title={"Удалить"} />*/}
-      </div>
-    </div>
+    <EntityCard
+      leftSide={`${user.firstName} ${user.lastName} (${user.username}) — ${type === "management" ? translateRole(user.role) : type === "creditor" ? "Кредитор" : "Владелец"}`}
+      rightSide={
+        type === "management" &&
+        (user.isBlocked ? (
+          <Button
+            className={styles.redButton}
+            title={"Разблокировать"}
+            onClick={() => unblockUserMutation.mutateAsync()}
+          />
+        ) : (
+          <Button
+            className={styles.redButton}
+            title={"Заблокировать"}
+            onClick={() => blockUserMutation.mutateAsync()}
+          />
+        ))
+      }
+      link={AppLinks.UserDetails.link({ userId: user.id! })}
+    />
   );
 }
 

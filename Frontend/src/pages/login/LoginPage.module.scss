@@ -2,6 +2,8 @@
 @use "src/styles/mixins" as *;
 
 .wrapper {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -10,13 +12,21 @@
   box-sizing: border-box;
   width: 100vw;
   height: 100vh;
-  background-color: #2d4547;
-  background-image: url("/src/assets/images/login-background-image.png");
-  background-size: cover;
+
+  &::after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    inset: 0;
+    background-image: url("/src/assets/images/login-background-image.png");
+    background-size: cover;
+    z-index: -1;
+  }
 }
 
 .header {
-  @include container;
+  @include page-container;
   font-size: 28px;
   color: $primary;
   padding: 0;
@@ -35,5 +45,12 @@
   gap: 20px;
   width: 336px;
   height: 218px;
-  @include container;
+  @include page-container;
+}
+
+html[class="light"] {
+  .wrapper::after {
+    background-image: url("/src/assets/images/background-image.png");
+    opacity: 0.2;
+  }
 }

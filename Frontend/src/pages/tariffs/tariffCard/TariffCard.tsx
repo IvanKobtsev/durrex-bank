@@ -1,29 +1,15 @@
-import styles from "./TariffCard.module.scss";
-import { useNavigate } from "react-router-dom";
 import { TariffResponse } from "services/credit-api/credit-api-client.types.ts";
+import { EntityCard } from "components/EntityCard/EntityCard.tsx";
 
 export interface TariffCardProps {
   tariff: TariffResponse;
-  type: "management" | "reference";
 }
 
-export function TariffCard({ tariff, type = "management" }: TariffCardProps) {
-  const navigate = useNavigate();
-
+export function TariffCard({ tariff }: TariffCardProps) {
   return (
-    <div className={styles.container}>
-      <div
-        className={styles.leftWrapper}
-        // onClick={() =>
-        //   navigate(AppLinks.TariffDetails.link({ tariffId: tariff.id! }))
-        // }
-      >
-        {tariff.name}
-      </div>
-      <div className={styles.rightWrapper}>
-        {`${Math.round((tariff.interestRate ?? 0) * 100)}% годовых, рассчитан на ${tariff.termMonths} мес.`}
-        {/*<Button className={styles.redButton} title={"Удалить"} />*/}
-      </div>
-    </div>
+    <EntityCard
+      leftSide={tariff.name}
+      rightSide={`${Math.round((tariff.interestRate ?? 0) * 100)}% годовых, рассчитан на ${tariff.termMonths} мес.`}
+    />
   );
 }

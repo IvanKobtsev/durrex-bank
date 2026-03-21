@@ -1,13 +1,20 @@
+using MassTransit;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using MyApp.CoreService.Enums;
+using MyApp.CoreService.Messaging.Messages;
+using MyApp.CreditService.Auth;
 using MyApp.CreditService.DTOs.Credits;
 using MyApp.CreditService.Models;
 
-public class RepayHandler(CreditDbContext db, ICoreServiceClient coreClient)
-    : IRequestHandler<RepayCommand, CreditResponse>
+public class RepayHandler(
+    CreditDbContext db,
+    IPublishEndpoint publishEndpoint,
+    IConfiguration config,
+    ICurrentUserContext user
+) : IRequestHandler<RepayCommand, CreditResponse>
 {
-    // Distributed transaction problem - user can be charged with money, but their credit won't close if service crashes or something.
-    // Outbox pattern could be used here to fix this.
     public async Task<CreditResponse> Handle(RepayCommand request, CancellationToken ct)
     {
         var credit =
@@ -20,12 +27,22 @@ public class RepayHandler(CreditDbContext db, ICoreServiceClient coreClient)
         if (credit.Status != CreditStatus.Active)
             throw new InvalidOperationException("Only active credits can be repaid.");
 
-        await coreClient.DebitAsync(
-            credit.AccountId,
-            credit.RemainingBalance,
-            "Early repayment",
-            ct
-        );
+        if (user.IsClient && credit.ClientId != user.UserId)
+            throw new UnauthorizedAccessException("Clients can only repay their own credits.");
+
+        var masterAccountId = config.GetValue<int>("Bank:MasterAccountId");
+
+        await publishEndpoint.Publish(
+            new TransactionRequested(
+                MessageId: Guid.NewGuid(),
+                AccountId: credit.AccountId,
+                Type: TransactionType.CreditRepayment,
+                Amount: credit.RemainingBalance,
+                RelatedAccountId: masterAccountId,
+                Description: "Early repayment",
+                RequestedByUserId: null
+            ),
+            ct);
 
         var now = DateTime.UtcNow;
         foreach (var entry in credit.Schedule.Where(e => !e.IsPaid))

@@ -255,7 +255,7 @@ public class AccountsControllerTests : IClassFixture<CoreServiceFactory>
     // ── POST /api/accounts/{id}/debit ────────────────────────────────────────
 
     [Fact]
-    public async Task Debit_SufficientFunds_Returns200WithCreditRepaymentTransaction()
+    public async Task Debit_SufficientFunds_Returns200WithDebitTransaction()
     {
         var created = await (await _client.PostAsJsonAsync("/api/accounts",
             new { OwnerId = 900, Currency = "RUB" }))
@@ -271,7 +271,7 @@ public class AccountsControllerTests : IClassFixture<CoreServiceFactory>
         tx!.Amount.Should().Be(150m);
         tx.BalanceBefore.Should().Be(500m);
         tx.BalanceAfter.Should().Be(350m);
-        tx.Type.Should().Be(TransactionType.CreditRepayment);
+        tx.Type.Should().Be(TransactionType.Debit);
     }
 
     [Fact]

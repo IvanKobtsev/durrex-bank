@@ -1,0 +1,44 @@
+@use "src/styles/variables" as *;
+@use "src/styles/mixins" as *;
+
+.ErrorPage {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  .title {
+    @include inner-container;
+    padding: 12px 32px;
+    background-color: #693535;
+    color: $primary;
+    font-size: 48px;
+    font-weight: bold;
+    border-radius: 20px;
+  }
+
+  .primaryButton,
+  .secondaryButton {
+    width: 290px;
+    height: 52px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 28px;
+    font-weight: bold;
+    padding: 6px;
+    border-radius: 20px;
+  }
+
+  .primaryButton {
+    background-color: #534f4f !important;
+    margin-top: 60px;
+    margin-bottom: 20px;
+  }
+
+  .secondaryButton {
+    background-color: #725454 !important;
+  }
+}

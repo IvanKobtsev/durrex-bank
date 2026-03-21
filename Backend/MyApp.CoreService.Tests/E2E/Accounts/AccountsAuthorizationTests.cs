@@ -309,6 +309,34 @@ public class AccountsAuthorizationTests : IClassFixture<CoreServiceFactory>
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
+    // ── POST /api/accounts/{id}/debit (internal / service-to-service only) ───
+
+    [Fact]
+    public async Task Debit_AsClient_Returns403()
+    {
+        var account = await SeedAccountAsync(1090);
+        await DepositAsync(account.Id, 200m);
+        var clientHttp = _factory.CreateClientUserClient(1090);
+
+        var response = await clientHttp.PostAsJsonAsync($"/api/accounts/{account.Id}/debit",
+            new { Amount = 50m });
+
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+    }
+
+    [Fact]
+    public async Task Debit_AsEmployee_Returns403()
+    {
+        var account = await SeedAccountAsync(1091);
+        await DepositAsync(account.Id, 200m);
+        var employee = _factory.CreateEmployeeClient(1);
+
+        var response = await employee.PostAsJsonAsync($"/api/accounts/{account.Id}/debit",
+            new { Amount = 50m });
+
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+    }
+
     // ── GET /api/accounts/{id}/transactions ──────────────────────────────────
 
     [Fact]

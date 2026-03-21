@@ -1,0 +1,6 @@
+@MyApp.SettingsService_HostAddress = http://localhost:5225
+
+GET {{MyApp.SettingsService_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

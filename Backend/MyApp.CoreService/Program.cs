@@ -115,7 +115,9 @@ if (!isTesting)
 {
     using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<CoreDbContext>();
+    var cfg = scope.ServiceProvider.GetRequiredService<IConfiguration>();
     await db.Database.MigrateAsync();
+    await MasterAccountSeeder.SeedAsync(db, cfg);
 }
 
 app.UseExceptionHandler(errApp =>

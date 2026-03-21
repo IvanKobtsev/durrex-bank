@@ -166,9 +166,13 @@ public class AccountsController : ControllerBase
     [HttpPost("{id:int}/debit")]
     [ProducesResponseType<TransactionResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Debit(int id, [FromBody] DebitRequest req, CancellationToken ct)
     {
+        if (!_user.IsInternal)
+            return StatusCode(StatusCodes.Status403Forbidden);
+
         var tx = await _mediator.Send(new DebitCommand(id, req.Amount, req.Description), ct);
         return Ok(tx);
     }

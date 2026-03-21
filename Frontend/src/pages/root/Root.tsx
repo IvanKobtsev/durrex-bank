@@ -1,5 +1,5 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { Header } from "../header/Header.tsx";
+import { Header } from "./header/Header.tsx";
 import styles from "./Root.module.scss";
 import { AppLinks } from "application/constants/appLinks.ts";
 
@@ -11,8 +11,10 @@ export function Root() {
   return (
     <div className={styles.root}>
       <Header />
-      <div className={styles.wrapper}>
-        <Outlet />
+      <div className={styles.outerWrapper}>
+        <div className={styles.pageWrapper}>
+          <Outlet />
+        </div>
       </div>
     </div>
   );

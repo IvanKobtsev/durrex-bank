@@ -1,4 +1,4 @@
-$primary: #ee98ad;
+$primary: var(--primary);
 $primary-light: rgba($primary, 0.8);
 $primary-disabled: rgba($primary, 0.5);
 $primary-background: rgba($primary, 0.05);
@@ -20,10 +20,10 @@ $background-input-hover: #f6f8fb;
 $dark: #1f2532;
 $menu-text: rgba(#f7f7f7, 0.8);
 $menu-text-hover: #f7f7f7;
-$input-background: #534f4f;
+$input-background: var(--input-background);
 $light-input-background: #ffffff;
 $caret-color: #344966;
-$background: #66646b;
+$background: var(--container-bg);
 $hint-text-color: #bdbdbd;
 $resources-text-gray: #828282;
 $night-view-cell-background: #e2e5f4;

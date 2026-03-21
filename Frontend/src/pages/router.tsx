@@ -2,7 +2,7 @@ import { AppLinks } from "application/constants/appLinks.ts";
 import { createBrowserRouter } from "react-router-dom";
 import { LoginPage } from "pages/login/LoginPage";
 import { UsersManagementPage } from "pages/users/management/UsersManagementPage.tsx";
-import { NotFoundPage } from "./errorPages/NotFoundPage.tsx";
+import { NotFoundPage } from "./errorPages/NotFoundPage/NotFoundPage.tsx";
 import { Root } from "./root/Root.tsx";
 import { UserCreationPage } from "./users/creation/UserCreationPage.tsx";
 import { UserDetailsPage } from "./users/userDetails/UserDetailsPage.tsx";
@@ -11,12 +11,14 @@ import { DashboardPage } from "./dashboard/DashboardPage.tsx";
 import { TariffsManagementPage } from "./tariffs/management/TariffsManagementPage.tsx";
 import { TariffCreationPage } from "./tariffs/creation/TariffCreationPage.tsx";
 import { CreditDetailsPage } from "./credits/creditDetails/CreditDetailsPage.tsx";
+import { ErrorBoundary } from "./errorPages/ErrorBoundary/ErrorBoundary.tsx";
 
 export const AppRoutes = () =>
   createBrowserRouter([
     {
       path: AppLinks.Login.route,
       element: <LoginPage />,
+      ErrorBoundary: ErrorBoundary,
     },
     {
       path: "/",
@@ -59,5 +61,6 @@ export const AppRoutes = () =>
           element: <NotFoundPage />,
         },
       ],
+      ErrorBoundary: ErrorBoundary,
     },
   ]);

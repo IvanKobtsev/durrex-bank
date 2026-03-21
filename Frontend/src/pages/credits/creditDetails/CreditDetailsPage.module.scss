@@ -2,7 +2,7 @@
 @use "src/styles/mixins" as *;
 
 .wrapper {
-  @include container;
+  @include page-container;
   margin: 20px auto;
   width: 1000px;
   display: flex;

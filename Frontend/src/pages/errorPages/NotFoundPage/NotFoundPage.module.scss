@@ -1,0 +1,14 @@
+@use "src/styles/mixins" as *;
+
+.image {
+  @include inner-container;
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  width: 440px;
+  height: 234px;
+  background: rgba(255, 0, 62, 0.2) url("../../../assets/images/404.png")
+    no-repeat;
+  background-size: 386px 310px;
+  background-position: center center;
+  margin-bottom: 20px;
+}

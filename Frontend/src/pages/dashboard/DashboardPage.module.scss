@@ -2,9 +2,8 @@
 @use "src/styles/mixins" as *;
 
 .wrapper {
-  @include container;
-  margin: 20px auto;
-  width: 1000px;
+  @include page-container;
+  width: 100%;
   display: flex;
   flex-direction: column;
   gap: 20px;

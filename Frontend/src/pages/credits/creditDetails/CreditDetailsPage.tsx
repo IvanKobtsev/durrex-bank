@@ -32,13 +32,6 @@ export function CreditDetailsPage() {
                   Кредит #{padWithZeros(credit.id?.toString(), 10)} по тарифу{" "}
                   <span>{credit.tariffName}</span>
                 </h2>
-                {/*{!account.closedAt ? (*/}
-                {/*  <span className={styles.status}>{"Открыт"}</span>*/}
-                {/*) : (*/}
-                {/*  <span className={clsx(styles.status, styles.closed)}>*/}
-                {/*    {"Закрыт " + account.closedAt}*/}
-                {/*  </span>*/}
-                {/*)}*/}
               </div>
             </div>
             <Loading loading={ownerLoading}>

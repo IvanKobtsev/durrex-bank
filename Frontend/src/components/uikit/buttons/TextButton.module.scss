@@ -1,5 +1,5 @@
-@use 'src/styles/variables' as *;
-@use 'src/styles/mixins' as *;
+@use "src/styles/variables" as *;
+@use "src/styles/mixins" as *;
 
 .link {
   text-decoration: none;
@@ -25,7 +25,7 @@
   pointer-events: none;
 }
 
-.button[data-disabled='true'] {
+.button[data-disabled="true"] {
   cursor: default;
   color: grey;
   pointer-events: none !important;
@@ -52,7 +52,6 @@
     fill: $default-color;
     stroke: $default-color;
     stroke-width: 0;
-    transition: 0.2s all;
   }
 
   &:hover {
@@ -87,14 +86,13 @@
     }
   }
 
-  &[data-disabled='true'] {
+  &[data-disabled="true"] {
     @extend :disabled;
   }
 }
 
 .content-button {
   padding: 0;
-  transition: 0.2s all;
 }
 
 .fullwidth-button {

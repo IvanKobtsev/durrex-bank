@@ -31,6 +31,7 @@
 .base-input:focus::placeholder {
   color: rgba($normal, 0.2);
 }
+
 .inputErrorText {
   width: 100%;
   margin-top: 2px;
@@ -40,4 +41,57 @@
 
   color: rgba($danger, 0.5);
   margin-bottom: -$errorTextMarginBottom;
+}
+
+* {
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--main-bg-color);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--container-bg);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #939191;
+  }
+}
+
+html {
+  overflow: hidden;
+  --container-bg: #66646b;
+  --main-bg-color: #2d4547;
+  --button-bg: #5c4457;
+  --primary: #ee98ad;
+  --list-item-background: #cd4868;
+  --input-background: #534f4f;
+}
+
+html[class="light"] {
+  --container-bg: #ad313b;
+  --main-bg-color: #b8b8b8;
+  --button-bg: #ba6445;
+  --primary: #ffffff;
+  --list-item-background: #c1670b;
+  --input-background: #df8869;
+
+  * {
+    ::-webkit-scrollbar-track {
+      background: #fff;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--main-bg-color);
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #8c8c8c;
+    }
+  }
 }

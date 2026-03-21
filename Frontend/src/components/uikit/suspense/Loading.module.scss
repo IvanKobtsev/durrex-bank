@@ -1,4 +1,19 @@
-@use 'src/styles/variables' as *;
+@use "src/styles/variables" as *;
+
+@keyframes loadingAnim {
+  0% {
+    content: ".";
+  }
+  33% {
+    content: "..";
+  }
+  66% {
+    content: "...";
+  }
+  100% {
+    content: ".";
+  }
+}
 
 .container {
   display: flex;
@@ -15,7 +30,7 @@
   max-width: 100%;
 }
 
-.loadingData[data-loading='true'] {
+.loadingData[data-loading="true"] {
   pointer-events: none;
 }
 
@@ -32,7 +47,6 @@
 }
 
 .loading {
-  background-color: rgba(white, 0.8);
   height: 100%;
   width: 100%;
   display: flex;
@@ -41,12 +55,20 @@
   line-height: 20px;
   color: $primary;
   flex-direction: column;
+  font-size: 30px;
+
+  background: $background;
 }
 
 .row {
   display: flex;
   flex-direction: row;
   max-width: 100%;
+
+  &::after {
+    content: ".";
+    animation: loadingAnim 1s infinite;
+  }
 }
 
 .title {

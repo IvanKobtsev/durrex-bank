@@ -1,0 +1,24 @@
+@use "src/styles/mixins" as *;
+
+.container {
+  @include inner-container;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--list-item-background);
+
+  .rightWrapper,
+  .leftWrapper {
+    display: flex;
+    gap: 10px;
+  }
+
+  .leftWrapper {
+    font-size: 28px;
+    cursor: pointer;
+  }
+
+  &.closed {
+    opacity: 0.6;
+  }
+}

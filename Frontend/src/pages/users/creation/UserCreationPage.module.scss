@@ -2,10 +2,9 @@
 @use "src/styles/mixins" as *;
 
 .wrapper {
-  @include container;
+  @include page-container;
   width: 800px;
-  margin: 50px auto;
-  //height: 100%;
+  margin: 50px auto 0 auto;
   padding-bottom: 25px;
 }
 

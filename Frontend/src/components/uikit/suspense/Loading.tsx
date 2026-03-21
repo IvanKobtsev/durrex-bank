@@ -26,10 +26,7 @@ export const Loading: React.FC<Props> = (props) => {
 
   const loading = (
     <div className={styles.loading}>
-      <div className={styles.row}>
-        {"Loading..."}
-        {props.title && <div className={styles.title}> {props.title}</div>}
-      </div>
+      <div className={styles.row}>{"Загрузка"}</div>
     </div>
   );
   const children = (

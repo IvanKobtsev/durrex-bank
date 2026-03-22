@@ -1,0 +1,20 @@
+.accountActions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 300px;
+
+  .withdraw,
+  .deposit {
+    color: #fff !important;
+    font-weight: 500 !important;
+  }
+
+  .withdraw {
+    background-color: red !important;
+  }
+
+  .deposit {
+    background-color: green !important;
+  }
+}

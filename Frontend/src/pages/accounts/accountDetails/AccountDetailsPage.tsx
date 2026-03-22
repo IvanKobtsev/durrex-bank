@@ -14,6 +14,10 @@ import { useState } from "react";
 import { Button } from "components/uikit/buttons/Button";
 import { TransactionEntry } from "./TransactionEntry";
 import { useTransactionsHub } from "services/signal-r-client/signalRClient.gen.ts";
+import { getValueWithCurrency } from "../../../helpers/currency-helper.ts";
+import { AccountActions } from "./accountActions/AccountActions.tsx";
+
+const isDev = true;
 
 export function AccountDetailsPage() {
   const { accountId } = AppLinks.AccountDetails.useParams();
@@ -77,7 +81,7 @@ export function AccountDetailsPage() {
               </div>
 
               <div className={styles.balance}>
-                {account.balance} {account.currency}
+                {getValueWithCurrency(account.currency, account.balance)}
               </div>
             </div>
 
@@ -97,14 +101,26 @@ export function AccountDetailsPage() {
             </div>
 
             <Loading loading={transactionsLoading}>
-              <span className={styles.transactionsTitle}>
-                История транзакций
-              </span>
+              <div className={styles.transactionsHeader}>
+                <span className={styles.transactionsTitle}>
+                  История транзакций
+                </span>
+                {isDev && (
+                  <AccountActions
+                    accountId={account.id}
+                    currency={account.currency}
+                  />
+                )}
+              </div>
               {transactionsHistory && transactionsHistory.items.length > 0 ? (
                 <>
                   <div className={styles.transactions}>
                     {transactionsHistory.items.map((tx) => (
-                      <TransactionEntry key={tx.id} transaction={tx} />
+                      <TransactionEntry
+                        key={tx.id}
+                        transaction={tx}
+                        accountCurrency={account.currency}
+                      />
                     ))}
                   </div>
 

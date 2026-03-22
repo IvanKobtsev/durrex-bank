@@ -52,6 +52,25 @@ public class UsersController(
 
         return Ok(result.Value);
     }
+    
+    /// <summary>Get current profile</summary>
+    /// <param name="ct"></param>
+    /// <response code="200">User profile returned</response>
+    /// <response code="403">Client may only view their own profile</response>
+    /// <response code="404">User not found</response>
+    [HttpGet("me")]
+    [ProducesResponseType(typeof(UserResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<UserResponse>> GetCurrentUser(CancellationToken ct)
+    {
+        var result = await userService.GetByIdAsync(currentUser.UserId!.Value, ct);
+
+        if (result.IsFailed)
+            return result.HasError<NotFoundError>() ? NotFound() : BadRequest();
+
+        return Ok(result.Value);
+    }
 
     /// <summary>Create a new client or employee</summary>
     /// <response code="201">User created successfully</response>

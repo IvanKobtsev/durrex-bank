@@ -12,8 +12,10 @@ public class InternalApiKeyMiddleware(RequestDelegate next, IConfiguration confi
             return;
         }
 
-        if (!context.Request.Headers.TryGetValue(HeaderName, out var key)
-            || key != config["InternalApiKey"])
+        if (
+            !context.Request.Headers.TryGetValue(HeaderName, out var key)
+            || key != config["InternalApiKey"]
+        )
         {
             context.Response.StatusCode = 401;
             await context.Response.WriteAsync("Missing or invalid internal API key.");

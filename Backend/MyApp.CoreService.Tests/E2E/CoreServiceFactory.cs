@@ -63,7 +63,7 @@ public class CoreServiceFactory : WebApplicationFactory<Program>
     {
         var client = CreateAuthenticatedClient();
         client.DefaultRequestHeaders.Add("X-User-Id", userId.ToString());
-        client.DefaultRequestHeaders.Add("X-User-Role", "Client");
+        client.DefaultRequestHeaders.Add("X-User-Roles", "Client");
         return client;
     }
 
@@ -72,7 +72,7 @@ public class CoreServiceFactory : WebApplicationFactory<Program>
     {
         var client = CreateAuthenticatedClient();
         client.DefaultRequestHeaders.Add("X-User-Id", userId.ToString());
-        client.DefaultRequestHeaders.Add("X-User-Role", "Employee");
+        client.DefaultRequestHeaders.Add("X-User-Roles", "Employee");
         return client;
     }
 }

@@ -8,58 +8,66 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Logging.AddConsole();
 
-builder.Services.AddReverseProxy()
+builder
+    .Services.AddReverseProxy()
     .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"))
     .AddTransforms(builderContext =>
     {
         builderContext.AddRequestTransform(transformContext =>
         {
-            if (!transformContext.HttpContext.Request.Path
-                    .StartsWithSegments("/auth", StringComparison.OrdinalIgnoreCase))
+            if (
+                !transformContext.HttpContext.Request.Path.StartsWithSegments(
+                    "/auth",
+                    StringComparison.OrdinalIgnoreCase
+                )
+            )
             {
                 transformContext.ProxyRequest.Headers.TryAddWithoutValidation(
                     "X-Internal-Api-Key",
-                    builder.Configuration["InternalApiKey"]);
+                    builder.Configuration["InternalApiKey"]
+                );
             }
             return ValueTask.CompletedTask;
         });
 
-        SwaggerResponseTransformUtil.AddTransformIfMatch(builderContext);
     });
 
-builder.Services.AddAuthentication("Bearer")
-    .AddJwtBearer("Bearer", options =>
-    {
-        options.Authority = builder.Configuration["Oidc:Authority"];
-        options.RequireHttpsMetadata = false;
-        options.MapInboundClaims = false;
-
-        options.TokenValidationParameters = new TokenValidationParameters
+builder
+    .Services.AddAuthentication("Bearer")
+    .AddJwtBearer(
+        "Bearer",
+        options =>
         {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidAudiences = [builder.Configuration["Oidc:Audience"]!],
-            ValidateLifetime = true,
-            ClockSkew = TimeSpan.FromSeconds(30),
-            NameClaimType = "sub",
-            RoleClaimType = "role"
-        };
+            options.Authority = builder.Configuration["Oidc:Authority"];
+            options.RequireHttpsMetadata = false;
+            options.MapInboundClaims = false;
 
-        options.Events = new JwtBearerEvents
-        {
-            OnMessageReceived = context =>
+            options.TokenValidationParameters = new TokenValidationParameters
             {
-                var accessToken = context.Request.Query["access_token"];
-                var path = context.HttpContext.Request.Path;
-                if (!string.IsNullOrEmpty(accessToken) &&
-                    path.StartsWithSegments("/core/hubs"))
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidAudiences = [builder.Configuration["Oidc:Audience"]!],
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.FromSeconds(30),
+                NameClaimType = "sub",
+                RoleClaimType = "role",
+            };
+
+            options.Events = new JwtBearerEvents
+            {
+                OnMessageReceived = context =>
                 {
-                    context.Token = accessToken;
-                }
-                return Task.CompletedTask;
-            },
-        };
-    });
+                    var accessToken = context.Request.Query["access_token"];
+                    var path = context.HttpContext.Request.Path;
+                    if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/core/hubs"))
+                    {
+                        context.Token = accessToken;
+                    }
+                    return Task.CompletedTask;
+                },
+            };
+        }
+    );
 
 builder.Services.AddAuthorization();
 
@@ -68,14 +76,17 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("DevCors", policy =>
-    {
-        policy
-            .WithOrigins("http://localhost:5173", "http://localhost:5174")
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials();
-    });
+    options.AddPolicy(
+        "DevCors",
+        policy =>
+        {
+            policy
+                .WithOrigins("http://localhost:5173", "http://localhost:5174")
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials();
+        }
+    );
 });
 
 var app = builder.Build();
@@ -87,6 +98,11 @@ app.UseSwaggerUI(options =>
     options.SwaggerEndpoint("/core/openapi/v1.json", "CoreService API");
     options.SwaggerEndpoint("/credit/swagger/v1/swagger.json", "CreditService API");
     options.SwaggerEndpoint("/user/swagger/v1/swagger.json", "UserService API");
+    options.SwaggerEndpoint("/web-app-settings/openapi/v1.json", "Web App Settings Service API");
+    options.SwaggerEndpoint(
+        "/mobile-app-settings/openapi/v1.json",
+        "Mobile App Settings Service API"
+    );
     options.RoutePrefix = "swagger";
 });
 

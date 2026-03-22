@@ -1,5 +1,5 @@
 import { AccountResponse } from "services/core-api/core-api-client.types.ts";
-import styles from "pages/users/userCard/UserCard.module.scss";
+import styles from "./AccountCard.module.scss";
 import { AppLinks } from "application/constants/appLinks.ts";
 import { Button } from "components/uikit/buttons/Button.tsx";
 import { padWithZeros } from "helpers/string-helpers.tsx";
@@ -10,6 +10,8 @@ import {
 import { toast } from "react-toastify";
 import { queryClient } from "services/query-client-helper.ts";
 import { EntityCard } from "components/EntityCard/EntityCard.tsx";
+import { Loading } from "components/uikit/suspense/Loading.tsx";
+import { getValueWithCurrency } from "../../../helpers/currency-helper.ts";
 
 export function AccountCard({ account }: { account: AccountResponse }) {
   const closeAccountMutation = useAccountsDELETEMutation(account.id, {
@@ -32,14 +34,16 @@ export function AccountCard({ account }: { account: AccountResponse }) {
       rightSide={
         <>
           <div className={styles.balance}>
-            {account.balance} {account.currency}
+            {getValueWithCurrency(account.currency, account.balance)}
           </div>
           {!account.closedAt ? (
-            <Button
-              className={styles.redButton}
-              title={"Закрыть"}
-              onClick={() => closeAccountMutation.mutate()}
-            />
+            <Loading loading={closeAccountMutation.isPending}>
+              <Button
+                className={styles.redButton}
+                title={"Закрыть"}
+                onClick={() => closeAccountMutation.mutate()}
+              />
+            </Loading>
           ) : (
             <div className={styles.balance}>(ЗАКРЫТ)</div>
           )}

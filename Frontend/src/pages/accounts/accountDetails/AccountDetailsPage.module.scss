@@ -10,6 +10,13 @@
   gap: 20px;
 }
 
+.transactionsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
 .userCard {
   padding: 0 10px;
 

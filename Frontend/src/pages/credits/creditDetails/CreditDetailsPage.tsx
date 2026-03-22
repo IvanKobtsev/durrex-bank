@@ -8,13 +8,22 @@ import { DataEntry } from "components/DataEntry/DataEntry.tsx";
 import { useCreditsGETQuery } from "services/credit-api/credit-api-client/Query.ts";
 import { padWithZeros } from "helpers/string-helpers.tsx";
 import { formatDateRu } from "pages/accounts/accountDetails/AccountDetailsPage.tsx";
+import { useAccountsGETQuery } from "services/core-api/core-api-client/Query.ts";
+import { getValueWithCurrency } from "helpers/currency-helper.ts";
+import { CreditStatus } from "../creditCard/CreditStatus.tsx";
 
 export function CreditDetailsPage() {
   const { creditId } = AppLinks.CreditDetails.useParams();
 
-  const { data: credit, isLoading: accountLoading } = useCreditsGETQuery({
+  const { data: credit, isLoading: creditLoading } = useCreditsGETQuery({
     id: creditId,
   });
+
+  const accountId = credit?.accountId;
+  const { data: account, isLoading: accountLoading } = useAccountsGETQuery(
+    { id: accountId! },
+    { enabled: !!credit?.accountId },
+  );
 
   const ownerId = credit?.clientId;
   const { data: owner, isLoading: ownerLoading } = useUsersGETQuery(ownerId!, {
@@ -23,7 +32,7 @@ export function CreditDetailsPage() {
 
   return (
     <div className={styles.wrapper}>
-      <Loading loading={accountLoading}>
+      <Loading loading={creditLoading || accountLoading}>
         {credit && (
           <div className={clsx(styles.userCard)}>
             <div className={styles.accountHeader}>
@@ -32,6 +41,7 @@ export function CreditDetailsPage() {
                   Кредит #{padWithZeros(credit.id?.toString(), 10)} по тарифу{" "}
                   <span>{credit.tariffName}</span>
                 </h2>
+                <CreditStatus status={!!credit.status} />
               </div>
             </div>
             <Loading loading={ownerLoading}>
@@ -42,10 +52,16 @@ export function CreditDetailsPage() {
                 title={"Дата выдачи"}
                 value={formatDateRu(credit.issuedAt ?? "")}
               />
-              <DataEntry title={"Сумма кредита"} value={credit.amount} />
+              <DataEntry
+                title={"Сумма кредита"}
+                value={getValueWithCurrency(account?.currency, credit.amount)}
+              />
               <DataEntry
                 title={"Осталось заплатить"}
-                value={credit.remainingBalance}
+                value={getValueWithCurrency(
+                  account?.currency,
+                  credit.remainingBalance,
+                )}
               />
               <span className={styles.history}>История платежей</span>
               {credit.schedule?.map((entry) => (
@@ -56,7 +72,13 @@ export function CreditDetailsPage() {
                     !entry.isPaid && styles.missed,
                   )}
                 >
-                  <DataEntry title={"Сумма платежа"} value={entry.amount} />
+                  <DataEntry
+                    title={"Сумма платежа"}
+                    value={getValueWithCurrency(
+                      account?.currency,
+                      entry.amount,
+                    )}
+                  />
                   <DataEntry
                     title={"Срок платежа"}
                     value={formatDateRu(entry.dueDate ?? "")}

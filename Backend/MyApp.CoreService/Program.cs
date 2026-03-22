@@ -32,12 +32,12 @@ builder.Services.AddScoped<ICurrentUserContext>(sp =>
         return new CurrentUserContext { Role = CallerRole.Internal };
 
     var userIdHeader = http.Request.Headers["X-User-Id"].FirstOrDefault();
-    var roleHeader = http.Request.Headers["X-User-Role"].FirstOrDefault();
+    var roleHeader = http.Request.Headers["X-User-Roles"].FirstOrDefault();
 
     if (string.IsNullOrEmpty(userIdHeader) || string.IsNullOrEmpty(roleHeader))
         return new CurrentUserContext { Role = CallerRole.Internal };
 
-    var role = roleHeader.Equals("Employee", StringComparison.OrdinalIgnoreCase)
+    var role = roleHeader.Contains("Employee", StringComparison.OrdinalIgnoreCase)
         ? CallerRole.Employee
         : CallerRole.Client;
 

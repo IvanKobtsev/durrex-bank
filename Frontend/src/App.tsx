@@ -11,7 +11,7 @@ function App() {
 
   if (auth.isAuthenticated)
     localStorage.setItem("access_token", auth.user?.access_token ?? "");
-  else localStorage.removeItem("access_token");
+  else if (!auth.isLoading) localStorage.removeItem("access_token");
 
   return (
     <SignalRConnectionsProvider>

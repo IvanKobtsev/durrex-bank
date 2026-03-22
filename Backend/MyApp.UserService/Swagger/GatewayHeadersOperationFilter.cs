@@ -24,7 +24,7 @@ public class GatewayHeadersOperationFilter : IOperationFilter
 
         operation.Parameters.Add(new OpenApiParameter
         {
-            Name = "X-User-Role",
+            Name = "X-User-Roles",
             In = ParameterLocation.Header,
             Required = false,
             Schema = new OpenApiSchema { Type = JsonSchemaType.String },

@@ -10,7 +10,8 @@ public class JwtForwardingMiddleware
     public JwtForwardingMiddleware(
         RequestDelegate next,
         IConfiguration configuration,
-        RsaSecurityKey rsaKey)
+        RsaSecurityKey rsaKey
+    )
     {
         _next = next;
 
@@ -28,7 +29,7 @@ public class JwtForwardingMiddleware
             ValidateLifetime = true,
             ClockSkew = TimeSpan.FromSeconds(30),
 
-            ValidateActor = false
+            ValidateActor = false,
         };
     }
 
@@ -41,17 +42,37 @@ public class JwtForwardingMiddleware
             await _next(context);
             return;
         }
-        
-        var authHeader = context.Request.Headers.Authorization.FirstOrDefault();
 
-        if (authHeader is null || !authHeader.StartsWith("Bearer "))
+        var isSignalRRequest = path.ToString().Contains("/hubs/");
+        var isNegotiationRequest = isSignalRRequest && path.ToString().EndsWith("/negotiate");
+
+        string token;
+        if (isSignalRRequest && !isNegotiationRequest)
         {
-            context.Response.StatusCode = 401;
-            await context.Response.WriteAsync("Missing or invalid Authorization header.");
-            return;
-        }
+            var accessToken = context.Request.Query["access_token"].ToString();
 
-        var token = authHeader.Substring("Bearer ".Length);
+            if (accessToken.Length == 0)
+            {
+                context.Response.StatusCode = 401;
+                await context.Response.WriteAsync("Missing or invalid Authorization header.");
+                return;
+            }
+
+            token = accessToken;
+        }
+        else
+        {
+            var authHeader = context.Request.Headers.Authorization.FirstOrDefault();
+
+            if (authHeader is null || !authHeader.StartsWith("Bearer "))
+            {
+                context.Response.StatusCode = 401;
+                await context.Response.WriteAsync("Missing or invalid Authorization header.");
+                return;
+            }
+
+            token = authHeader.Substring("Bearer ".Length);
+        }
 
         var handler = new JwtSecurityTokenHandler();
 

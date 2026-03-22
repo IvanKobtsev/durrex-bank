@@ -36,6 +36,9 @@ export const SignalRConnectionsProvider = (props: React.PropsWithChildren) => {
       const newConnection = new SignalR.HubConnectionBuilder()
         .withUrl(backendUri + "/hubs/" + hubName, {
           withCredentials: true,
+          accessTokenFactory: () => {
+            return localStorage.getItem("access_token")!;
+          },
         })
         .configureLogging(
           EnableSignalRDebug

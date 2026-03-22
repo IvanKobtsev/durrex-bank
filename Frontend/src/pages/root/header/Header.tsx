@@ -4,6 +4,7 @@ import { AppLinks } from "application/constants/appLinks.ts";
 import { Button } from "components/uikit/buttons/Button.tsx";
 import { ThemeSwitcher } from "./ThemeSwitcher.tsx";
 import { useAuth } from "react-oidc-context";
+import clsx from "clsx";
 
 export function Header() {
   const navigate = useNavigate();
@@ -20,7 +21,7 @@ export function Header() {
       <div className={styles.rightWrapper}>
         <ThemeSwitcher />
         <Button
-          className={styles.logout}
+          className={clsx(styles.logout, auth.isLoading && styles.loading)}
           title={"Выйти"}
           onClick={async () => {
             await auth.signoutSilent();

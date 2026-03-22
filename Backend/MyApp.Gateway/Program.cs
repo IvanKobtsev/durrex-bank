@@ -30,7 +30,6 @@ builder
             return ValueTask.CompletedTask;
         });
 
-        SwaggerResponseTransformUtil.AddTransformIfMatch(builderContext);
     });
 
 builder

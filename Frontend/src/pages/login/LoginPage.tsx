@@ -1,16 +1,7 @@
 import styles from "./LoginPage.module.scss";
-import { LoginRequest } from "services/user-api/user-api-client.types.ts";
-import { Input } from "components/uikit/inputs/Input.tsx";
-import {
-  registerPassword,
-  registerString,
-} from "helpers/form/register-helpers.ts";
 import { Button } from "components/uikit/buttons/Button.tsx";
-import { useLoginMutation } from "services/user-api/user-api-client/Query.ts";
-import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { AppLinks } from "application/constants/appLinks.ts";
-import { useAdvancedForm } from "helpers/form/useAdvancedForm.ts";
 import { Loading } from "../../components/uikit/suspense/Loading.tsx";
 import { useAuth } from "react-oidc-context";
 import { useEffect } from "react";
@@ -25,13 +16,16 @@ export function LoginPage() {
 
   return (
     <div className={styles.wrapper}>
-      <div className={styles.header}>Кабинет сотрудника</div>
-      <Button
-        className={styles.loginButton}
-        title={"Войти"}
-        onClick={() => auth.signinRedirect()}
-      />
-      {/*</Loading>*/}
+      <div className={styles.loginWrapper}>
+        <Loading loading={auth.isLoading}>
+          <div className={styles.header}>Кабинет сотрудника</div>
+          <Button
+            className={styles.loginButton}
+            title={"Войти"}
+            onClick={async () => auth.signinRedirect()}
+          />
+        </Loading>
+      </div>
     </div>
   );
 }

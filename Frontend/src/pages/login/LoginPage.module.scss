@@ -24,6 +24,15 @@
     background-size: cover;
     z-index: -1;
   }
+
+  .loginWrapper {
+    height: 400px;
+    width: 336px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
 }
 
 .header {

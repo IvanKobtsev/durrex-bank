@@ -1,109 +1,54 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using Microsoft.IdentityModel.Tokens;
+namespace MyApp.Gateway.Middlewares;
 
-public class JwtForwardingMiddleware
+public class JwtForwardingMiddleware(RequestDelegate next)
 {
-    private readonly RequestDelegate _next;
-    private readonly TokenValidationParameters _validationParameters;
+    private static readonly string[] PublicPrefixes =
+    [
+        "/auth/connect/",
+        "/auth/.well-known/",
+        "/auth/account/",
+    ];
 
-    public JwtForwardingMiddleware(
-        RequestDelegate next,
-        IConfiguration configuration,
-        RsaSecurityKey rsaKey
-    )
+    private static bool IsPublicPath(PathString path)
     {
-        _next = next;
-
-        _validationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidIssuer = configuration["Jwt:Issuer"],
-
-            ValidateAudience = true,
-            ValidAudience = configuration["Jwt:Audience"],
-
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = rsaKey,
-
-            ValidateLifetime = true,
-            ClockSkew = TimeSpan.FromSeconds(30),
-
-            ValidateActor = false,
-        };
+        var p = path.ToString();
+        return PublicPrefixes.Any(prefix =>
+                   p.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+               || p.EndsWith(".json", StringComparison.OrdinalIgnoreCase);
     }
 
     public async Task InvokeAsync(HttpContext context)
     {
-        var path = context.Request.Path;
-
-        if (path.Equals("/user/auth/login") || path.ToString().EndsWith(".json"))
+        if (IsPublicPath(context.Request.Path))
         {
-            await _next(context);
+            await next(context);
             return;
         }
 
-        var isSignalRRequest = path.ToString().Contains("/hubs/");
-        var isNegotiationRequest = isSignalRRequest && path.ToString().EndsWith("/negotiate");
+        var user = context.User;
 
-        string token;
-        if (isSignalRRequest && !isNegotiationRequest)
-        {
-            var accessToken = context.Request.Query["access_token"].ToString();
-
-            if (accessToken.Length == 0)
-            {
-                context.Response.StatusCode = 401;
-                await context.Response.WriteAsync("Missing or invalid Authorization header.");
-                return;
-            }
-
-            token = accessToken;
-        }
-        else
-        {
-            var authHeader = context.Request.Headers.Authorization.FirstOrDefault();
-
-            if (authHeader is null || !authHeader.StartsWith("Bearer "))
-            {
-                context.Response.StatusCode = 401;
-                await context.Response.WriteAsync("Missing or invalid Authorization header.");
-                return;
-            }
-
-            token = authHeader.Substring("Bearer ".Length);
-        }
-
-        var handler = new JwtSecurityTokenHandler();
-
-        try
-        {
-            var principal = handler.ValidateToken(
-                token,
-                _validationParameters,
-                out var validatedToken
-            );
-
-            var userId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var role = principal.FindFirst(ClaimTypes.Role)?.Value;
-
-            if (userId is null || role is null)
-            {
-                context.Response.StatusCode = 401;
-                await context.Response.WriteAsync("Invalid token claims.");
-                return;
-            }
-
-            // Inject headers for downstream services
-            context.Request.Headers["X-User-Id"] = userId;
-            context.Request.Headers["X-User-Role"] = role;
-
-            await _next(context);
-        }
-        catch (Exception)
+        if (user.Identity is null || !user.Identity.IsAuthenticated)
         {
             context.Response.StatusCode = 401;
-            await context.Response.WriteAsync("Invalid or expired token.");
+            await context.Response.WriteAsync("Missing or invalid Authorization header.");
+            return;
         }
+
+        var userId = user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
+                  ?? user.FindFirst("sub")?.Value;
+
+        var roles = user.FindAll("role").Select(c => c.Value).ToList();
+
+        if (userId is null || roles.Count == 0)
+        {
+            context.Response.StatusCode = 401;
+            await context.Response.WriteAsync("Invalid token claims.");
+            return;
+        }
+
+        context.Request.Headers["X-User-Id"] = userId;
+        context.Request.Headers["X-User-Roles"] = string.Join(",", roles);
+
+        await next(context);
     }
 }

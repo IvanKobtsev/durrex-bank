@@ -10,7 +10,10 @@ namespace MyApp.UserService.Controllers;
 [ApiController]
 [Route("users")]
 [Produces("application/json")]
-public class UsersController(IUserService userService, ICurrentUserContext currentUser) : ControllerBase
+public class UsersController(
+    IUserService userService,
+    ICurrentUserContext currentUser,
+    UserRegistrationService registrationService) : ControllerBase
 {
     /// <summary>Get a list of all users (clients and employees)</summary>
     /// <response code="200">List of users returned</response>
@@ -55,10 +58,11 @@ public class UsersController(IUserService userService, ICurrentUserContext curre
     /// <response code="403">Only employees may create users</response>
     /// <response code="409">Username or email is already taken</response>
     [HttpPost]
-    [ProducesResponseType(typeof(UserResponse), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
-    public async Task<ActionResult<UserResponse>> Create(
+    [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
+    public async Task<IActionResult> Create(
         [FromBody] CreateUserRequest request,
         CancellationToken ct
     )
@@ -66,12 +70,15 @@ public class UsersController(IUserService userService, ICurrentUserContext curre
         if (!currentUser.IsEmployee)
             return StatusCode(StatusCodes.Status403Forbidden);
 
-        var result = await userService.CreateAsync(request, ct);
-
-        if (result.IsFailed)
-            return result.HasError<ConflictError>() ? Conflict() : BadRequest();
-
-        return CreatedAtAction(nameof(GetById), new { id = result.Value.Id }, result.Value);
+        try
+        {
+            var (user, inviteUrl) = await registrationService.RegisterAsync(request, ct);
+            return Created($"/users/{user.Id}", new { User = user, InviteUrl = inviteUrl });
+        }
+        catch (InvalidOperationException ex) when (ex.Message.Contains("unavailable"))
+        {
+            return StatusCode(503, new { Error = "Authentication service is unavailable. Please try again later." });
+        }
     }
 
     /// <summary>Block a user</summary>

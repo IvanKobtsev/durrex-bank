@@ -64,13 +64,14 @@ builder.Services.AddScoped<ICurrentUserContext>(sp =>
     if (http is null)
         return new CurrentUserContext { Role = CallerRole.Internal };
 
-    var userIdHeader = http.Request.Headers["X-User-Id"].FirstOrDefault();
-    var roleHeader   = http.Request.Headers["X-User-Role"].FirstOrDefault();
+    var userIdHeader  = http.Request.Headers["X-User-Id"].FirstOrDefault();
+    var rolesHeader   = http.Request.Headers["X-User-Roles"].FirstOrDefault();
 
-    if (string.IsNullOrEmpty(userIdHeader) || string.IsNullOrEmpty(roleHeader))
+    if (string.IsNullOrEmpty(userIdHeader) || string.IsNullOrEmpty(rolesHeader))
         return new CurrentUserContext { Role = CallerRole.Internal };
 
-    var role = roleHeader.Equals("Employee", StringComparison.OrdinalIgnoreCase)
+    var roles = rolesHeader.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+    var role = roles.Any(r => r.Equals("Employee", StringComparison.OrdinalIgnoreCase))
         ? CallerRole.Employee
         : CallerRole.Client;
 
@@ -81,9 +82,16 @@ builder.Services.AddScoped<ICurrentUserContext>(sp =>
     };
 });
 
+builder.Services.AddHttpClient<AuthServiceClient>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["Services:AuthService"]!);
+    client.DefaultRequestHeaders.Add(
+        "X-Internal-Api-Key",
+        builder.Configuration["InternalApiKey"]!);
+});
+
 builder.Services.AddScoped<DataSeeder>();
-builder.Services.AddSingleton<RsaKeyProvider>();
-builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<UserRegistrationService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 

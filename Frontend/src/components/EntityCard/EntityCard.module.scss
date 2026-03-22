@@ -15,7 +15,10 @@
 
   .leftWrapper {
     font-size: 28px;
-    cursor: pointer;
+
+    &.clickable {
+      cursor: pointer;
+    }
   }
 
   &.closed {

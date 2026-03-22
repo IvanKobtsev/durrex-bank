@@ -93,21 +93,6 @@ services:
       - postgres
       - rabbitmq
 
-  settings-service:
-    build:
-      context: .
-      dockerfile: MyApp.SettingsService/Dockerfile
-    restart: unless-stopped
-    environment:
-      ASPNETCORE_ENVIRONMENT: Development
-      ASPNETCORE_URLS: http://+:8080
-      ConnectionStrings__Default: "Host=postgres;Port=5432;Database=durrex_settings;Username=postgres;Password=postgres"
-      InternalApiKey: "dev-internal-api-key-12345"
-    ports:
-      - "5210:8080"
-    depends_on:
-      - postgres
-
   web-app-settings-service:
     build:
       context: .
@@ -158,7 +143,6 @@ services:
       - user-service
       - core-service
       - credit-service
-      - settings-service
 
 volumes:
   postgres_data:

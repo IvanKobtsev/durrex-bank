@@ -87,7 +87,6 @@ app.UseSwaggerUI(options =>
     options.SwaggerEndpoint("/core/openapi/v1.json", "CoreService API");
     options.SwaggerEndpoint("/credit/swagger/v1/swagger.json", "CreditService API");
     options.SwaggerEndpoint("/user/swagger/v1/swagger.json", "UserService API");
-    options.SwaggerEndpoint("/settings/openapi/v1.json", "SettingsService API");
     options.RoutePrefix = "swagger";
 });
 

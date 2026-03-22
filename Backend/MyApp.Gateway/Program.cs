@@ -81,6 +81,10 @@ app.UseSwaggerUI(options =>
 
     options.SwaggerEndpoint("/user/swagger/v1/swagger.json", "UserService API");
 
+    options.SwaggerEndpoint("/web-app-settings/openapi/v1.json", "Web App Settings API");
+
+    options.SwaggerEndpoint("/mobile-app-settings/openapi/v1.json", "Mobile App Settings API");
+
     options.RoutePrefix = "swagger";
 });
 

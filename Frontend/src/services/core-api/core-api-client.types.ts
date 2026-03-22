@@ -176,6 +176,8 @@ export type TransactionResponse = {
   relatedAccountId: number | null;
   description: string | null;
   createdAt: Date;
+  exchangeRate: number | null;
+  sourceCurrency: string | null;
   [key: string]: any;
 }
 export function deserializeTransactionResponse(json: string): TransactionResponse {

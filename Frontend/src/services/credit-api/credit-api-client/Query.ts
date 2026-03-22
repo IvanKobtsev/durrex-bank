@@ -26,6 +26,14 @@ export type CreditsGETQueryParameters = {
   id: number ;
 }
 
+export type OverdueQueryParameters = {
+  clientId?: number | undefined ;
+}
+
+export type RatingQueryParameters = {
+  clientId?: number | undefined ;
+}
+
 export type RepayQueryParameters = {
   id: number ;
 }
@@ -46,7 +54,7 @@ export function creditsPOSTMutationKey(): MutationKey {
 /**
  * Issue a new loan to a client
  * @param body (optional) 
- * @return Loan issued and funds credited to the acount
+ * @return Loan issued and funds credited to the account
  */
 export function useCreditsPOSTMutation<TContext>(options?: Omit<UseMutationOptions<Types.CreditResponse, unknown, Types.IssueCreditRequest, TContext>, 'mutationKey' | 'mutationFn'>): UseMutationResult<Types.CreditResponse, unknown, Types.IssueCreditRequest, TContext> {
   const key = creditsPOSTMutationKey();
@@ -106,7 +114,7 @@ export function __creditsAll(context: QueryFunctionContext, axiosConfig?: AxiosR
 export function useCreditsAllQuery<TSelectData = Types.CreditResponse[], TError = unknown>(dto: CreditsAllQueryParameters, options?: Omit<UseQueryOptions<Types.CreditResponse[], TError, TSelectData>, 'queryKey'>, axiosConfig?: Partial<AxiosRequestConfig>): UseQueryResult<TSelectData, TError>;
 /**
  * List credits for a client
- * @param clientId (optional) Client whose credits to return
+ * @param clientId (optional) Client whose credits to return (required for employees)
  * @return List of credits returned
  */
 export function useCreditsAllQuery<TSelectData = Types.CreditResponse[], TError = unknown>(clientId?: number | undefined, options?: Omit<UseQueryOptions<Types.CreditResponse[], TError, TSelectData>, 'queryKey'>, axiosConfig?: Partial<AxiosRequestConfig>): UseQueryResult<TSelectData, TError>;
@@ -137,7 +145,7 @@ export function useCreditsAllQuery<TSelectData = Types.CreditResponse[], TError 
 }
 /**
  * List credits for a client
- * @param clientId (optional) Client whose credits to return
+ * @param clientId (optional) Client whose credits to return (required for employees)
  * @return List of credits returned
  */
 export function setCreditsAllData(queryClient: QueryClient, updater: (data: Types.CreditResponse[] | undefined) => Types.CreditResponse[], clientId?: number | undefined) {
@@ -148,7 +156,7 @@ export function setCreditsAllData(queryClient: QueryClient, updater: (data: Type
 
 /**
  * List credits for a client
- * @param clientId (optional) Client whose credits to return
+ * @param clientId (optional) Client whose credits to return (required for employees)
  * @return List of credits returned
  */
 export function setCreditsAllDataByQueryId(queryClient: QueryClient, queryKey: QueryKey, updater: (data: Types.CreditResponse[] | undefined) => Types.CreditResponse[]) {
@@ -245,6 +253,330 @@ export function setCreditsGETData(queryClient: QueryClient, updater: (data: Type
  * @return Credit details returned
  */
 export function setCreditsGETDataByQueryId(queryClient: QueryClient, queryKey: QueryKey, updater: (data: Types.CreditDetailResponse | undefined) => Types.CreditDetailResponse) {
+  queryClient.setQueryData(queryKey, updater);
+}
+    
+export function overdueUrl(clientId?: number | undefined): string {
+  let url_ = getBaseUrl() + "/credits/overdue?";
+if (clientId === null)
+    throw new Error("The parameter 'clientId' cannot be null.");
+else if (clientId !== undefined)
+    url_ += "clientId=" + encodeURIComponent("" + clientId) + "&";
+  url_ = url_.replace(/[?&]$/, "");
+  return url_;
+}
+
+let overdueDefaultOptions: Omit<UseQueryOptions<Types.OverduePaymentResponse[], unknown, Types.OverduePaymentResponse[]>, 'queryKey' | 'queryFn'> & Partial<Pick<UseQueryOptions<Types.OverduePaymentResponse[], unknown, Types.OverduePaymentResponse[]>, 'queryFn'>> = {
+};
+export function getOverdueDefaultOptions() {
+  return overdueDefaultOptions;
+};
+export function setOverdueDefaultOptions(options: typeof overdueDefaultOptions) {
+  overdueDefaultOptions = options;
+}
+
+export function overdueQueryKey(clientId?: number | undefined): QueryKey;
+export function overdueQueryKey(...params: any[]): QueryKey {
+  if (params.length === 1 && isParameterObject(params[0])) {
+    const { clientId,  } = params[0] as OverdueQueryParameters;
+
+    return trimArrayEnd([
+        'Client',
+        'overdue',
+        clientId as any,
+      ]);
+  } else {
+    return trimArrayEnd([
+        'Client',
+        'overdue',
+        ...params
+      ]);
+  }
+}
+export function __overdue(context: QueryFunctionContext, axiosConfig?: AxiosRequestConfig | undefined) {
+  return Client.overdue(
+      context.queryKey[2] as number | undefined,axiosConfig    );
+}
+
+export function useOverdueQuery<TSelectData = Types.OverduePaymentResponse[], TError = unknown>(dto: OverdueQueryParameters, options?: Omit<UseQueryOptions<Types.OverduePaymentResponse[], TError, TSelectData>, 'queryKey'>, axiosConfig?: Partial<AxiosRequestConfig>): UseQueryResult<TSelectData, TError>;
+/**
+ * List overdue schedule entries for a client (employees and internal calls only)
+ * @param clientId (optional) 
+ * @return OK
+ */
+export function useOverdueQuery<TSelectData = Types.OverduePaymentResponse[], TError = unknown>(clientId?: number | undefined, options?: Omit<UseQueryOptions<Types.OverduePaymentResponse[], TError, TSelectData>, 'queryKey'>, axiosConfig?: Partial<AxiosRequestConfig>): UseQueryResult<TSelectData, TError>;
+export function useOverdueQuery<TSelectData = Types.OverduePaymentResponse[], TError = unknown>(...params: any []): UseQueryResult<TSelectData, TError> {
+  let options: UseQueryOptions<Types.OverduePaymentResponse[], TError, TSelectData> | undefined = undefined;
+  let axiosConfig: AxiosRequestConfig |undefined = undefined;
+  let clientId: any = undefined;
+  
+  if (params.length > 0) {
+    if (isParameterObject(params[0])) {
+      ({ clientId,  } = params[0] as OverdueQueryParameters);
+      options = params[1];
+      axiosConfig = params[2];
+    } else {
+      [clientId, options, axiosConfig] = params;
+    }
+  }
+
+  const metaContext = useContext(QueryMetaContext);
+  options = addMetaToOptions(options, metaContext);
+
+  return useQuery<Types.OverduePaymentResponse[], TError, TSelectData>({
+    queryFn: axiosConfig ? (context) => __overdue(context, axiosConfig) : __overdue,
+    queryKey: overdueQueryKey(clientId),
+    ...overdueDefaultOptions as unknown as Omit<UseQueryOptions<Types.OverduePaymentResponse[], TError, TSelectData>, 'queryKey'>,
+    ...options,
+  });
+}
+/**
+ * List overdue schedule entries for a client (employees and internal calls only)
+ * @param clientId (optional) 
+ * @return OK
+ */
+export function setOverdueData(queryClient: QueryClient, updater: (data: Types.OverduePaymentResponse[] | undefined) => Types.OverduePaymentResponse[], clientId?: number | undefined) {
+  queryClient.setQueryData(overdueQueryKey(clientId),
+    updater
+  );
+}
+
+/**
+ * List overdue schedule entries for a client (employees and internal calls only)
+ * @param clientId (optional) 
+ * @return OK
+ */
+export function setOverdueDataByQueryId(queryClient: QueryClient, queryKey: QueryKey, updater: (data: Types.OverduePaymentResponse[] | undefined) => Types.OverduePaymentResponse[]) {
+  queryClient.setQueryData(queryKey, updater);
+}
+    
+export function meAllUrl(): string {
+  let url_ = getBaseUrl() + "/credits/overdue/me";
+  url_ = url_.replace(/[?&]$/, "");
+  return url_;
+}
+
+let meAllDefaultOptions: Omit<UseQueryOptions<Types.OverduePaymentResponse[], unknown, Types.OverduePaymentResponse[]>, 'queryKey' | 'queryFn'> & Partial<Pick<UseQueryOptions<Types.OverduePaymentResponse[], unknown, Types.OverduePaymentResponse[]>, 'queryFn'>> = {
+};
+export function getMeAllDefaultOptions() {
+  return meAllDefaultOptions;
+};
+export function setMeAllDefaultOptions(options: typeof meAllDefaultOptions) {
+  meAllDefaultOptions = options;
+}
+
+export function meAllQueryKey(): QueryKey;
+export function meAllQueryKey(...params: any[]): QueryKey {
+  return trimArrayEnd([
+      'Client',
+      'meAll',
+    ]);
+}
+export function __meAll(context: QueryFunctionContext, axiosConfig?: AxiosRequestConfig | undefined) {
+  return Client.meAll(
+axiosConfig    );
+}
+
+/**
+ * List overdue schedule entries for the authenticated client
+ * @return OK
+ */
+export function useMeAllQuery<TSelectData = Types.OverduePaymentResponse[], TError = unknown>(options?: Omit<UseQueryOptions<Types.OverduePaymentResponse[], TError, TSelectData>, 'queryKey'>, axiosConfig?: Partial<AxiosRequestConfig>): UseQueryResult<TSelectData, TError>;
+export function useMeAllQuery<TSelectData = Types.OverduePaymentResponse[], TError = unknown>(...params: any []): UseQueryResult<TSelectData, TError> {
+  let options: UseQueryOptions<Types.OverduePaymentResponse[], TError, TSelectData> | undefined = undefined;
+  let axiosConfig: AxiosRequestConfig |undefined = undefined;
+  
+
+  options = params[0] as any;
+  axiosConfig = params[1] as any;
+
+  const metaContext = useContext(QueryMetaContext);
+  options = addMetaToOptions(options, metaContext);
+
+  return useQuery<Types.OverduePaymentResponse[], TError, TSelectData>({
+    queryFn: axiosConfig ? (context) => __meAll(context, axiosConfig) : __meAll,
+    queryKey: meAllQueryKey(),
+    ...meAllDefaultOptions as unknown as Omit<UseQueryOptions<Types.OverduePaymentResponse[], TError, TSelectData>, 'queryKey'>,
+    ...options,
+  });
+}
+/**
+ * List overdue schedule entries for the authenticated client
+ * @return OK
+ */
+export function setMeAllData(queryClient: QueryClient, updater: (data: Types.OverduePaymentResponse[] | undefined) => Types.OverduePaymentResponse[], ) {
+  queryClient.setQueryData(meAllQueryKey(),
+    updater
+  );
+}
+
+/**
+ * List overdue schedule entries for the authenticated client
+ * @return OK
+ */
+export function setMeAllDataByQueryId(queryClient: QueryClient, queryKey: QueryKey, updater: (data: Types.OverduePaymentResponse[] | undefined) => Types.OverduePaymentResponse[]) {
+  queryClient.setQueryData(queryKey, updater);
+}
+    
+export function ratingUrl(clientId?: number | undefined): string {
+  let url_ = getBaseUrl() + "/credits/rating?";
+if (clientId === null)
+    throw new Error("The parameter 'clientId' cannot be null.");
+else if (clientId !== undefined)
+    url_ += "clientId=" + encodeURIComponent("" + clientId) + "&";
+  url_ = url_.replace(/[?&]$/, "");
+  return url_;
+}
+
+let ratingDefaultOptions: Omit<UseQueryOptions<Types.CreditRatingResponse, unknown, Types.CreditRatingResponse>, 'queryKey' | 'queryFn'> & Partial<Pick<UseQueryOptions<Types.CreditRatingResponse, unknown, Types.CreditRatingResponse>, 'queryFn'>> = {
+};
+export function getRatingDefaultOptions() {
+  return ratingDefaultOptions;
+};
+export function setRatingDefaultOptions(options: typeof ratingDefaultOptions) {
+  ratingDefaultOptions = options;
+}
+
+export function ratingQueryKey(clientId?: number | undefined): QueryKey;
+export function ratingQueryKey(...params: any[]): QueryKey {
+  if (params.length === 1 && isParameterObject(params[0])) {
+    const { clientId,  } = params[0] as RatingQueryParameters;
+
+    return trimArrayEnd([
+        'Client',
+        'rating',
+        clientId as any,
+      ]);
+  } else {
+    return trimArrayEnd([
+        'Client',
+        'rating',
+        ...params
+      ]);
+  }
+}
+export function __rating(context: QueryFunctionContext, axiosConfig?: AxiosRequestConfig | undefined) {
+  return Client.rating(
+      context.queryKey[2] as number | undefined,axiosConfig    );
+}
+
+export function useRatingQuery<TSelectData = Types.CreditRatingResponse, TError = unknown>(dto: RatingQueryParameters, options?: Omit<UseQueryOptions<Types.CreditRatingResponse, TError, TSelectData>, 'queryKey'>, axiosConfig?: Partial<AxiosRequestConfig>): UseQueryResult<TSelectData, TError>;
+/**
+ * Credit rating for a client (employees and internal calls only)
+ * @param clientId (optional) 
+ * @return OK
+ */
+export function useRatingQuery<TSelectData = Types.CreditRatingResponse, TError = unknown>(clientId?: number | undefined, options?: Omit<UseQueryOptions<Types.CreditRatingResponse, TError, TSelectData>, 'queryKey'>, axiosConfig?: Partial<AxiosRequestConfig>): UseQueryResult<TSelectData, TError>;
+export function useRatingQuery<TSelectData = Types.CreditRatingResponse, TError = unknown>(...params: any []): UseQueryResult<TSelectData, TError> {
+  let options: UseQueryOptions<Types.CreditRatingResponse, TError, TSelectData> | undefined = undefined;
+  let axiosConfig: AxiosRequestConfig |undefined = undefined;
+  let clientId: any = undefined;
+  
+  if (params.length > 0) {
+    if (isParameterObject(params[0])) {
+      ({ clientId,  } = params[0] as RatingQueryParameters);
+      options = params[1];
+      axiosConfig = params[2];
+    } else {
+      [clientId, options, axiosConfig] = params;
+    }
+  }
+
+  const metaContext = useContext(QueryMetaContext);
+  options = addMetaToOptions(options, metaContext);
+
+  return useQuery<Types.CreditRatingResponse, TError, TSelectData>({
+    queryFn: axiosConfig ? (context) => __rating(context, axiosConfig) : __rating,
+    queryKey: ratingQueryKey(clientId),
+    ...ratingDefaultOptions as unknown as Omit<UseQueryOptions<Types.CreditRatingResponse, TError, TSelectData>, 'queryKey'>,
+    ...options,
+  });
+}
+/**
+ * Credit rating for a client (employees and internal calls only)
+ * @param clientId (optional) 
+ * @return OK
+ */
+export function setRatingData(queryClient: QueryClient, updater: (data: Types.CreditRatingResponse | undefined) => Types.CreditRatingResponse, clientId?: number | undefined) {
+  queryClient.setQueryData(ratingQueryKey(clientId),
+    updater
+  );
+}
+
+/**
+ * Credit rating for a client (employees and internal calls only)
+ * @param clientId (optional) 
+ * @return OK
+ */
+export function setRatingDataByQueryId(queryClient: QueryClient, queryKey: QueryKey, updater: (data: Types.CreditRatingResponse | undefined) => Types.CreditRatingResponse) {
+  queryClient.setQueryData(queryKey, updater);
+}
+    
+export function meUrl(): string {
+  let url_ = getBaseUrl() + "/credits/rating/me";
+  url_ = url_.replace(/[?&]$/, "");
+  return url_;
+}
+
+let meDefaultOptions: Omit<UseQueryOptions<Types.CreditRatingResponse, unknown, Types.CreditRatingResponse>, 'queryKey' | 'queryFn'> & Partial<Pick<UseQueryOptions<Types.CreditRatingResponse, unknown, Types.CreditRatingResponse>, 'queryFn'>> = {
+};
+export function getMeDefaultOptions() {
+  return meDefaultOptions;
+};
+export function setMeDefaultOptions(options: typeof meDefaultOptions) {
+  meDefaultOptions = options;
+}
+
+export function meQueryKey(): QueryKey;
+export function meQueryKey(...params: any[]): QueryKey {
+  return trimArrayEnd([
+      'Client',
+      'me',
+    ]);
+}
+export function __me(context: QueryFunctionContext, axiosConfig?: AxiosRequestConfig | undefined) {
+  return Client.me(
+axiosConfig    );
+}
+
+/**
+ * Credit rating for the authenticated client
+ * @return OK
+ */
+export function useMeQuery<TSelectData = Types.CreditRatingResponse, TError = unknown>(options?: Omit<UseQueryOptions<Types.CreditRatingResponse, TError, TSelectData>, 'queryKey'>, axiosConfig?: Partial<AxiosRequestConfig>): UseQueryResult<TSelectData, TError>;
+export function useMeQuery<TSelectData = Types.CreditRatingResponse, TError = unknown>(...params: any []): UseQueryResult<TSelectData, TError> {
+  let options: UseQueryOptions<Types.CreditRatingResponse, TError, TSelectData> | undefined = undefined;
+  let axiosConfig: AxiosRequestConfig |undefined = undefined;
+  
+
+  options = params[0] as any;
+  axiosConfig = params[1] as any;
+
+  const metaContext = useContext(QueryMetaContext);
+  options = addMetaToOptions(options, metaContext);
+
+  return useQuery<Types.CreditRatingResponse, TError, TSelectData>({
+    queryFn: axiosConfig ? (context) => __me(context, axiosConfig) : __me,
+    queryKey: meQueryKey(),
+    ...meDefaultOptions as unknown as Omit<UseQueryOptions<Types.CreditRatingResponse, TError, TSelectData>, 'queryKey'>,
+    ...options,
+  });
+}
+/**
+ * Credit rating for the authenticated client
+ * @return OK
+ */
+export function setMeData(queryClient: QueryClient, updater: (data: Types.CreditRatingResponse | undefined) => Types.CreditRatingResponse, ) {
+  queryClient.setQueryData(meQueryKey(),
+    updater
+  );
+}
+
+/**
+ * Credit rating for the authenticated client
+ * @return OK
+ */
+export function setMeDataByQueryId(queryClient: QueryClient, queryKey: QueryKey, updater: (data: Types.CreditRatingResponse | undefined) => Types.CreditRatingResponse) {
   queryClient.setQueryData(queryKey, updater);
 }
     

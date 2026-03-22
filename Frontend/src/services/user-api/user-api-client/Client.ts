@@ -187,6 +187,13 @@ function processUsersAll(response: AxiosResponse): Promise<Types.UserResponse[]>
             }
         return Promise.resolve<Types.UserResponse[]>(result200);
 
+    } else if (status === 403) {
+        const _responseText = response.data;
+        let result403: any = null;
+        let resultData403  = _responseText;
+        result403 = Types.initProblemDetails(resultData403);
+        return throwException("Clients are not allowed to list all users", status, _responseText, _headers, result403);
+
     } else if (status !== 200 && status !== 204) {
         const _responseText = response.data;
         return throwException("An unexpected server error occurred.", status, _responseText, _headers);
@@ -247,12 +254,19 @@ function processUsersPOST(response: AxiosResponse): Promise<Types.UserResponse> 
         result201 = Types.initUserResponse(resultData201);
         return Promise.resolve<Types.UserResponse>(result201);
 
+    } else if (status === 403) {
+        const _responseText = response.data;
+        let result403: any = null;
+        let resultData403  = _responseText;
+        result403 = Types.initProblemDetails(resultData403);
+        return throwException("Only employees may create users", status, _responseText, _headers, result403);
+
     } else if (status === 409) {
         const _responseText = response.data;
         let result409: any = null;
         let resultData409  = _responseText;
         result409 = Types.initProblemDetails(resultData409);
-        return throwException("Username is already taken", status, _responseText, _headers, result409);
+        return throwException("Username or email is already taken", status, _responseText, _headers, result409);
 
     } else if (status !== 200 && status !== 204) {
         const _responseText = response.data;
@@ -312,6 +326,13 @@ function processUsersGET(response: AxiosResponse): Promise<Types.UserResponse> {
         let resultData200  = _responseText;
         result200 = Types.initUserResponse(resultData200);
         return Promise.resolve<Types.UserResponse>(result200);
+
+    } else if (status === 403) {
+        const _responseText = response.data;
+        let result403: any = null;
+        let resultData403  = _responseText;
+        result403 = Types.initProblemDetails(resultData403);
+        return throwException("Client may only view their own profile", status, _responseText, _headers, result403);
 
     } else if (status === 404) {
         const _responseText = response.data;
@@ -375,6 +396,13 @@ function processBlock(response: AxiosResponse): Promise<void> {
         const _responseText = response.data;
         return Promise.resolve<void>(null as any);
 
+    } else if (status === 403) {
+        const _responseText = response.data;
+        let result403: any = null;
+        let resultData403  = _responseText;
+        result403 = Types.initProblemDetails(resultData403);
+        return throwException("Only employees may block users", status, _responseText, _headers, result403);
+
     } else if (status === 404) {
         const _responseText = response.data;
         let result404: any = null;
@@ -436,6 +464,13 @@ function processUnblock(response: AxiosResponse): Promise<void> {
     if (status === 204) {
         const _responseText = response.data;
         return Promise.resolve<void>(null as any);
+
+    } else if (status === 403) {
+        const _responseText = response.data;
+        let result403: any = null;
+        let resultData403  = _responseText;
+        result403 = Types.initProblemDetails(resultData403);
+        return throwException("Only employees may unblock users", status, _responseText, _headers, result403);
 
     } else if (status === 404) {
         const _responseText = response.data;

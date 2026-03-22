@@ -597,6 +597,13 @@ function processDebit(response: AxiosResponse): Promise<Types.TransactionRespons
         result400 = Types.initProblemDetails(resultData400);
         return throwException("Bad Request", status, _responseText, _headers, result400);
 
+    } else if (status === 403) {
+        const _responseText = response.data;
+        let result403: any = null;
+        let resultData403  = _responseText;
+        result403 = Types.initProblemDetails(resultData403);
+        return throwException("Forbidden", status, _responseText, _headers, result403);
+
     } else if (status === 404) {
         const _responseText = response.data;
         let result404: any = null;

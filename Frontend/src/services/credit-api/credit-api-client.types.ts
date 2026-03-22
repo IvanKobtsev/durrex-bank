@@ -83,6 +83,33 @@ export function prepareSerializeCreditDetailResponse(_data: CreditDetailResponse
   }
   return data as CreditDetailResponse;
 }
+export type CreditRatingResponse = {
+  clientId?: number;
+  score?: number;
+  calculatedAt?: Date;
+}
+export function deserializeCreditRatingResponse(json: string): CreditRatingResponse {
+  const data = JSON.parse(json) as CreditRatingResponse;
+  initCreditRatingResponse(data);
+  return data;
+}
+export function initCreditRatingResponse(_data: CreditRatingResponse) {
+  if (_data) {
+    _data.calculatedAt = _data["calculatedAt"] ? new Date(_data["calculatedAt"].toString()) : <any>null;
+  }
+  return _data;
+}
+export function serializeCreditRatingResponse(_data: CreditRatingResponse | undefined) {
+  if (_data) {
+    _data = prepareSerializeCreditRatingResponse(_data as CreditRatingResponse);
+  }
+  return JSON.stringify(_data);
+}
+export function prepareSerializeCreditRatingResponse(_data: CreditRatingResponse): CreditRatingResponse {
+  const data: Record<string, any> = { ..._data };
+  data["calculatedAt"] = _data.calculatedAt && _data.calculatedAt.toISOString();
+  return data as CreditRatingResponse;
+}
 /** Credit summary */
 export type CreditResponse = {
   /** Unique credit Id */
@@ -156,6 +183,35 @@ export function serializeIssueCreditRequest(_data: IssueCreditRequest | undefine
 export function prepareSerializeIssueCreditRequest(_data: IssueCreditRequest): IssueCreditRequest {
   const data: Record<string, any> = { ..._data };
   return data as IssueCreditRequest;
+}
+export type OverduePaymentResponse = {
+  entryId?: number;
+  creditId?: number;
+  dueDate?: Date;
+  amount?: number;
+  daysOverdue?: number;
+}
+export function deserializeOverduePaymentResponse(json: string): OverduePaymentResponse {
+  const data = JSON.parse(json) as OverduePaymentResponse;
+  initOverduePaymentResponse(data);
+  return data;
+}
+export function initOverduePaymentResponse(_data: OverduePaymentResponse) {
+  if (_data) {
+    _data.dueDate = _data["dueDate"] ? new Date(_data["dueDate"].toString()) : <any>null;
+  }
+  return _data;
+}
+export function serializeOverduePaymentResponse(_data: OverduePaymentResponse | undefined) {
+  if (_data) {
+    _data = prepareSerializeOverduePaymentResponse(_data as OverduePaymentResponse);
+  }
+  return JSON.stringify(_data);
+}
+export function prepareSerializeOverduePaymentResponse(_data: OverduePaymentResponse): OverduePaymentResponse {
+  const data: Record<string, any> = { ..._data };
+  data["dueDate"] = _data.dueDate && _data.dueDate.toISOString();
+  return data as OverduePaymentResponse;
 }
 /** A single entry in a credit's repayment schedule */
 export type PaymentScheduleEntryResponse = {

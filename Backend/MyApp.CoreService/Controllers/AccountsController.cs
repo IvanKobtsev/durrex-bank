@@ -39,7 +39,6 @@ public class AccountsController : ControllerBase
         return StatusCode(StatusCodes.Status403Forbidden);
     }
 
-    // POST /api/accounts
     [HttpPost]
     [ProducesResponseType<AccountResponse>(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -55,7 +54,6 @@ public class AccountsController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = account.Id }, account);
     }
 
-    // GET /api/accounts  OR  GET /api/accounts?ownerId=N
     [HttpGet]
     [ProducesResponseType<IReadOnlyList<AccountResponse>>(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAll([FromQuery] int? ownerId, CancellationToken ct)
@@ -67,7 +65,6 @@ public class AccountsController : ControllerBase
             var byOwner = await _mediator.Send(new GetAccountsByOwnerIdQuery(_user.UserId.Value), ct);
             return Ok(byOwner);
         }
-        // Employee / Internal: honour optional ?ownerId filter
         if (ownerId.HasValue)
         {
             var byOwner = await _mediator.Send(new GetAccountsByOwnerIdQuery(ownerId.Value), ct);
@@ -77,7 +74,6 @@ public class AccountsController : ControllerBase
         return Ok(all);
     }
 
-    // GET /api/accounts/{id}
     [HttpGet("{id:int}")]
     [ProducesResponseType<AccountResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -90,7 +86,6 @@ public class AccountsController : ControllerBase
         return Ok(account);
     }
 
-    // DELETE /api/accounts/{id}
     [HttpDelete("{id:int}")]
     [ProducesResponseType<AccountResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -108,7 +103,6 @@ public class AccountsController : ControllerBase
         return Ok(result);
     }
 
-    // POST /api/accounts/{id}/deposit
     [HttpPost("{id:int}/deposit")]
     [ProducesResponseType<TransactionResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -126,7 +120,6 @@ public class AccountsController : ControllerBase
         return Ok(tx);
     }
 
-    // POST /api/accounts/{id}/withdraw
     [HttpPost("{id:int}/withdraw")]
     [ProducesResponseType<TransactionResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -144,7 +137,6 @@ public class AccountsController : ControllerBase
         return Ok(tx);
     }
 
-    // POST /api/accounts/{id}/transfer
     [HttpPost("{id:int}/transfer")]
     [ProducesResponseType<TransactionResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -162,7 +154,6 @@ public class AccountsController : ControllerBase
         return Ok(tx);
     }
 
-    // POST /api/accounts/{id}/debit  — internal, called by CreditService only
     [HttpPost("{id:int}/debit")]
     [ProducesResponseType<TransactionResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -177,7 +168,6 @@ public class AccountsController : ControllerBase
         return Ok(tx);
     }
 
-    // GET /api/accounts/{id}/transactions
     [HttpGet("{id:int}/transactions")]
     [ProducesResponseType<PagedResponse<TransactionResponse>>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -200,7 +190,6 @@ public class AccountsController : ControllerBase
 
 }
 
-// Request body records (used only in controller, no separate DTO file needed)
 public record DepositRequest(decimal Amount, string? Description = null);
 public record WithdrawRequest(decimal Amount, string? Description = null);
 public record TransferRequest(int TargetAccountId, decimal Amount, string? Description = null);

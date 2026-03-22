@@ -16,7 +16,7 @@ import { getAxios, getBaseUrl } from './helpers';
 /**
  * Issue a new loan to a client
  * @param body (optional) 
- * @return Loan issued and funds credited to the acount
+ * @return Loan issued and funds credited to the account
  */
 export function creditsPOST(body?: Types.IssueCreditRequest | undefined, config?: AxiosRequestConfig | undefined): Promise<Types.CreditResponse> {
     let url_ = getBaseUrl() + "/credits";
@@ -73,6 +73,13 @@ function processCreditsPOST(response: AxiosResponse): Promise<Types.CreditRespon
         result400 = Types.initProblemDetails(resultData400);
         return throwException("Validation error or account not found in CoreService", status, _responseText, _headers, result400);
 
+    } else if (status === 403) {
+        const _responseText = response.data;
+        let result403: any = null;
+        let resultData403  = _responseText;
+        result403 = Types.initProblemDetails(resultData403);
+        return throwException("Only clients and employees may issue loans", status, _responseText, _headers, result403);
+
     } else if (status !== 200 && status !== 204) {
         const _responseText = response.data;
         return throwException("An unexpected server error occurred.", status, _responseText, _headers);
@@ -82,7 +89,7 @@ function processCreditsPOST(response: AxiosResponse): Promise<Types.CreditRespon
 
 /**
  * List credits for a client
- * @param clientId (optional) Client whose credits to return
+ * @param clientId (optional) Client whose credits to return (required for employees)
  * @return List of credits returned
  */
 export function creditsAll(clientId?: number | undefined, config?: AxiosRequestConfig | undefined): Promise<Types.CreditResponse[]> {
@@ -142,7 +149,14 @@ function processCreditsAll(response: AxiosResponse): Promise<Types.CreditRespons
         let result400: any = null;
         let resultData400  = _responseText;
         result400 = Types.initProblemDetails(resultData400);
-        return throwException("clientId is missing", status, _responseText, _headers, result400);
+        return throwException("clientId is missing (employees only)", status, _responseText, _headers, result400);
+
+    } else if (status === 403) {
+        const _responseText = response.data;
+        let result403: any = null;
+        let resultData403  = _responseText;
+        result403 = Types.initProblemDetails(resultData403);
+        return throwException("Only clients and employees may list credits", status, _responseText, _headers, result403);
 
     } else if (status !== 200 && status !== 204) {
         const _responseText = response.data;
@@ -222,6 +236,272 @@ function processCreditsGET(response: AxiosResponse): Promise<Types.CreditDetailR
         return throwException("An unexpected server error occurred.", status, _responseText, _headers);
     }
     return Promise.resolve<Types.CreditDetailResponse>(null as any);
+}
+
+/**
+ * List overdue schedule entries for a client (employees and internal calls only)
+ * @param clientId (optional) 
+ * @return OK
+ */
+export function overdue(clientId?: number | undefined, config?: AxiosRequestConfig | undefined): Promise<Types.OverduePaymentResponse[]> {
+    let url_ = getBaseUrl() + "/credits/overdue?";
+    if (clientId === null)
+        throw new Error("The parameter 'clientId' cannot be null.");
+    else if (clientId !== undefined)
+        url_ += "clientId=" + encodeURIComponent("" + clientId) + "&";
+      url_ = url_.replace(/[?&]$/, "");
+
+    let options_: AxiosRequestConfig = {
+        ..._requestConfigOverdue,
+        ...config,
+        method: "GET",
+        url: url_,
+        headers: {
+            ..._requestConfigOverdue?.headers,
+            "Accept": "application/json",
+            ...config?.headers,
+        }
+    };
+
+    return getAxios().request(options_).catch((_error: any) => {
+        if (isAxiosError(_error) && _error.response) {
+            return _error.response;
+        } else {
+            throw _error;
+        }
+    }).then((_response: AxiosResponse) => {
+        return processOverdue(_response);
+    });
+}
+
+function processOverdue(response: AxiosResponse): Promise<Types.OverduePaymentResponse[]> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && typeof response.headers === "object") {
+        for (let k in response.headers) {
+            if (response.headers.hasOwnProperty(k)) {
+                _headers[k] = response.headers[k];
+            }
+        }
+    }
+    if (status === 200) {
+        const _responseText = response.data;
+        let result200: any = null;
+        let resultData200  = _responseText;
+        if (Array.isArray(resultData200)) {
+              result200 = resultData200.map(item => 
+                Types.initOverduePaymentResponse(item)
+              );
+            }
+        return Promise.resolve<Types.OverduePaymentResponse[]>(result200);
+
+    } else if (status === 403) {
+        const _responseText = response.data;
+        let result403: any = null;
+        let resultData403  = _responseText;
+        result403 = Types.initProblemDetails(resultData403);
+        return throwException("Forbidden", status, _responseText, _headers, result403);
+
+    } else if (status !== 200 && status !== 204) {
+        const _responseText = response.data;
+        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+    }
+    return Promise.resolve<Types.OverduePaymentResponse[]>(null as any);
+}
+
+/**
+ * List overdue schedule entries for the authenticated client
+ * @return OK
+ */
+export function meAll(config?: AxiosRequestConfig | undefined): Promise<Types.OverduePaymentResponse[]> {
+    let url_ = getBaseUrl() + "/credits/overdue/me";
+      url_ = url_.replace(/[?&]$/, "");
+
+    let options_: AxiosRequestConfig = {
+        ..._requestConfigMeAll,
+        ...config,
+        method: "GET",
+        url: url_,
+        headers: {
+            ..._requestConfigMeAll?.headers,
+            "Accept": "application/json",
+            ...config?.headers,
+        }
+    };
+
+    return getAxios().request(options_).catch((_error: any) => {
+        if (isAxiosError(_error) && _error.response) {
+            return _error.response;
+        } else {
+            throw _error;
+        }
+    }).then((_response: AxiosResponse) => {
+        return processMeAll(_response);
+    });
+}
+
+function processMeAll(response: AxiosResponse): Promise<Types.OverduePaymentResponse[]> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && typeof response.headers === "object") {
+        for (let k in response.headers) {
+            if (response.headers.hasOwnProperty(k)) {
+                _headers[k] = response.headers[k];
+            }
+        }
+    }
+    if (status === 200) {
+        const _responseText = response.data;
+        let result200: any = null;
+        let resultData200  = _responseText;
+        if (Array.isArray(resultData200)) {
+              result200 = resultData200.map(item => 
+                Types.initOverduePaymentResponse(item)
+              );
+            }
+        return Promise.resolve<Types.OverduePaymentResponse[]>(result200);
+
+    } else if (status === 403) {
+        const _responseText = response.data;
+        let result403: any = null;
+        let resultData403  = _responseText;
+        result403 = Types.initProblemDetails(resultData403);
+        return throwException("Forbidden", status, _responseText, _headers, result403);
+
+    } else if (status !== 200 && status !== 204) {
+        const _responseText = response.data;
+        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+    }
+    return Promise.resolve<Types.OverduePaymentResponse[]>(null as any);
+}
+
+/**
+ * Credit rating for a client (employees and internal calls only)
+ * @param clientId (optional) 
+ * @return OK
+ */
+export function rating(clientId?: number | undefined, config?: AxiosRequestConfig | undefined): Promise<Types.CreditRatingResponse> {
+    let url_ = getBaseUrl() + "/credits/rating?";
+    if (clientId === null)
+        throw new Error("The parameter 'clientId' cannot be null.");
+    else if (clientId !== undefined)
+        url_ += "clientId=" + encodeURIComponent("" + clientId) + "&";
+      url_ = url_.replace(/[?&]$/, "");
+
+    let options_: AxiosRequestConfig = {
+        ..._requestConfigRating,
+        ...config,
+        method: "GET",
+        url: url_,
+        headers: {
+            ..._requestConfigRating?.headers,
+            "Accept": "application/json",
+            ...config?.headers,
+        }
+    };
+
+    return getAxios().request(options_).catch((_error: any) => {
+        if (isAxiosError(_error) && _error.response) {
+            return _error.response;
+        } else {
+            throw _error;
+        }
+    }).then((_response: AxiosResponse) => {
+        return processRating(_response);
+    });
+}
+
+function processRating(response: AxiosResponse): Promise<Types.CreditRatingResponse> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && typeof response.headers === "object") {
+        for (let k in response.headers) {
+            if (response.headers.hasOwnProperty(k)) {
+                _headers[k] = response.headers[k];
+            }
+        }
+    }
+    if (status === 200) {
+        const _responseText = response.data;
+        let result200: any = null;
+        let resultData200  = _responseText;
+        result200 = Types.initCreditRatingResponse(resultData200);
+        return Promise.resolve<Types.CreditRatingResponse>(result200);
+
+    } else if (status === 403) {
+        const _responseText = response.data;
+        let result403: any = null;
+        let resultData403  = _responseText;
+        result403 = Types.initProblemDetails(resultData403);
+        return throwException("Forbidden", status, _responseText, _headers, result403);
+
+    } else if (status !== 200 && status !== 204) {
+        const _responseText = response.data;
+        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+    }
+    return Promise.resolve<Types.CreditRatingResponse>(null as any);
+}
+
+/**
+ * Credit rating for the authenticated client
+ * @return OK
+ */
+export function me(config?: AxiosRequestConfig | undefined): Promise<Types.CreditRatingResponse> {
+    let url_ = getBaseUrl() + "/credits/rating/me";
+      url_ = url_.replace(/[?&]$/, "");
+
+    let options_: AxiosRequestConfig = {
+        ..._requestConfigMe,
+        ...config,
+        method: "GET",
+        url: url_,
+        headers: {
+            ..._requestConfigMe?.headers,
+            "Accept": "application/json",
+            ...config?.headers,
+        }
+    };
+
+    return getAxios().request(options_).catch((_error: any) => {
+        if (isAxiosError(_error) && _error.response) {
+            return _error.response;
+        } else {
+            throw _error;
+        }
+    }).then((_response: AxiosResponse) => {
+        return processMe(_response);
+    });
+}
+
+function processMe(response: AxiosResponse): Promise<Types.CreditRatingResponse> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && typeof response.headers === "object") {
+        for (let k in response.headers) {
+            if (response.headers.hasOwnProperty(k)) {
+                _headers[k] = response.headers[k];
+            }
+        }
+    }
+    if (status === 200) {
+        const _responseText = response.data;
+        let result200: any = null;
+        let resultData200  = _responseText;
+        result200 = Types.initCreditRatingResponse(resultData200);
+        return Promise.resolve<Types.CreditRatingResponse>(result200);
+
+    } else if (status === 403) {
+        const _responseText = response.data;
+        let result403: any = null;
+        let resultData403  = _responseText;
+        result403 = Types.initProblemDetails(resultData403);
+        return throwException("Forbidden", status, _responseText, _headers, result403);
+
+    } else if (status !== 200 && status !== 204) {
+        const _responseText = response.data;
+        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+    }
+    return Promise.resolve<Types.CreditRatingResponse>(null as any);
 }
 
 /**
@@ -423,6 +703,13 @@ function processTariffs(response: AxiosResponse): Promise<Types.TariffResponse> 
         result400 = Types.initProblemDetails(resultData400);
         return throwException("Validation error", status, _responseText, _headers, result400);
 
+    } else if (status === 403) {
+        const _responseText = response.data;
+        let result403: any = null;
+        let resultData403  = _responseText;
+        result403 = Types.initProblemDetails(resultData403);
+        return throwException("Only employees may create tariffs", status, _responseText, _headers, result403);
+
     } else if (status !== 200 && status !== 204) {
         const _responseText = response.data;
         return throwException("An unexpected server error occurred.", status, _responseText, _headers);
@@ -460,6 +747,50 @@ export function setCreditsGETRequestConfig(value: Partial<AxiosRequestConfig>) {
 }
 export function patchCreditsGETRequestConfig(patch: (value: Partial<AxiosRequestConfig>) => Partial<AxiosRequestConfig>) {
   _requestConfigCreditsGET = patch(_requestConfigCreditsGET ?? {});
+}
+
+let _requestConfigOverdue: Partial<AxiosRequestConfig> | null;
+export function getOverdueRequestConfig() {
+  return _requestConfigOverdue;
+}
+export function setOverdueRequestConfig(value: Partial<AxiosRequestConfig>) {
+  _requestConfigOverdue = value;
+}
+export function patchOverdueRequestConfig(patch: (value: Partial<AxiosRequestConfig>) => Partial<AxiosRequestConfig>) {
+  _requestConfigOverdue = patch(_requestConfigOverdue ?? {});
+}
+
+let _requestConfigMeAll: Partial<AxiosRequestConfig> | null;
+export function getMeAllRequestConfig() {
+  return _requestConfigMeAll;
+}
+export function setMeAllRequestConfig(value: Partial<AxiosRequestConfig>) {
+  _requestConfigMeAll = value;
+}
+export function patchMeAllRequestConfig(patch: (value: Partial<AxiosRequestConfig>) => Partial<AxiosRequestConfig>) {
+  _requestConfigMeAll = patch(_requestConfigMeAll ?? {});
+}
+
+let _requestConfigRating: Partial<AxiosRequestConfig> | null;
+export function getRatingRequestConfig() {
+  return _requestConfigRating;
+}
+export function setRatingRequestConfig(value: Partial<AxiosRequestConfig>) {
+  _requestConfigRating = value;
+}
+export function patchRatingRequestConfig(patch: (value: Partial<AxiosRequestConfig>) => Partial<AxiosRequestConfig>) {
+  _requestConfigRating = patch(_requestConfigRating ?? {});
+}
+
+let _requestConfigMe: Partial<AxiosRequestConfig> | null;
+export function getMeRequestConfig() {
+  return _requestConfigMe;
+}
+export function setMeRequestConfig(value: Partial<AxiosRequestConfig>) {
+  _requestConfigMe = value;
+}
+export function patchMeRequestConfig(patch: (value: Partial<AxiosRequestConfig>) => Partial<AxiosRequestConfig>) {
+  _requestConfigMe = patch(_requestConfigMe ?? {});
 }
 
 let _requestConfigRepay: Partial<AxiosRequestConfig> | null;

@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import styles from "./EntityCard.module.scss";
 import { useNavigate } from "react-router-dom";
+import clsx from "clsx";
 
 interface EntityCardProps {
   leftSide: ReactNode;
@@ -14,7 +15,7 @@ export function EntityCard({ leftSide, rightSide, link }: EntityCardProps) {
   return (
     <div className={styles.container}>
       <div
-        className={styles.leftWrapper}
+        className={clsx(styles.leftWrapper, link && styles.clickable)}
         onClick={() => {
           if (link) navigate(link);
         }}

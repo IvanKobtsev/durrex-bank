@@ -1,30 +1,26 @@
 import styles from "./TariffCreationPage.module.scss";
 import { useNavigate } from "react-router-dom";
-import { useUsersPOSTMutation } from "services/user-api/user-api-client/Query.ts";
 import { toast } from "react-toastify";
 import { AppLinks } from "application/constants/appLinks.ts";
-import {
-  CreateUserRequest,
-  CreateUserRequestRole,
-} from "services/user-api/user-api-client.types.ts";
 import { useAdvancedForm } from "helpers/form/useAdvancedForm.ts";
 import { FormError } from "components/uikit/FormError.tsx";
 import { Input } from "components/uikit/inputs/Input.tsx";
 import {
   registerNumber,
-  registerPassword,
+  registerPercentage,
   registerString,
 } from "helpers/form/register-helpers.ts";
 import { Button } from "components/uikit/buttons/Button.tsx";
 import React from "react";
 import { CreateTariffRequest } from "services/credit-api/credit-api-client.types.ts";
 import { useTariffsMutation } from "services/credit-api/credit-api-client/Query.ts";
+import { Loading } from "components/uikit/suspense/Loading";
 
 export function TariffCreationPage() {
   const navigate = useNavigate();
   const createTariffMutation = useTariffsMutation({
     onError: () => {
-      toast.error("Ошибка при создании тарифа.");
+      toast.error("Не удалось создать тариф.");
     },
     onSuccess: () => {
       toast.success("Тариф успешно создан.");
@@ -41,27 +37,29 @@ export function TariffCreationPage() {
 
   return (
     <div className={styles.wrapper}>
-      <div className={styles.header}>Создание тарифа</div>
-      <FormError>{form.overallError}</FormError>
+      <Loading loading={createTariffMutation.isPending}>
+        <div className={styles.header}>Создание тарифа</div>
+        <FormError>{form.overallError}</FormError>
 
-      <form className={styles.form} onSubmit={form.handleSubmitDefault}>
-        <Input
-          {...registerString(form, "name", { required: true })}
-          fieldProps={{ title: "Название тарифа" }}
-        />
+        <form className={styles.form} onSubmit={form.handleSubmitDefault}>
+          <Input
+            {...registerString(form, "name", { required: true })}
+            fieldProps={{ title: "Название тарифа" }}
+          />
 
-        <Input
-          {...registerNumber(form, "interestRate", "currency")}
-          fieldProps={{ title: "Процентная ставка (процентов)" }}
-        />
+          <Input
+            {...registerPercentage(form, "interestRate")}
+            fieldProps={{ title: "Процентная ставка (процентов)" }}
+          />
 
-        <Input
-          {...registerNumber(form, "termMonths", "int")}
-          fieldProps={{ title: "Срок кредита (месяцев)" }}
-        />
+          <Input
+            {...registerNumber(form, "termMonths", "int")}
+            fieldProps={{ title: "Срок кредита (месяцев)" }}
+          />
 
-        <Button type="submit" title="Создать тариф" />
-      </form>
+          <Button type="submit" title="Создать тариф" />
+        </form>
+      </Loading>
     </div>
   );
 }

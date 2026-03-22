@@ -10,6 +10,7 @@ fun UserResponse.toUser() = User(
     email = email,
     telephoneNumber = telephoneNumber,
     role = role,
-    isBlocked = isBlocked
+    isBlocked = isBlocked,
+    rating = rating
 )
 

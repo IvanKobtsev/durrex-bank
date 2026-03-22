@@ -36,5 +36,6 @@ internal static class AccountHelper
     internal static TransactionResponse MapTransaction(Transaction t) => new(
         t.Id, t.AccountId, t.Type, t.Amount,
         t.BalanceBefore, t.BalanceAfter,
-        t.RelatedAccountId, t.Description, t.CreatedAt);
+        t.RelatedAccountId, t.Description, t.CreatedAt,
+        t.ExchangeRate, t.SourceCurrency);
 }

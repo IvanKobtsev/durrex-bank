@@ -113,6 +113,10 @@ export function initPersister() {
   
   addResultTypeFactory('Client___creditsAll', (data: any) => Types.initCreditResponse(data));
   addResultTypeFactory('Client___creditsGET', (data: any) => Types.initCreditDetailResponse(data));
+  addResultTypeFactory('Client___overdue', (data: any) => Types.initOverduePaymentResponse(data));
+  addResultTypeFactory('Client___meAll', (data: any) => Types.initOverduePaymentResponse(data));
+  addResultTypeFactory('Client___rating', (data: any) => Types.initCreditRatingResponse(data));
+  addResultTypeFactory('Client___me', (data: any) => Types.initCreditRatingResponse(data));
   addResultTypeFactory('Client___tariffsAll', (data: any) => Types.initTariffResponse(data));
 
 

@@ -82,8 +82,8 @@ fun Headline(
 @Composable
 fun Headline2(
     text: String,
-    color: Color,
     modifier: Modifier = Modifier,
+    color: Color = LocalAppColors.current.fontPrimary,
 ) {
     Text(
         text = text,

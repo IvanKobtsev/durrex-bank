@@ -7,6 +7,7 @@ import nekit.corporation.loan_shared.domain.model.Deposit
 import nekit.corporation.loan_shared.domain.model.PagedTransactions
 import nekit.corporation.loan_shared.domain.model.Transaction
 import nekit.corporation.loan_shared.domain.model.TransactionTypeDomain
+import nekit.corporation.loan_shared.domain.model.Transfer
 import nekit.corporation.loan_shared.domain.model.Withdraw
 
 
@@ -18,6 +19,13 @@ fun Deposit.toDepositRequest() =
 
 fun Debit.toDebitRequest() =
     DebitRequest(
+        amount = amount,
+        description = description
+    )
+
+fun Transfer.toTransferRequest() =
+    TransferRequest(
+        targetAccountId = targetAccountId,
         amount = amount,
         description = description
     )

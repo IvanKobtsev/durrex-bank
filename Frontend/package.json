@@ -8,14 +8,16 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "generate-api-clients": "concurrently \"yarn generate-core-api-client-axios\" \"yarn generate-credit-api-client-axios\" \"yarn generate-user-api-client-axios\"",
+    "generate-api-clients": "concurrently \"yarn generate-core-api-client-axios\" \"yarn generate-credit-api-client-axios\" \"yarn generate-user-api-client-axios\" \"yarn generate-web-app-settings-api-client-axios\"",
     "generate-core-api-client-axios": "react-query-swagger openapi2tsclient /tanstack /input:http://localhost:5260/core/openapi/v1.json /output:src/services/core-api/core-api-client.ts /template:Axios /serviceHost:. /minimal",
     "generate-credit-api-client-axios": "react-query-swagger openapi2tsclient /tanstack /input:http://localhost:5260/credit/swagger/v1/swagger.json /output:src/services/credit-api/credit-api-client.ts /template:Axios /serviceHost:. /minimal",
-    "generate-user-api-client-axios": "react-query-swagger openapi2tsclient /tanstack /input:http://localhost:5260/user/swagger/v1/swagger.json /output:src/services/user-api/user-api-client.ts /template:Axios /serviceHost:. /minimal"
+    "generate-user-api-client-axios": "react-query-swagger openapi2tsclient /tanstack /input:http://localhost:5260/user/swagger/v1/swagger.json /output:src/services/user-api/user-api-client.ts /template:Axios /serviceHost:. /minimal",
+    "generate-web-app-settings-api-client-axios": "react-query-swagger openapi2tsclient /tanstack /input:http://localhost:5260/web-app-settings/openapi/v1.json /output:src/services/web-app-settings-api/web-app-settings-api-client.ts /template:Axios /serviceHost:. /minimal"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
+    "@microsoft/signalr": "^10.0.0",
     "@mui/material": "^7.3.8",
     "@mui/styles": "^6.4.8",
     "@tanstack/react-query": "^5.90.21",

@@ -48,6 +48,20 @@ export function registerNumber<T extends FieldValues>(
   };
 }
 
+export function registerPercentage<T extends FieldValues>(
+  form: UseFormReturn<T>,
+  name: Path<T>,
+) {
+  return {
+    ...registerBase(form, name, {
+      ...requiredRule(),
+      ...numberField("percentage"),
+    }),
+    type: "number",
+    step: "0.1",
+  };
+}
+
 export function registerString<T extends FieldValues>(
   form: UseFormReturn<T>,
   name: Path<T>,

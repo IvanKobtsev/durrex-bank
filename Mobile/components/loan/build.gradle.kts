@@ -1,23 +1,16 @@
 plugins {
-    common.library
+    id("android-library-convention")
     `kotlinx-serialization`
-    alias(stack.plugins.anvil)
-    alias(stack.plugins.kotlin.ksp)
+    alias(stack.plugins.metro)
 }
 
 android {
     namespace = "nekit.corporation.loan"
-
 }
 
 dependencies {
     api(stack.retrofit)
-    ksp(stack.anvil.utils.compiler)
     implementation(stack.kotlinx.serialization.json)
     implementation(project(":core:common"))
     implementation(project(":core:util"))
-}
-anvil {
-    useKsp(contributesAndFactoryGeneration = true)
-    generateDaggerFactories = true
 }

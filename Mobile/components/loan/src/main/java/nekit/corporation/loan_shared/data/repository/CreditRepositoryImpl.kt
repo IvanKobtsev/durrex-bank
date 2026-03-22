@@ -1,14 +1,18 @@
 package nekit.corporation.loan_shared.data.repository
 
+import dev.zacsweers.metro.AppScope
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.Inject
 import nekit.corporation.loan_shared.data.datasource.remote.api.LoanApi
 import nekit.corporation.loan_shared.data.datasource.remote.model.IssueCreditRequest
 import nekit.corporation.loan_shared.data.datasource.remote.model.toDomain
 import nekit.corporation.loan_shared.domain.model.Credit
 import nekit.corporation.loan_shared.domain.model.CreditDetail
 import nekit.corporation.loan_shared.domain.repository.CreditRepository
-import javax.inject.Inject
 
-class CreditRepositoryImpl @Inject constructor(
+@Inject
+@ContributesBinding(AppScope::class)
+class CreditRepositoryImpl(
     private val api: LoanApi
 ) : CreditRepository {
 

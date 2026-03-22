@@ -11,18 +11,20 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { AppLinks } from "application/constants/appLinks.ts";
 import { useAdvancedForm } from "helpers/form/useAdvancedForm.ts";
+import { Loading } from "../../components/uikit/suspense/Loading.tsx";
 
 export function LoginPage() {
   const navigate = useNavigate();
   const loginMutation = useLoginMutation({
     onError: () => {
-      toast.error("Ошибка при входе. Проверьте правильность введенных данных.");
+      toast.error("Не удалось войти. Проверьте правильность введенных данных.");
     },
     onSuccess: (data) => {
       localStorage.setItem("access_token", data.token ?? "");
       navigate(AppLinks.Dashboard.link());
     },
   });
+
   const onSubmit = async (data: LoginRequest) => {
     await loginMutation.mutateAsync(data);
   };
@@ -31,18 +33,20 @@ export function LoginPage() {
 
   return (
     <div className={styles.wrapper}>
-      <div className={styles.header}>Кабинет сотрудника</div>
-      <form className={styles.form} onSubmit={form.handleSubmitDefault}>
-        <Input
-          {...registerString(form, "username")}
-          fieldProps={{ title: "Имя пользователя" }}
-        />
-        <Input
-          {...registerPassword(form, "password")}
-          fieldProps={{ title: "Пароль" }}
-        />
-        <Button type="submit" title={"Войти"} />
-      </form>
+      <Loading loading={loginMutation.isPending}>
+        <div className={styles.header}>Кабинет сотрудника</div>
+        <form className={styles.form} onSubmit={form.handleSubmitDefault}>
+          <Input
+            {...registerString(form, "username")}
+            fieldProps={{ title: "Имя пользователя" }}
+          />
+          <Input
+            {...registerPassword(form, "password")}
+            fieldProps={{ title: "Пароль" }}
+          />
+          <Button type="submit" title={"Войти"} />
+        </form>
+      </Loading>
     </div>
   );
 }

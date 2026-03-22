@@ -10,6 +10,7 @@ import { toast } from "react-toastify";
 import { queryClient } from "services/query-client-helper.ts";
 import { AppLinks } from "application/constants/appLinks.ts";
 import { EntityCard } from "components/EntityCard/EntityCard.tsx";
+import { Loading } from "components/uikit/suspense/Loading.tsx";
 
 export interface UserCardProps {
   user: UserResponse;
@@ -19,7 +20,7 @@ export interface UserCardProps {
 export function UserCard({ user, type = "management" }: UserCardProps) {
   const blockUserMutation = useBlockMutation(user.id!, {
     onError: () => {
-      toast.error("Ошибка при блокировке пользователя.");
+      toast.error("Не удалось заблокировать пользователя.");
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({
@@ -29,7 +30,7 @@ export function UserCard({ user, type = "management" }: UserCardProps) {
   });
   const unblockUserMutation = useUnblockMutation(user.id!, {
     onError: () => {
-      toast.error("Ошибка при разблокировке пользователя.");
+      toast.error("Не удалось разблокировать пользователя.");
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({
@@ -38,24 +39,30 @@ export function UserCard({ user, type = "management" }: UserCardProps) {
     },
   });
 
+  const isPending =
+    blockUserMutation.isPending || unblockUserMutation.isPending;
+
   return (
     <EntityCard
       leftSide={`${user.firstName} ${user.lastName} (${user.username}) — ${type === "management" ? translateRole(user.role) : type === "creditor" ? "Кредитор" : "Владелец"}`}
       rightSide={
-        type === "management" &&
-        (user.isBlocked ? (
-          <Button
-            className={styles.redButton}
-            title={"Разблокировать"}
-            onClick={() => unblockUserMutation.mutateAsync()}
-          />
-        ) : (
-          <Button
-            className={styles.redButton}
-            title={"Заблокировать"}
-            onClick={() => blockUserMutation.mutateAsync()}
-          />
-        ))
+        type === "management" && (
+          <Loading loading={isPending}>
+            {user.isBlocked ? (
+              <Button
+                className={styles.redButton}
+                title={"Разблокировать"}
+                onClick={() => unblockUserMutation.mutateAsync()}
+              />
+            ) : (
+              <Button
+                className={styles.redButton}
+                title={"Заблокировать"}
+                onClick={() => blockUserMutation.mutateAsync()}
+              />
+            )}
+          </Loading>
+        )
       }
       link={AppLinks.UserDetails.link({ userId: user.id! })}
     />

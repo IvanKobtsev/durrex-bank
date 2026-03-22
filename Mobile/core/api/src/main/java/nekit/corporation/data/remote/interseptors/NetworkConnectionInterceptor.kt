@@ -6,7 +6,7 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import androidx.annotation.RequiresPermission
-import jakarta.inject.Inject
+import dev.zacsweers.metro.Inject
 import nekit.corporation.util.domain.common.NoConnectionFailure
 import okhttp3.Interceptor
 import okhttp3.Response

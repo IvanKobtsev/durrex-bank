@@ -1,5 +1,5 @@
 plugins {
-    common.library
+    id("android-library-convention")
     `kotlin-composecompiler`
 }
 
@@ -9,12 +9,12 @@ android {
     buildFeatures {
         compose = true
     }
+
 }
 
 dependencies {
     implementation(project(":core:util"))
     implementation(stack.gson)
-    implementation(stack.dagger)
     api(stack.androidx.lifecycle.viewmodel.ktx)
     api(stack.androidx.lifecycle.viewmodel.savedstate)
 

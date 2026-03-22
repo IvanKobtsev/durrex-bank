@@ -1,10 +1,15 @@
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using MyApp.CoreService.Enums;
+using MyApp.CoreService.Messaging.Messages;
 using MyApp.CreditService.Models;
 
 namespace MyApp.CreditService.Services;
 
 public class PaymentSchedulerService(
     IServiceScopeFactory scopeFactory,
+    IConfiguration config,
     ILogger<PaymentSchedulerService> logger
 ) : BackgroundService
 {
@@ -21,8 +26,9 @@ public class PaymentSchedulerService(
     {
         await using var scope = scopeFactory.CreateAsyncScope();
         var db = scope.ServiceProvider.GetRequiredService<CreditDbContext>();
-        var coreClient = scope.ServiceProvider.GetRequiredService<ICoreServiceClient>();
+        var publishEndpoint = scope.ServiceProvider.GetRequiredService<IPublishEndpoint>();
 
+        var masterAccountId = config.GetValue<int>("Bank:MasterAccountId");
         var now = DateTime.UtcNow;
         var dueEntries = await db
             .PaymentScheduleEntries.Where(e => !e.IsPaid && e.DueDate <= now)
@@ -34,12 +40,17 @@ public class PaymentSchedulerService(
         {
             try
             {
-                await coreClient.DebitAsync(
-                    entry.Credit.AccountId,
-                    entry.Amount,
-                    "Scheduled payment",
-                    ct
-                );
+                await publishEndpoint.Publish(
+                    new TransactionRequested(
+                        MessageId: Guid.NewGuid(),
+                        AccountId: entry.Credit.AccountId,
+                        Type: TransactionType.CreditRepayment,
+                        Amount: entry.Amount,
+                        RelatedAccountId: masterAccountId,
+                        Description: "Scheduled payment",
+                        RequestedByUserId: null
+                    ),
+                    ct);
 
                 entry.IsPaid = true;
                 entry.PaidAt = now;

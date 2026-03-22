@@ -19,6 +19,7 @@
     width: 100%;
     height: 100%;
     inset: 0;
+    background-color: #2d4547;
     background-image: url("/src/assets/images/login-background-image.png");
     background-size: cover;
     z-index: -1;
@@ -50,6 +51,7 @@
 
 html[class="light"] {
   .wrapper::after {
+    background-color: #fff;
     background-image: url("/src/assets/images/background-image.png");
     opacity: 0.2;
   }

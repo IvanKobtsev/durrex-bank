@@ -7,6 +7,7 @@ public interface ICurrentUserContext
     int? UserId { get; }
     CallerRole Role { get; }
     bool IsClient   => Role == CallerRole.Client;
+    bool IsEmployee => Role == CallerRole.Employee;
     bool IsInternal => Role == CallerRole.Internal;
 }
 

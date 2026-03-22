@@ -1,12 +1,24 @@
+using MassTransit;
 using MediatR;
+using Microsoft.Extensions.Configuration;
+using MyApp.CoreService.Enums;
+using MyApp.CoreService.Messaging.Messages;
+using MyApp.CreditService.Auth;
 using MyApp.CreditService.DTOs.Credits;
 using MyApp.CreditService.Models;
 
-public class IssueCreditHandler(CreditDbContext db, ICoreServiceClient coreClient)
-    : IRequestHandler<IssueCreditCommand, CreditResponse>
+public class IssueCreditHandler(
+    CreditDbContext db,
+    IPublishEndpoint publishEndpoint,
+    IConfiguration config,
+    ICurrentUserContext user
+) : IRequestHandler<IssueCreditCommand, CreditResponse>
 {
     public async Task<CreditResponse> Handle(IssueCreditCommand request, CancellationToken ct)
     {
+        if (user.IsClient && request.ClientId != user.UserId)
+            throw new UnauthorizedAccessException("Clients can only issue credits for themselves.");
+
         var tariff =
             await db.Tariffs.FindAsync([request.TariffId], ct)
             ?? throw new KeyNotFoundException($"Tariff {request.TariffId} not found.");
@@ -41,9 +53,22 @@ public class IssueCreditHandler(CreditDbContext db, ICoreServiceClient coreClien
         };
 
         db.Credits.Add(credit);
-        await db.SaveChangesAsync(ct);
 
-        await coreClient.DepositAsync(request.AccountId, request.Amount, "Credit issuance", ct);
+        var masterAccountId = config.GetValue<int>("Bank:MasterAccountId");
+
+        await publishEndpoint.Publish(
+            new TransactionRequested(
+                MessageId: Guid.NewGuid(),
+                AccountId: masterAccountId,
+                Type: TransactionType.Transfer,
+                Amount: request.Amount,
+                RelatedAccountId: request.AccountId,
+                Description: "Credit issuance",
+                RequestedByUserId: null
+            ),
+            ct);
+
+        await db.SaveChangesAsync(ct);
 
         return new CreditResponse(
             credit.Id,

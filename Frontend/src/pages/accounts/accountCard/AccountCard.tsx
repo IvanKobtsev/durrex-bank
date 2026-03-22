@@ -16,7 +16,7 @@ export function AccountCard({ account }: { account: AccountResponse }) {
     onError: (error: any) => {
       if (error?.error === "Cannot close account with positive balance.")
         toast.error("Невозможно закрыть счёт с положительным балансом.");
-      else toast.error("Ошибка при закрытии счёта.");
+      else toast.error("Не удалось закрыть счёт.");
     },
     onSuccess: async () => {
       toast.error("Счёт успешно закрыт.");

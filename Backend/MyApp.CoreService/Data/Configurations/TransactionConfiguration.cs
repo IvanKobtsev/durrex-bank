@@ -47,6 +47,14 @@ public class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
             .HasColumnName("description")
             .HasMaxLength(500);
 
+        builder.Property(t => t.ExchangeRate)
+            .HasColumnName("exchange_rate")
+            .HasColumnType("decimal(18,6)");
+
+        builder.Property(t => t.SourceCurrency)
+            .HasColumnName("source_currency")
+            .HasMaxLength(3);
+
         builder.Property(t => t.CreatedAt)
             .HasColumnName("created_at")
             .IsRequired();

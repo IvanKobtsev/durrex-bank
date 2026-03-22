@@ -9,4 +9,8 @@
 
     <string name="tariff">Тариф: </string>
     <string name="account">Счет: </string>
+
+    <string name="account_number">Номер счета</string>
+    <string name="balance">Баланс</string>
+
 </resources>

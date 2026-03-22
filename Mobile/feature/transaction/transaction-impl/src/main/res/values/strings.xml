@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="account_not_found_exception">Аккаунт с таким id не найден</string>
+    <string name="transfer">Перевести</string>
+    <string name="description">Описание</string>
+    <string name="description_enter">Введите описание</string>
+    <string name="transfer_to">Кому хотите отправить деньги?</string>
+
+    <string name="first_name">Имя</string>
+    <string name="second_name">Фамилия</string>
+    <string name="phone">Номер телефона</string>
+
+</resources>

@@ -11,7 +11,6 @@ data class ProblemDetails(
     val instance: String? = null,
     val extensions: Map<String, kotlinx.serialization.json.JsonElement> = emptyMap()
 ) {
-    @Serializable
     companion object {
         private val json = kotlinx.serialization.json.Json { ignoreUnknownKeys = true }
         fun fromJsonString(jsonString: String): ProblemDetails = json.decodeFromString(jsonString)

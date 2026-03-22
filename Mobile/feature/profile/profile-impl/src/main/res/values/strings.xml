@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="change_scheme_error">К сожалению, не удалось сохраненить изменения темы</string>
+    <string name="change_language_error">К сожалению, не удалось сохраненить изменения языка</string>
+    <string name="no_connection">Проблемы с соединением</string>
+    <string name="something_went_wrong">Что-то пошло не так</string>
+    <string name="first_name">Имя</string>
+    <string name="last_name">Фамилия</string>
+    <string name="email">Почта</string>
+    <string name="phone">Телефон</string>
+    <string name="status">Статус</string>
+    <string name="blocked">Заблокирован</string>
+    <string name="unblocked">Не заблокирован</string>
+    <string name="credit_rating">Кредитный рейтинг</string>
+    <string name="selected_language">Выбранный язык:</string>
+    <string name="selected_theme">Выбранная тема:</string>
+</resources>

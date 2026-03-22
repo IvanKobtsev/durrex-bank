@@ -158,17 +158,21 @@ public class AccountsController : ControllerBase
             var denied = EnforceClientOwnership(account.OwnerId);
             if (denied is not null) return denied;
         }
-        var (source, _) = await _mediator.Send(new TransferCommand(id, req.TargetAccountId, req.Amount, req.Description), ct);
-        return Ok(source);
+        var tx = await _mediator.Send(new TransferCommand(id, req.TargetAccountId, req.Amount, req.Description), ct);
+        return Ok(tx);
     }
 
     // POST /api/accounts/{id}/debit  — internal, called by CreditService only
     [HttpPost("{id:int}/debit")]
     [ProducesResponseType<TransactionResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Debit(int id, [FromBody] DebitRequest req, CancellationToken ct)
     {
+        if (!_user.IsInternal)
+            return StatusCode(StatusCodes.Status403Forbidden);
+
         var tx = await _mediator.Send(new DebitCommand(id, req.Amount, req.Description), ct);
         return Ok(tx);
     }

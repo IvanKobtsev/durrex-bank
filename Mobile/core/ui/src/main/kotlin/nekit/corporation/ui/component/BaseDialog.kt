@@ -9,7 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.tooling.preview.Preview
-import nekit.corporation.ui.theme.LoansAppTheme
+import nekit.corporation.ui.theme.DurexBankTheme
 import nekit.corporation.ui.theme.LocalAppColors
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -46,7 +46,7 @@ fun BaseDialog(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun PreviewBaseDialog() {
-    LoansAppTheme {
+    DurexBankTheme {
         Box(Modifier.fillMaxSize()) {
             BaseDialog(
                 text = "Вы уверены, что хотите выйти?",

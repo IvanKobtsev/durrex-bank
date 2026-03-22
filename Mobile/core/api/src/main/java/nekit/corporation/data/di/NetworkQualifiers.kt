@@ -1,6 +1,6 @@
 package nekit.corporation.data.di
 
-import javax.inject.Qualifier
+import dev.zacsweers.metro.Qualifier
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
@@ -17,3 +17,7 @@ internal annotation class AuthRetrofit
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 internal annotation class DefaultRetrofit
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+internal annotation class MainServerUrl

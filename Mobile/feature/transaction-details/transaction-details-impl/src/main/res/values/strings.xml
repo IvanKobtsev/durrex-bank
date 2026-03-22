@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="transaction">Транзакция</string>
+    <string name="id">Id</string>
+    <string name="type">Тип</string>
+    <string name="amount">Количество</string>
+    <string name="balanceBefore">Баланс после</string>
+    <string name="balanceAfter">Баланс до</string>
+    <string name="description">Описание</string>
+
+
+    <string name="not_found_error">Не найдено такой займ,что то пошло не так</string>
+    <string name="strange_error">Произошла ошибка, но фиксики уже пшли ее чинить</string>
+    <string name="no_connections_error">Бип буп бип, проблемы с соедиением</string>
+</resources>

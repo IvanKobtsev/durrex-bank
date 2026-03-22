@@ -1,14 +1,13 @@
 package nekit.corporation.data.remote.interseptors
 
 import android.util.Log
+import dev.zacsweers.metro.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import nekit.corporation.data.remote.Network.addAuthorizationHeader
 import nekit.corporation.auth.domain.repository.AuthRepository
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
-import javax.inject.Inject
 
 class AuthInterceptor @Inject constructor(
     private val repository: AuthRepository

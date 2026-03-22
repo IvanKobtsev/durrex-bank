@@ -17,12 +17,13 @@ import { useAdvancedForm } from "helpers/form/useAdvancedForm.ts";
 import { FormError } from "components/uikit/FormError.tsx";
 import { useNavigate } from "react-router-dom";
 import { AppLinks } from "application/constants/appLinks.ts";
+import { Loading } from "../../../components/uikit/suspense/Loading.tsx";
 
 export function UserCreationPage() {
   const navigate = useNavigate();
   const createUserMutation = useUsersPOSTMutation({
     onError: () => {
-      toast.error("Ошибка при создании пользователя.");
+      toast.error("Не удалось создать пользователя.");
     },
     onSuccess: () => {
       toast.success("Пользователь успешно создан.");
@@ -49,49 +50,51 @@ export function UserCreationPage() {
 
   return (
     <div className={styles.wrapper}>
-      <div className={styles.header}>Создание пользователя</div>
-      <FormError>{translateOverallError(form.overallError)}</FormError>
+      <Loading loading={createUserMutation.isPending}>
+        <div className={styles.header}>Создание пользователя</div>
+        <FormError>{translateOverallError(form.overallError)}</FormError>
 
-      <form className={styles.form} onSubmit={form.handleSubmitDefault}>
-        <Input
-          {...registerString(form, "email")}
-          fieldProps={{ title: "Email" }}
-        />
+        <form className={styles.form} onSubmit={form.handleSubmitDefault}>
+          <Input
+            {...registerString(form, "email")}
+            fieldProps={{ title: "Email" }}
+          />
 
-        <Input
-          {...registerString(form, "username")}
-          fieldProps={{ title: "Имя пользователя" }}
-        />
+          <Input
+            {...registerString(form, "username")}
+            fieldProps={{ title: "Имя пользователя" }}
+          />
 
-        <Input
-          {...registerPassword(form, "password")}
-          fieldProps={{ title: "Пароль" }}
-        />
+          <Input
+            {...registerPassword(form, "password")}
+            fieldProps={{ title: "Пароль" }}
+          />
 
-        <Input
-          {...registerString(form, "firstName")}
-          fieldProps={{ title: "Имя" }}
-        />
+          <Input
+            {...registerString(form, "firstName")}
+            fieldProps={{ title: "Имя" }}
+          />
 
-        <Input
-          {...registerString(form, "lastName")}
-          fieldProps={{ title: "Фамилия" }}
-        />
+          <Input
+            {...registerString(form, "lastName")}
+            fieldProps={{ title: "Фамилия" }}
+          />
 
-        <Input
-          {...registerString(form, "telephoneNumber")}
-          fieldProps={{ title: "Телефон" }}
-        />
+          <Input
+            {...registerString(form, "telephoneNumber")}
+            fieldProps={{ title: "Телефон" }}
+          />
 
-        <Field title={"Роль"}>
-          <select {...form.register("role")}>
-            <option value="Client">Клиент</option>
-            <option value="Employee">Сотрудник</option>
-          </select>
-        </Field>
+          <Field title={"Роль"}>
+            <select {...form.register("role")}>
+              <option value="Client">Клиент</option>
+              <option value="Employee">Сотрудник</option>
+            </select>
+          </Field>
 
-        <Button type="submit" title="Создать пользователя" />
-      </form>
+          <Button type="submit" title="Создать пользователя" />
+        </form>
+      </Loading>
     </div>
   );
 }

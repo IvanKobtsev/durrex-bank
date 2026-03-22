@@ -7,7 +7,7 @@ public class JwtForwardingMiddleware(RequestDelegate next)
     [
         "/auth/connect/",
         "/auth/.well-known/",
-        "/auth/account/",    // Login, Logout, SetPassword Razor pages
+        "/auth/account/", // Login, Logout, SetPassword Razor pages
     ];
 
     private static bool IsPublicPath(PathString path)
@@ -50,7 +50,7 @@ public class JwtForwardingMiddleware(RequestDelegate next)
             return;
         }
 
-        context.Request.Headers["X-User-Id"]    = userId;
+        context.Request.Headers["X-User-Id"] = userId;
         context.Request.Headers["X-User-Roles"] = string.Join(",", roles);
 
         await next(context);

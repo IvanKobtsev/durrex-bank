@@ -11,5 +11,6 @@ data class UserResponse(
     val email: String,
     val telephoneNumber: String,
     val role: UserRole,
-    val isBlocked: Boolean
+    val isBlocked: Boolean,
+    val rating: Float
 )

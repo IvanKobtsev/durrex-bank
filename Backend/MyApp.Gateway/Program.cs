@@ -34,8 +34,8 @@ builder.Services.AddAuthentication("Bearer")
         // AuthService discovery doc: {Authority}/.well-known/openid-configuration
         // JWKS fetched automatically, cached, and auto-rotated
         options.Authority = builder.Configuration["Oidc:Authority"];
-        options.RequireHttpsMetadata = false;   // HTTP allowed in dev; enforce HTTPS in production
-        options.MapInboundClaims = false;       // Keep short JWT claim names (sub, role) as-is
+        options.RequireHttpsMetadata = false; // HTTP allowed in dev; enforce HTTPS in production
+        options.MapInboundClaims = false; // Keep short JWT claim names (sub, role) as-is
 
         options.TokenValidationParameters = new TokenValidationParameters
         {
@@ -78,7 +78,7 @@ builder.Services.AddCors(options =>
             .WithOrigins("http://localhost:5173", "http://localhost:5174")
             .AllowAnyHeader()
             .AllowAnyMethod()
-            .AllowCredentials();   // Required for SignalR WebSocket from browser
+            .AllowCredentials(); // Required for SignalR WebSocket from browser
     });
 });
 
@@ -88,17 +88,18 @@ app.UseSwagger();
 
 app.UseSwaggerUI(options =>
 {
-    options.SwaggerEndpoint("/core/openapi/v1.json",           "CoreService API");
+    options.SwaggerEndpoint("/core/openapi/v1.json", "CoreService API");
     options.SwaggerEndpoint("/credit/swagger/v1/swagger.json", "CreditService API");
-    options.SwaggerEndpoint("/user/swagger/v1/swagger.json",   "UserService API");
-    options.SwaggerEndpoint("/settings/openapi/v1.json",       "SettingsService API");
+    options.SwaggerEndpoint("/user/swagger/v1/swagger.json", "UserService API");
+    options.SwaggerEndpoint("/settings/openapi/v1.json", "SettingsService API");
     options.RoutePrefix = "swagger";
 });
 
 app.UseCors("DevCors");
-app.UseAuthentication();   // validates JWT, populates HttpContext.User
+app.UseAuthentication(); // validates JWT, populates HttpContext.User
 app.UseAuthorization();
 app.UseMiddleware<JwtForwardingMiddleware>();
+app.UseWebSockets();
 app.MapReverseProxy();
 
 Console.WriteLine($"Environment: {builder.Environment.EnvironmentName}");

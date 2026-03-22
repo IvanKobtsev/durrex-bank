@@ -2,19 +2,10 @@ import styles from "./Header.module.scss";
 import { useNavigate } from "react-router-dom";
 import { AppLinks } from "application/constants/appLinks.ts";
 import { Button } from "components/uikit/buttons/Button.tsx";
-import { useState } from "react";
-import SunIcon from "assets/icons/Sun.svg?react";
-import MoonIcon from "assets/icons/Moon.svg?react";
+import { ThemeSwitcher } from "./ThemeSwitcher.tsx";
 
 export function Header() {
   const navigate = useNavigate();
-  const [isLightTheme, setIsLightTheme] = useState(
-    localStorage.getItem("theme") === "light",
-  );
-
-  if (isLightTheme) document.documentElement.classList.add("light");
-  else document.documentElement.classList.remove("light");
-  localStorage.setItem("theme", isLightTheme ? "light" : "dark");
 
   return (
     <div className={styles.header}>
@@ -25,12 +16,7 @@ export function Header() {
         Durrex Bank
       </span>
       <div className={styles.rightWrapper}>
-        <div
-          className={styles.themeSwitch}
-          onClick={() => setIsLightTheme((prev) => !prev)}
-        >
-          {isLightTheme ? <SunIcon /> : <MoonIcon />}
-        </div>
+        <ThemeSwitcher />
         <Button
           className={styles.logout}
           title={"Выйти"}

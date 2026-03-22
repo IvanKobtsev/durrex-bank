@@ -1,7 +1,7 @@
 plugins {
-    common.library
-    alias(stack.plugins.anvil)
+    id("android-library-convention")
     alias(stack.plugins.kotlin.ksp)
+    alias(stack.plugins.metro)
 }
 
 android {
@@ -10,11 +10,9 @@ android {
 
 dependencies {
     implementation(project(":core:architecture"))
-    api(stack.anvil.utils.annotations)
-    api(stack.dagger)
-    api(stack.anvil.annotations)
-}
-anvil {
-    useKsp(contributesAndFactoryGeneration = true)
-    generateDaggerFactories = true
+    implementation("androidx.core:core-ktx:1.18.0")
+    api(stack.metro.android)
+    api(stack.metro.viewmodel)
+    api(stack.metro.viewmodel.compose)
+    api(stack.androidx.fragment.ktx)
 }

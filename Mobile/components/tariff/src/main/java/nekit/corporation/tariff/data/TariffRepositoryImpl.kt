@@ -1,13 +1,17 @@
 package nekit.corporation.tariff.data
 
+import dev.zacsweers.metro.AppScope
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.Inject
 import nekit.corporation.tariff.data.remote.TariffApi
 import nekit.corporation.tariff.data.remote.model.CreateTariffRequest
 import nekit.corporation.tariff.data.remote.model.toDomain
 import nekit.corporation.tariff.domain.TariffRepository
 import nekit.corporation.tariff.domain.model.Tariff
-import javax.inject.Inject
 
-class TariffRepositoryImpl @Inject constructor(
+@Inject
+@ContributesBinding(AppScope::class)
+class TariffRepositoryImpl(
     private val api: TariffApi
 ) : TariffRepository {
 

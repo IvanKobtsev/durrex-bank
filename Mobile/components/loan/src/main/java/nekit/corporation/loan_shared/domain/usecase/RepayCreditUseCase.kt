@@ -1,9 +1,10 @@
 package nekit.corporation.loan_shared.domain.usecase
 
-import jakarta.inject.Inject
+import dev.zacsweers.metro.Inject
 import nekit.corporation.loan_shared.domain.repository.CreditRepository
 
-class RepayCreditUseCase @Inject constructor(
+@Inject
+class RepayCreditUseCase(
     private val repository: CreditRepository
 ) {
     suspend operator fun invoke(

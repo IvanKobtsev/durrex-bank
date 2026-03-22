@@ -13,6 +13,7 @@ import { DataEntry } from "components/DataEntry/DataEntry.tsx";
 import { useState } from "react";
 import { Button } from "components/uikit/buttons/Button";
 import { TransactionEntry } from "./TransactionEntry";
+import { useTransactionsHub } from "services/signal-r-client/signalRClient.gen.ts";
 
 export function AccountDetailsPage() {
   const { accountId } = AppLinks.AccountDetails.useParams();
@@ -20,16 +21,32 @@ export function AccountDetailsPage() {
   const [page, setPage] = useState(1);
   const pageSize = 20;
 
-  const { data: account, isLoading: accountLoading } = useAccountsGETQuery({
+  const {
+    data: account,
+    isLoading: accountLoading,
+    refetch: refetchAccount,
+  } = useAccountsGETQuery({
     id: accountId,
   });
 
-  const { data: transactionsHistory, isLoading: transactionsLoading } =
-    useTransactionsQuery({
-      id: accountId,
-      page,
-      pageSize,
-    });
+  const {
+    data: transactionsHistory,
+    isLoading: transactionsLoading,
+    refetch: refetchTransactions,
+  } = useTransactionsQuery({
+    id: accountId,
+    page,
+    pageSize,
+  });
+
+  const { invoker } = useTransactionsHub({
+    NewTransaction: async () => {
+      await refetchTransactions();
+      await refetchAccount();
+    },
+  });
+
+  void invoker.SubscribeToAccount(accountId);
 
   const ownerId = account?.ownerId;
 

@@ -27,7 +27,6 @@ services:
       dockerfile: MyApp.UserService/Dockerfile
     restart: unless-stopped
     environment:
-      ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://+:8080
       ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=durrex_users;Username=postgres;Password=postgres"
       InternalApiKey: "dev-internal-api-key-12345"
@@ -43,7 +42,6 @@ services:
       dockerfile: MyApp.AuthService/Dockerfile
     restart: unless-stopped
     environment:
-      ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://+:8080
       ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=durrex_auth;Username=postgres;Password=postgres"
       IdentityServer__IssuerUri: "http://localhost:5260/auth"
@@ -62,7 +60,6 @@ services:
       dockerfile: MyApp.CoreService/Dockerfile
     restart: unless-stopped
     environment:
-      ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://+:8080
       ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=durrex_core;Username=postgres;Password=postgres"
       InternalApiKey: "dev-internal-api-key-12345"
@@ -81,7 +78,6 @@ services:
       dockerfile: MyApp.CreditService/Dockerfile
     restart: unless-stopped
     environment:
-      ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://+:8080
       ConnectionStrings__Default: "Host=postgres;Port=5432;Database=durrex_credit;Username=postgres;Password=postgres"
       InternalApiKey: "dev-internal-api-key-12345"
@@ -99,7 +95,6 @@ services:
       dockerfile: MyApp.WebAppSettingsService/Dockerfile
     restart: unless-stopped
     environment:
-      ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://+:8080
       ConnectionStrings__Default: "Host=postgres;Port=5432;Database=durrex_web_app_settings;Username=postgres;Password=postgres"
       InternalApiKey: "dev-internal-api-key-12345"
@@ -114,7 +109,6 @@ services:
       dockerfile: MyApp.MobileAppSettingsService/Dockerfile
     restart: unless-stopped
     environment:
-      ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://+:8080
       ConnectionStrings__Default: "Host=postgres;Port=5432;Database=durrex_mobile_app_settings;Username=postgres;Password=postgres"
       InternalApiKey: "dev-internal-api-key-12345"
@@ -129,7 +123,6 @@ services:
       dockerfile: MyApp.Gateway/Dockerfile
     restart: unless-stopped
     environment:
-      ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://+:8080
       Oidc__Authority: "http://auth-service:8080/auth"
       Oidc__Audience: "bank.api"

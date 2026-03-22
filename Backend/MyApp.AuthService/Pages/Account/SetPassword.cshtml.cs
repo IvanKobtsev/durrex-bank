@@ -46,7 +46,6 @@ public class SetPasswordModel(
             return Page();
         }
 
-        // Set password (replaces any existing hash)
         var token = await userManager.GeneratePasswordResetTokenAsync(user);
         var result = await userManager.ResetPasswordAsync(user, token, Password);
         if (!result.Succeeded)

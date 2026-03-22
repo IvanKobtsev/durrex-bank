@@ -15,13 +15,12 @@ public static class AuthSeeder
 
         var admin = new ApplicationUser
         {
-            Id = 1,   // Must match the ID seeded by UserService's DataSeeder
+            Id = 1,
             UserName = adminEmail,
             Email = adminEmail,
             EmailConfirmed = true
         };
 
-        // Password from config (set via environment variable in production)
         await userManager.CreateAsync(admin, config["AdminPassword"]
             ?? throw new InvalidOperationException("AdminPassword not configured"));
     }

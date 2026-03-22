@@ -16,16 +16,12 @@ public class HierarchicalProfileService(
         var user = await userManager.GetUserAsync(context.Subject);
         if (user is null) return;
 
-        // Fetch expanded roles from UserService (business logic lives there)
         var profile = await userServiceClient.GetAuthProfileAsync(user.Id);
         if (profile is null) return;
 
-        // Emit one claim per expanded role (e.g. Employee + Client for an employee)
-        // Gateway collects all "role" claims → joins into X-User-Roles header
         context.IssuedClaims.AddRange(
             profile.ExpandedRoles.Select(r => new Claim("role", r))
         );
-        // "sub" is already emitted by IdentityServer (= user.Id.ToString())
     }
 
     public async Task IsActiveAsync(IsActiveContext context)

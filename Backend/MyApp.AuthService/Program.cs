@@ -13,11 +13,9 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddRazorPages();
 builder.Services.AddControllers();
 
-// Auth DB (own durrex_auth database)
 builder.Services.AddDbContext<AuthDbContext>(options =>
     options.UseNpgsql(connectionString));
 
-// ASP.NET Core Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole<int>>(options =>
 {
     options.Password.RequireDigit = false;
@@ -28,7 +26,6 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole<int>>(options =>
 .AddEntityFrameworkStores<AuthDbContext>()
 .AddDefaultTokenProviders();
 
-// UserService HTTP client (for role/profile data)
 builder.Services.AddHttpClient<UserServiceClient>(client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["Services:UserService"]!);
@@ -37,7 +34,6 @@ builder.Services.AddHttpClient<UserServiceClient>(client =>
         builder.Configuration["InternalApiKey"]!);
 });
 
-// Read IdentityServer config from appsettings.json
 var identityResources = builder.Configuration
     .GetSection("IdentityServer:IdentityResources")
     .Get<List<IdentityResource>>() ?? [];
@@ -54,7 +50,6 @@ var clients = builder.Configuration
     .GetSection("IdentityServer:Clients")
     .Get<List<Client>>() ?? [];
 
-// Duende IdentityServer
 builder.Services
     .AddIdentityServer(options =>
     {
@@ -69,11 +64,10 @@ builder.Services
     .AddInMemoryClients(clients)
     .AddAspNetIdentity<ApplicationUser>()
     .AddProfileService<HierarchicalProfileService>()
-    .AddDeveloperSigningCredential();  // Replace with AddSigningCredential() in production
+    .AddDeveloperSigningCredential();
 
 var app = builder.Build();
 
-// Migrate and seed
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AuthDbContext>();

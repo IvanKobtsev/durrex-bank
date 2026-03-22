@@ -14,7 +14,6 @@ public class UserRegistrationService(
     {
         await using var tx = await db.Database.BeginTransactionAsync(ct);
 
-        // Persist user profile within the open transaction (not committed yet)
         var user = new AppUser
         {
             Email           = request.Email,
@@ -26,9 +25,8 @@ public class UserRegistrationService(
             IsBlocked       = false
         };
         db.Users.Add(user);
-        await db.SaveChangesAsync(ct);  // user.Id populated; row not committed yet
+        await db.SaveChangesAsync(ct);
 
-        // Call AuthService while transaction is open
         var inviteUrl = await authServiceClient.CreateInviteAsync(user.Id, user.Email, ct);
         if (inviteUrl is null)
         {

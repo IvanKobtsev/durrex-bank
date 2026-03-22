@@ -3,7 +3,7 @@ namespace MyApp.AuthService.Infrastructure;
 public class UserAuthProfile
 {
     public int UserId { get; set; }
-    public List<string> ExpandedRoles { get; set; } = [];   // e.g. ["Employee","Client"]
+    public List<string> ExpandedRoles { get; set; } = [];
     public bool IsBlocked { get; set; }
 }
 

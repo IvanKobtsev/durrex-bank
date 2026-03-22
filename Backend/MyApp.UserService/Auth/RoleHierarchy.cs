@@ -2,7 +2,6 @@ namespace MyApp.UserService.Auth;
 
 public static class RoleHierarchy
 {
-    // Key role implicitly includes all value roles
     private static readonly Dictionary<string, string[]> Hierarchy = new()
     {
         ["Employee"] = ["Client"],

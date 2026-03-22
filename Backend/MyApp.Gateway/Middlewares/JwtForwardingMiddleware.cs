@@ -2,12 +2,11 @@ namespace MyApp.Gateway.Middlewares;
 
 public class JwtForwardingMiddleware(RequestDelegate next)
 {
-    // Paths that bypass JWT requirement (public endpoints)
     private static readonly string[] PublicPrefixes =
     [
         "/auth/connect/",
         "/auth/.well-known/",
-        "/auth/account/", // Login, Logout, SetPassword Razor pages
+        "/auth/account/",
     ];
 
     private static bool IsPublicPath(PathString path)
@@ -15,7 +14,7 @@ public class JwtForwardingMiddleware(RequestDelegate next)
         var p = path.ToString();
         return PublicPrefixes.Any(prefix =>
                    p.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
-               || p.EndsWith(".json", StringComparison.OrdinalIgnoreCase); // Swagger JSON
+               || p.EndsWith(".json", StringComparison.OrdinalIgnoreCase);
     }
 
     public async Task InvokeAsync(HttpContext context)
@@ -35,12 +34,9 @@ public class JwtForwardingMiddleware(RequestDelegate next)
             return;
         }
 
-        // NameClaimType = "sub" was configured in AddJwtBearer
         var userId = user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
                   ?? user.FindFirst("sub")?.Value;
 
-        // Collect all expanded role claims (e.g. ["Employee","Client"] for an employee)
-        // UserService expanded these at issuance via HierarchicalProfileService
         var roles = user.FindAll("role").Select(c => c.Value).ToList();
 
         if (userId is null || roles.Count == 0)

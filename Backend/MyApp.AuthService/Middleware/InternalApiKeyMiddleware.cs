@@ -6,7 +6,6 @@ public class InternalApiKeyMiddleware(RequestDelegate next, IConfiguration confi
 
     public async Task InvokeAsync(HttpContext context)
     {
-        // Only guard /internal/** routes
         if (!context.Request.Path.StartsWithSegments("/internal"))
         {
             await next(context);

@@ -55,9 +55,8 @@ public static class SwaggerResponseTransformUtil
                     Encoding.UTF8,
                     "application/json");
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                // Console.WriteLine(ex.Message);
             }
         });
     }

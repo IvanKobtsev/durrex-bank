@@ -16,7 +16,6 @@ public class InternalApiKeyMiddleware
 
     public async Task InvokeAsync(HttpContext context)
     {
-        // Allow Scalar UI, OpenAPI spec, and Swagger UI through without a key (dev convenience)
         if (
             context.Request.Path.StartsWithSegments("/scalar")
             || context.Request.Path.StartsWithSegments("/openapi")

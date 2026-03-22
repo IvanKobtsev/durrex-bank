@@ -14,7 +14,6 @@ builder.Services.AddReverseProxy()
     {
         builderContext.AddRequestTransform(transformContext =>
         {
-            // AuthService is a public OIDC server — do not inject the internal key
             if (!transformContext.HttpContext.Request.Path
                     .StartsWithSegments("/auth", StringComparison.OrdinalIgnoreCase))
             {
@@ -31,11 +30,9 @@ builder.Services.AddReverseProxy()
 builder.Services.AddAuthentication("Bearer")
     .AddJwtBearer("Bearer", options =>
     {
-        // AuthService discovery doc: {Authority}/.well-known/openid-configuration
-        // JWKS fetched automatically, cached, and auto-rotated
         options.Authority = builder.Configuration["Oidc:Authority"];
-        options.RequireHttpsMetadata = false; // HTTP allowed in dev; enforce HTTPS in production
-        options.MapInboundClaims = false; // Keep short JWT claim names (sub, role) as-is
+        options.RequireHttpsMetadata = false;
+        options.MapInboundClaims = false;
 
         options.TokenValidationParameters = new TokenValidationParameters
         {
@@ -48,7 +45,6 @@ builder.Services.AddAuthentication("Bearer")
             RoleClaimType = "role"
         };
 
-        // Handle WebSocket connections: browsers pass token in query string
         options.Events = new JwtBearerEvents
         {
             OnMessageReceived = context =>
@@ -78,7 +74,7 @@ builder.Services.AddCors(options =>
             .WithOrigins("http://localhost:5173", "http://localhost:5174")
             .AllowAnyHeader()
             .AllowAnyMethod()
-            .AllowCredentials(); // Required for SignalR WebSocket from browser
+            .AllowCredentials();
     });
 });
 
@@ -96,7 +92,7 @@ app.UseSwaggerUI(options =>
 });
 
 app.UseCors("DevCors");
-app.UseAuthentication(); // validates JWT, populates HttpContext.User
+app.UseAuthentication();
 app.UseAuthorization();
 app.UseMiddleware<JwtForwardingMiddleware>();
 app.UseWebSockets();

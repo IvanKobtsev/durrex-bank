@@ -16,9 +16,6 @@ public class InviteController(
     [HttpPost]
     public async Task<IActionResult> CreateInvite([FromBody] CreateInviteRequest request)
     {
-        // Both the ApplicationUser insert (via UserManager) and the InviteToken insert
-        // must succeed or fail together. UserManager uses the same AuthDbContext instance,
-        // so it participates in this transaction automatically.
         await using var tx = await db.Database.BeginTransactionAsync();
 
         var existing = await userManager.FindByIdAsync(request.UserId.ToString());
@@ -31,7 +28,7 @@ public class InviteController(
                 Email = request.Email,
                 EmailConfirmed = true
             };
-            var result = await userManager.CreateAsync(user);  // calls SaveChangesAsync internally
+            var result = await userManager.CreateAsync(user);
             if (!result.Succeeded)
             {
                 await tx.RollbackAsync();

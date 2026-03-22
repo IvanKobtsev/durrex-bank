@@ -1,6 +1,7 @@
 package nekit.corporation.loan_details_impl.presentation
 
 import android.util.Log
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ClassKey
@@ -27,8 +28,8 @@ import nekit.corporation.util.domain.common.UnknownFailure
 
 @Inject
 @ViewModelKey(LoanDetailsViewModel::class)
-@ContributesIntoMap(AppScope::class, binding<@ClassKey(LoanDetailsViewModel::class) LoanInteractions>())
-internal class LoanDetailsViewModel(
+@ContributesIntoMap(AppScope::class, binding = binding<ViewModel>())
+class LoanDetailsViewModel(
     private val getCreditByIdUseCase: GetCreditDetailUseCase,
     private val navigator: LoanDetailsNavigator
 ) : StatefulViewModel<LoanDetailsState>(), LoanInteractions {

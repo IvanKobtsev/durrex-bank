@@ -1,9 +1,9 @@
 package nekit.corporation.user.data.model
 
-import nekit.corporation.user.domain.model.Language
-import nekit.corporation.user.domain.model.Scheme
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class SettingsDto(
-    val scheme: Scheme,
-    val language: Language
+    val theme: String,
+    val hiddenAccountIds: List<Int>
 )

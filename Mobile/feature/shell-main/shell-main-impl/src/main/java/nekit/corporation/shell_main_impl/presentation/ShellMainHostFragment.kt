@@ -17,8 +17,10 @@ import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ClassKey
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
+import dev.zacsweers.metro.SingleIn
 import dev.zacsweers.metro.binding
 import nekit.corporation.common.FragmentKey
+import nekit.corporation.common.MainBottomNav
 import nekit.corporation.shell_main_api.MainShellApi
 import nekit.corporation.shell_main_api.model.Tab
 import nekit.corporation.shell_main_impl.R
@@ -30,22 +32,21 @@ import kotlin.getValue
 
 @ContributesIntoMap(
     AppScope::class,
-    binding<@ClassKey(ShellMainHostFragment::class) MainShellApi>()
+    binding<Fragment>()
 )
 @FragmentKey(ShellMainHostFragment::class)
 @Inject
-internal class ShellMainHostFragment(
-    private val viewModelFactory: ViewModelProvider.Factory
+@SingleIn(AppScope::class)
+class ShellMainHostFragment(
+    private val viewModelFactory: ViewModelProvider.Factory,
+    private val router: Cicerone<MainBottomBarRouter>,
+    private val navigator: MainBottomBarNavigator
+
 ) : Fragment(), MainShellApi {
 
     override val defaultViewModelProviderFactory: ViewModelProvider.Factory
         get() = viewModelFactory
 
-    @Inject
-    private lateinit var router: Cicerone<MainBottomBarRouter>
-
-    @Inject
-    private lateinit var navigator: MainBottomBarNavigator
     private val childNavigator by lazy {
         AppNavigator(requireActivity(), R.id.tabs_container, childFragmentManager)
     }
@@ -90,7 +91,7 @@ internal class ShellMainHostFragment(
     }
 
     override fun onTab(tab: Tab) = FragmentScreen {
-        ShellMainHostFragment(viewModelFactory).also {
+        ShellMainHostFragment(viewModelFactory, router, navigator).also {
             navigator.toTab(tab)
         }
     }

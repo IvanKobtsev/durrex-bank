@@ -9,7 +9,7 @@ import nekit.corporation.shell_main_api.MainShellApi
 import nekit.corporation.transaction_details_api.TransactionDetailsApi
 
 @Inject
-internal class MenuNavigator(
+class MenuNavigator(
     private val router: Router,
     private val authApi: AuthApi,
     private val onboardingApi: OnboardingApi,

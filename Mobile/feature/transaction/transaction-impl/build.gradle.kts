@@ -24,4 +24,5 @@ dependencies {
     implementation(projects.components.user)
 
     implementation(projects.feature.transaction.transactionApi)
+    implementation(projects.feature.shellMain.shellMainApi)
 }

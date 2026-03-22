@@ -5,11 +5,11 @@ import nekit.corporation.user.domain.UserRepository
 import nekit.corporation.user.domain.model.Settings
 
 @Inject
-class SaveSettingsUseCase (
+class SaveSettingsUseCase(
     private val userRepository: UserRepository
 ) {
 
-    suspend operator fun invoke(settings: Settings) {
+    suspend operator fun invoke(settings: Settings): Settings {
         return userRepository.saveSettings(settings)
     }
 }

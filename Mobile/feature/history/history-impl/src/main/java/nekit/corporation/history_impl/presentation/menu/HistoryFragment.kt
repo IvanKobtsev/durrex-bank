@@ -42,7 +42,7 @@ class HistoryFragment(
                         is HistoryEvent.ShowToast -> {
                             Toast.makeText(
                                 requireContext(),
-                                getString(it.res),
+                                getString((it as HistoryEvent.ShowToast).res),
                                 Toast.LENGTH_SHORT
                             ).show()
                         }

@@ -1,12 +1,13 @@
 package nekit.corporation.main_impl.presentation.models
 
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.PersistentList
 import nekit.corporation.architecture.presentation.ScreenState
 import nekit.corporation.loan_shared.domain.model.Account
 import nekit.corporation.loan_shared.domain.model.Credit
 
 
-internal sealed interface MainState : ScreenState {
+sealed interface MainState : ScreenState {
 
     data object Loading : MainState
 
@@ -15,6 +16,9 @@ internal sealed interface MainState : ScreenState {
         val isCurrencyMenuOpen: Boolean,
         val selectedCurrency: Currency,
         val credits: ImmutableList<Credit>,
-        val accounts: ImmutableList<Account>
+        val allAccounts: ImmutableList<Account>,
+        val accounts: ImmutableList<Account>,
+        val showHidden: Boolean,
+        val hidden: ImmutableList<Int>
     ) : MainState
 }

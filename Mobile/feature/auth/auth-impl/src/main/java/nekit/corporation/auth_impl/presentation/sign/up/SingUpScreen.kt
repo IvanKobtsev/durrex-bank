@@ -32,7 +32,7 @@ internal fun SingUpScreen(state: AuthState.SignUpState, signUpInteract: SignUpIn
             .padding(bottom = WindowInsets.systemBars.asPaddingValues().calculateBottomPadding())
     ) {
         item {*/
-    PrimaryInputField(
+   /* PrimaryInputField(
         value = state.login.text,
         label = stringResource(R.string.login),
         onValueChange = signUpInteract::onLoginChange,
@@ -41,9 +41,9 @@ internal fun SingUpScreen(state: AuthState.SignUpState, signUpInteract: SignUpIn
         isError = state.login.error != null,
         supportingText = state.login.error?.let { stringResource(it) } ?: "",
     )
-    /* }
+    *//* }
 
-     item {*/
+     item {*//*
     PrimaryInputField(
         value = state.email.text,
         label = stringResource(R.string.email),
@@ -53,8 +53,8 @@ internal fun SingUpScreen(state: AuthState.SignUpState, signUpInteract: SignUpIn
         isError = state.email.error != null,
         supportingText = state.email.error?.let { stringResource(it) } ?: "",
     )
-    /*}
-    item {*/
+    *//*}
+    item {*//*
     PrimaryInputField(
         value = state.firstName.text,
         label = stringResource(R.string.first_name),
@@ -64,8 +64,8 @@ internal fun SingUpScreen(state: AuthState.SignUpState, signUpInteract: SignUpIn
         isError = state.firstName.error != null,
         supportingText = state.firstName.error?.let { stringResource(it) } ?: "",
     )
-    /* }
-     item {*/
+    *//* }
+     item {*//*
     PrimaryInputField(
         value = state.lastName.text,
         label = stringResource(R.string.last_name),
@@ -75,8 +75,8 @@ internal fun SingUpScreen(state: AuthState.SignUpState, signUpInteract: SignUpIn
         isError = state.lastName.error != null,
         supportingText = state.lastName.error?.let { stringResource(it) } ?: "",
     )
-    /*}
-    item {*/
+    *//*}
+    item {*//*
     PrimaryInputField(
         value = state.phone.text,
         label = stringResource(R.string.phone),
@@ -90,9 +90,9 @@ internal fun SingUpScreen(state: AuthState.SignUpState, signUpInteract: SignUpIn
             keyboardType = KeyboardType.Phone
         )
     )
-    /*}
+    *//*}
 
-    item {*/
+    item {*//*
     PrimaryInputField(
         value = state.password.password,
         label = stringResource(R.string.password),
@@ -108,8 +108,8 @@ internal fun SingUpScreen(state: AuthState.SignUpState, signUpInteract: SignUpIn
         else
             PasswordVisualTransformation()
     )
-    /*}
-    item {*/
+    *//*}
+    item {*//*
     PrimaryInputField(
         value = state.repeatPassword.password,
         label = stringResource(R.string.repeat_password),
@@ -124,7 +124,7 @@ internal fun SingUpScreen(state: AuthState.SignUpState, signUpInteract: SignUpIn
             VisualTransformation.None
         else
             PasswordVisualTransformation()
-    )
+    )*/
     /*}
     item {*/
     PrimaryButton(
@@ -143,6 +143,7 @@ internal fun SingUpScreen(state: AuthState.SignUpState, signUpInteract: SignUpIn
     }*/
 }
 
+/*
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun PreviewSingInScreen() {
@@ -233,4 +234,4 @@ fun PreviewSingInScreen() {
             }
         )
     }
-}
+}*/

@@ -16,7 +16,8 @@ data class TransactionState(
     val isCreateButtonEnabled: Boolean,
     val recipient: UserUi?,
     val user: UserUi?,
-    val description: String
+    val description: String,
+    val isButtonEnable: Boolean
 ) : ScreenState {
     companion object {
         val DEFAULT = TransactionState(
@@ -29,7 +30,8 @@ data class TransactionState(
             isCreateButtonEnabled = false,
             user = null,
             recipient = null,
-            description = ""
+            description = "",
+            isButtonEnable = true
         )
     }
 }

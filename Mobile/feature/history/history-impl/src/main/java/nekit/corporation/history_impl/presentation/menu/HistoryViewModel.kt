@@ -1,9 +1,11 @@
 package nekit.corporation.history_impl.presentation.menu
 
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
+import dev.zacsweers.metro.binding
 import dev.zacsweers.metrox.viewmodel.ViewModelKey
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -22,8 +24,8 @@ import kotlin.collections.flatten
 
 @Inject
 @ViewModelKey(HistoryViewModel::class)
-@ContributesIntoMap(AppScope::class)
-internal class HistoryViewModel(
+@ContributesIntoMap(AppScope::class, binding = binding<ViewModel>())
+class HistoryViewModel(
     private val navigation: MenuNavigator,
     private val accountRepository: AccountRepository
 ) : StatefulViewModel<MenuState>() {

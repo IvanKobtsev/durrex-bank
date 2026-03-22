@@ -8,6 +8,8 @@ import nekit.corporation.loan_shared.data.datasource.remote.model.IssueCreditReq
 import nekit.corporation.loan_shared.data.datasource.remote.model.toDomain
 import nekit.corporation.loan_shared.domain.model.Credit
 import nekit.corporation.loan_shared.domain.model.CreditDetail
+import nekit.corporation.loan_shared.domain.model.Overdue
+import nekit.corporation.loan_shared.domain.model.Rating
 import nekit.corporation.loan_shared.domain.repository.CreditRepository
 
 @Inject
@@ -41,4 +43,12 @@ class CreditRepositoryImpl(
         creditId: Int
     ): Credit =
         api.repayCredit(userId).toDomain()
+
+    override suspend fun getOverdueCredits(): List<Overdue> {
+        return api.getOverdueCredits().map { it.toDomain() }
+    }
+
+    override suspend fun getRating(): Rating {
+        return api.getRating().toDomain()
+    }
 }

@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
@@ -13,10 +14,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.persistentListOf
@@ -31,11 +37,16 @@ import nekit.corporation.ui.component.Caption
 import nekit.corporation.ui.component.Headline2
 import nekit.corporation.ui.component.LoadingScreen
 import nekit.corporation.ui.component.LoanBanner
+import nekit.corporation.ui.component.PrimaryButton
 import nekit.corporation.ui.theme.DurexBankTheme
 import nekit.corporation.ui.theme.LocalAppColors
 
 @Composable
-internal fun MainScreen(state: MainState, eventQueue: EventQueue, interaction: MainViewModelInteraction) {
+internal fun MainScreen(
+    state: MainState,
+    eventQueue: EventQueue,
+    interaction: MainViewModelInteraction
+) {
     val colors = LocalAppColors.current
     val context = LocalContext.current
 
@@ -89,6 +100,17 @@ internal fun MainScreen(state: MainState, eventQueue: EventQueue, interaction: M
                 }
                 item { Spacer(Modifier.height(24.dp)) }
                 item {
+                    PrimaryButton(
+                        stringResource(R.string.create_transaction),
+                        onClick = interaction::onCreateTransactionClick,
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .fillMaxWidth()
+
+                    )
+                    Spacer(Modifier.height(16.dp))
+                }
+                item {
                     Headline2(
                         text = stringResource(R.string.my_loans),
                         color = colors.fontPrimary,
@@ -115,11 +137,25 @@ internal fun MainScreen(state: MainState, eventQueue: EventQueue, interaction: M
                     Spacer(Modifier.height(16.dp))
                 }
                 item {
-                    Headline2(
-                        text = stringResource(R.string.my_accouts),
-                        color = colors.fontPrimary,
-                        modifier = Modifier.padding(horizontal = 16.dp)
-                    )
+                    Row(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Headline2(
+                            text = stringResource(R.string.my_accouts),
+                            color = colors.fontPrimary
+                        )
+                        Spacer(Modifier.weight(1f))
+                        IconButton(interaction::onHiddenSwitch) {
+                            Icon(
+                                imageVector = ImageVector.vectorResource(
+                                    if (state.showHidden) R.drawable.eye
+                                    else R.drawable.eye_cross
+                                ),
+                                null
+                            )
+                        }
+                    }
                 }
                 item {
                     if (state.accounts.isEmpty()) {
@@ -156,7 +192,10 @@ fun PreviewMainScreen() {
                 isCurrencyMenuOpen = false,
                 selectedCurrency = Currency.RUB,
                 credits = persistentListOf(),
-                accounts = persistentListOf()
+                accounts = persistentListOf(),
+                allAccounts = persistentListOf(),
+                showHidden = true,
+                hidden = persistentListOf()
             ),
             eventQueue = EventQueue(),
             interaction = object : MainViewModelInteraction {
@@ -197,6 +236,14 @@ fun PreviewMainScreen() {
                 }
 
                 override fun onAccountClick(id: Int) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onHiddenSwitch() {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onCreateTransactionClick() {
                     TODO("Not yet implemented")
                 }
 

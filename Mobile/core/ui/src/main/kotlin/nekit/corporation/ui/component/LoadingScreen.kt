@@ -34,7 +34,7 @@ fun LoadingScreen(modifier: Modifier = Modifier) {
 }
 
 @Composable
-@Preview(showBackground = true, showSystemUi = true)
+@Preview(showBackground = true, showSystemUi = true, backgroundColor = 0xff23ff)
 fun PreviewLoadingScreen() {
     DurexBankTheme {
         LoadingScreen(modifier = Modifier.fillMaxSize())

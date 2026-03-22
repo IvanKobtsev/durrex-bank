@@ -1,9 +1,11 @@
 package nekit.corporation.onboarding_impl.presentation
 
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
+import dev.zacsweers.metro.binding
 import dev.zacsweers.metrox.viewmodel.ViewModelKey
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.Dispatchers
@@ -18,8 +20,8 @@ import nekit.corporation.onboarding_shared.domain.usecase.UpdateSettingUseCase
 
 @Inject
 @ViewModelKey(OnboardingViewModel::class)
-@ContributesIntoMap(AppScope::class)
-internal class OnboardingViewModel(
+@ContributesIntoMap(AppScope::class, binding = binding<ViewModel>())
+class OnboardingViewModel(
     private val onboardingNavigator: OnboardingNavigator,
     private val updateSettingUseCase: UpdateSettingUseCase
 ) : StatefulViewModel<OnboardingState>() {

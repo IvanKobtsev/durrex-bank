@@ -4,7 +4,7 @@ import com.github.terrakok.cicerone.Router
 import dev.zacsweers.metro.Inject
 
 @Inject
-internal class CreateCreditNavigator(
+class CreateCreditNavigator(
     private val router: Router
 ) {
 

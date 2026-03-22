@@ -1,6 +1,7 @@
 package nekit.corporation.account_details_impl.presentation
 
 import android.util.Log
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ClassKey
@@ -34,8 +35,7 @@ import nekit.corporation.util.domain.common.UnknownFailure
 @Inject
 @ViewModelKey(AccountDetailsViewModel::class)
 @ContributesIntoMap(
-    AppScope::class,
-    binding = binding<@ClassKey(AccountDetailsViewModel::class) AccountDetailsInteractions>()
+    AppScope::class, binding = binding<ViewModel>()
 )
 internal class AccountDetailsViewModel(
     private val accountRepository: AccountRepository,

@@ -17,6 +17,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         missingDimensionStrategy("version", "dev")
+        manifestPlaceholders["appAuthRedirectScheme"] = "com.example.shift_project"
     }
 
     buildTypes {

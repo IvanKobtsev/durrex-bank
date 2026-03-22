@@ -25,4 +25,5 @@ dependencies {
 
     implementation(projects.components.user)
     implementation(projects.components.languageComponent)
+    implementation(projects.components.loan)
 }

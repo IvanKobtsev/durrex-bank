@@ -4,7 +4,7 @@ import kotlinx.collections.immutable.ImmutableList
 import nekit.corporation.architecture.presentation.ScreenState
 import nekit.corporation.loan_shared.domain.model.Credit
 
-internal sealed interface AllLoansState : ScreenState {
+sealed interface AllLoansState : ScreenState {
 
     data object Loading : AllLoansState
 

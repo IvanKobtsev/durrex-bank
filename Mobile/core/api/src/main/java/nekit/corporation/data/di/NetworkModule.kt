@@ -6,6 +6,7 @@ import dev.zacsweers.metro.Provides
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import nekit.corporation.auth.data.datasource.remote.AuthApi
+import nekit.corporation.common.MainServerUrl
 import nekit.corporation.data.remote.Network
 import nekit.corporation.data.remote.Network.getHttpClient
 import nekit.corporation.data.remote.interseptors.AuthInterceptor
@@ -120,7 +121,7 @@ interface NetworkModule {
 
     @Provides
     @MainServerUrl
-    fun provideMainServerUrl(): String = "https://1bc7-66-234-150-130.ngrok-free.app/"
+    fun provideMainServerUrl(): String = "https://9fe6-185-93-3-35.ngrok-free.app".trim()
 
     companion object {
         private val contentType = "application/json".toMediaType()

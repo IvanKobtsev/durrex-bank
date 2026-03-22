@@ -6,7 +6,7 @@ import axios, { AxiosError, AxiosResponse } from "axios";
 import { AuthProvider } from "react-oidc-context";
 
 const oidcConfig = {
-  authority: "http://localhost:5000", // IdentityServer URL
+  authority: "http://localhost:5260/auth", // ← Gateway, not direct AuthService
   client_id: "web-spa",
   redirect_uri: "http://localhost:5173/callback",
   post_logout_redirect_uri: "http://localhost:5173",

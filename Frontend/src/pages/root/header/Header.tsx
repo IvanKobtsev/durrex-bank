@@ -3,9 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { AppLinks } from "application/constants/appLinks.ts";
 import { Button } from "components/uikit/buttons/Button.tsx";
 import { ThemeSwitcher } from "./ThemeSwitcher.tsx";
+import { useAuth } from "react-oidc-context";
 
 export function Header() {
   const navigate = useNavigate();
+  const auth = useAuth();
 
   return (
     <div className={styles.header}>
@@ -20,7 +22,8 @@ export function Header() {
         <Button
           className={styles.logout}
           title={"Выйти"}
-          onClick={() => {
+          onClick={async () => {
+            await auth.signoutSilent();
             localStorage.removeItem("access_token");
             navigate(AppLinks.Login.link());
           }}

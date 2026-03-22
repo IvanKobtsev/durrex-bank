@@ -13,45 +13,43 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddRazorPages();
 builder.Services.AddControllers();
 
-builder.Services.AddDbContext<AuthDbContext>(options =>
-    options.UseNpgsql(connectionString));
+builder.Services.AddDbContext<AuthDbContext>(options => options.UseNpgsql(connectionString));
 
-builder.Services.AddIdentity<ApplicationUser, IdentityRole<int>>(options =>
-{
-    options.Password.RequireDigit = false;
-    options.Password.RequiredLength = 6;
-    options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequireUppercase = false;
-})
-.AddEntityFrameworkStores<AuthDbContext>()
-.AddDefaultTokenProviders();
+builder
+    .Services.AddIdentity<ApplicationUser, IdentityRole<int>>(options =>
+    {
+        options.Password.RequireDigit = false;
+        options.Password.RequiredLength = 6;
+        options.Password.RequireNonAlphanumeric = false;
+        options.Password.RequireUppercase = false;
+    })
+    .AddEntityFrameworkStores<AuthDbContext>()
+    .AddDefaultTokenProviders();
 
 builder.Services.AddHttpClient<UserServiceClient>(client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["Services:UserService"]!);
     client.DefaultRequestHeaders.Add(
         "X-Internal-Api-Key",
-        builder.Configuration["InternalApiKey"]!);
+        builder.Configuration["InternalApiKey"]!
+    );
 });
 
-var identityResources = builder.Configuration
-    .GetSection("IdentityServer:IdentityResources")
-    .Get<List<IdentityResource>>() ?? [];
+var identityResources =
+    builder
+        .Configuration.GetSection("IdentityServer:IdentityResources")
+        .Get<List<IdentityResource>>() ?? [];
 
-var apiScopes = builder.Configuration
-    .GetSection("IdentityServer:ApiScopes")
-    .Get<List<ApiScope>>() ?? [];
+var apiScopes =
+    builder.Configuration.GetSection("IdentityServer:ApiScopes").Get<List<ApiScope>>() ?? [];
 
-var apiResources = builder.Configuration
-    .GetSection("IdentityServer:ApiResources")
-    .Get<List<ApiResource>>() ?? [];
+var apiResources =
+    builder.Configuration.GetSection("IdentityServer:ApiResources").Get<List<ApiResource>>() ?? [];
 
-var clients = builder.Configuration
-    .GetSection("IdentityServer:Clients")
-    .Get<List<Client>>() ?? [];
+var clients = builder.Configuration.GetSection("IdentityServer:Clients").Get<List<Client>>() ?? [];
 
-builder.Services
-    .AddIdentityServer(options =>
+builder
+    .Services.AddIdentityServer(options =>
     {
         options.IssuerUri = builder.Configuration["IdentityServer:IssuerUri"];
         options.Events.RaiseErrorEvents = true;
@@ -66,6 +64,25 @@ builder.Services
     .AddProfileService<HierarchicalProfileService>()
     .AddDeveloperSigningCredential();
 
+builder.Services.AddScoped<AuthSeeder>();
+
+builder.Services.Configure<CookiePolicyOptions>(options =>
+{
+    options.MinimumSameSitePolicy = SameSiteMode.Unspecified;
+    options.OnAppendCookie = cookieContext =>
+        CheckSameSite(cookieContext.Context, cookieContext.CookieOptions);
+    options.OnDeleteCookie = cookieContext =>
+        CheckSameSite(cookieContext.Context, cookieContext.CookieOptions);
+});
+
+static void CheckSameSite(HttpContext httpContext, CookieOptions options)
+{
+    if (options.SameSite == SameSiteMode.None && !httpContext.Request.IsHttps)
+    {
+        options.SameSite = SameSiteMode.Unspecified;
+    }
+}
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -73,15 +90,15 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
     await db.Database.MigrateAsync();
 
-    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-    var cfg = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-    await AuthSeeder.SeedAsync(userManager, cfg);
+    var seeder = scope.ServiceProvider.GetRequiredService<AuthSeeder>();
+    await seeder.SeedAsync();
 }
 
 app.UseMiddleware<InternalApiKeyMiddleware>();
 app.UseStaticFiles();
 app.UseRouting();
 app.UseIdentityServer();
+app.UseCookiePolicy();
 app.UseAuthorization();
 app.MapRazorPages();
 app.MapControllers();

@@ -25,20 +25,13 @@ export function LoginPage() {
 
   return (
     <div className={styles.wrapper}>
-      <Loading loading={auth.isLoading}>
-        <div className={styles.header}>Кабинет сотрудника</div>
-        {/*<form className={styles.form} onSubmit={form.handleSubmitDefault}>*/}
-        {/*  <Input*/}
-        {/*    {...registerString(form, "username")}*/}
-        {/*    fieldProps={{ title: "Имя пользователя" }}*/}
-        {/*  />*/}
-        {/*  <Input*/}
-        {/*    {...registerPassword(form, "password")}*/}
-        {/*    fieldProps={{ title: "Пароль" }}*/}
-        {/*  />*/}
-        {/*</form>*/}
-        <Button title={"Войти"} onClick={() => auth.signinRedirect()} />
-      </Loading>
+      <div className={styles.header}>Кабинет сотрудника</div>
+      <Button
+        className={styles.loginButton}
+        title={"Войти"}
+        onClick={() => auth.signinRedirect()}
+      />
+      {/*</Loading>*/}
     </div>
   );
 }

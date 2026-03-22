@@ -58,7 +58,7 @@ public class UsersController(
     /// <response code="200">User profile returned</response>
     /// <response code="403">Client may only view their own profile</response>
     /// <response code="404">User not found</response>
-    [HttpGet]
+    [HttpGet("me")]
     [ProducesResponseType(typeof(UserResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

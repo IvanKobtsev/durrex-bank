@@ -14,6 +14,7 @@ import { useState } from "react";
 import { Button } from "components/uikit/buttons/Button";
 import { TransactionEntry } from "./TransactionEntry";
 import { useTransactionsHub } from "services/signal-r-client/signalRClient.gen.ts";
+import { getValueWithCurrency } from "../../../helpers/currency-helper.ts";
 
 export function AccountDetailsPage() {
   const { accountId } = AppLinks.AccountDetails.useParams();
@@ -77,7 +78,7 @@ export function AccountDetailsPage() {
               </div>
 
               <div className={styles.balance}>
-                {account.balance} {account.currency}
+                {getValueWithCurrency(account.currency, account.balance)}
               </div>
             </div>
 
@@ -104,7 +105,11 @@ export function AccountDetailsPage() {
                 <>
                   <div className={styles.transactions}>
                     {transactionsHistory.items.map((tx) => (
-                      <TransactionEntry key={tx.id} transaction={tx} />
+                      <TransactionEntry
+                        key={tx.id}
+                        transaction={tx}
+                        accountCurrency={account.currency}
+                      />
                     ))}
                   </div>
 

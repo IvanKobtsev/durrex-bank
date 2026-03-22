@@ -1,0 +1,12 @@
+.status {
+  padding: 5px 10px;
+  border-radius: 10px;
+
+  &.closed {
+    background-color: rgba(green, 0.5);
+  }
+
+  //&.active {
+  //  background-color: rgba(blue, 0.5);
+  //}
+}

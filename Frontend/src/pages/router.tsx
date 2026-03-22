@@ -12,12 +12,18 @@ import { TariffsManagementPage } from "./tariffs/management/TariffsManagementPag
 import { TariffCreationPage } from "./tariffs/creation/TariffCreationPage.tsx";
 import { CreditDetailsPage } from "./credits/creditDetails/CreditDetailsPage.tsx";
 import { ErrorBoundary } from "./errorPages/ErrorBoundary/ErrorBoundary.tsx";
+import Callback from "./login/Callback.tsx";
 
 export const AppRoutes = () =>
   createBrowserRouter([
     {
       path: AppLinks.Login.route,
       element: <LoginPage />,
+      ErrorBoundary: ErrorBoundary,
+    },
+    {
+      path: AppLinks.Callback.route,
+      element: <Callback />,
       ErrorBoundary: ErrorBoundary,
     },
     {

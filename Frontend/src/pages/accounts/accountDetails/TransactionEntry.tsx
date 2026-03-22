@@ -3,11 +3,14 @@ import { DataEntry } from "components/DataEntry/DataEntry.tsx";
 import { formatDateRu } from "./AccountDetailsPage.tsx";
 import styles from "./AccountDetailsPage.module.scss";
 import clsx from "clsx";
+import { getValueWithCurrency } from "../../../helpers/currency-helper.ts";
 
 export function TransactionEntry({
   transaction,
+  accountCurrency,
 }: {
   transaction: TransactionResponse;
+  accountCurrency: string | null | undefined;
 }) {
   const isPositive = transaction.balanceAfter - transaction.balanceBefore > 0;
 
@@ -28,7 +31,15 @@ export function TransactionEntry({
       />
       <DataEntry
         title={"Операция"}
-        value={transaction.balanceAfter - transaction.balanceBefore}
+        value={
+          (transaction.balanceAfter - transaction.balanceBefore > 0
+            ? "+"
+            : "") +
+          getValueWithCurrency(
+            accountCurrency,
+            transaction.balanceAfter - transaction.balanceBefore,
+          )
+        }
       />
     </div>
   );

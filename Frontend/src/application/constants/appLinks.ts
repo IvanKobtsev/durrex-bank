@@ -2,6 +2,7 @@ import { createRoute, RequiredNumberParam } from "react-router-url-params";
 
 export const AppLinks = {
   Login: createRoute("/login"),
+  Callback: createRoute("/callback"),
   Users: createRoute("/users"),
   Dashboard: createRoute("/"),
   UserCreation: createRoute("/users/create"),

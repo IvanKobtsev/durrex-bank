@@ -80,3 +80,43 @@
   margin: 10px 0;
   padding: 0 !important;
 }
+
+.creditsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.creditRating {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-weight: 600;
+  color: #fff;
+  box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.1);
+}
+
+.bad {
+  background-color: $danger-background;
+}
+
+.warning {
+  //color: #d97904;
+  background-color: rgba(#d97904, 1);
+}
+
+.neutral {
+  //color: $normal;
+  background-color: rgba($normal, 1);
+}
+
+.good {
+  //color: #2f7d32;
+  background-color: rgba(#2f7d32, 1);
+}
+
+.excellent {
+  //color: #1b5e20;
+  background-color: rgba(#1b5e20, 1);
+}

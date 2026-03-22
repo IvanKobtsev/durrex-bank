@@ -53,7 +53,6 @@ public class UserService(IUserRepository userRepository) : IUserService
             FirstName = request.FirstName,
             LastName = request.LastName,
             TelephoneNumber = request.TelephoneNumber,
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
             Role = request.Role,
             IsBlocked = request.IsBlocked,
         };

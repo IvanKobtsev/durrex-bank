@@ -34,8 +34,6 @@ file class AppUserConfiguration : IEntityTypeConfiguration<AppUser>
         builder.Property(u => u.TelephoneNumber).IsRequired().HasMaxLength(32);
         builder.HasIndex(u => u.TelephoneNumber).IsUnique();
 
-        builder.Property(u => u.PasswordHash).IsRequired();
-
         builder.Property(u => u.Role).IsRequired();
     }
 }

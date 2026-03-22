@@ -94,6 +94,7 @@ using (var scope = app.Services.CreateScope())
     await seeder.SeedAsync();
 }
 
+app.UsePathBase("/auth");
 app.UseMiddleware<InternalApiKeyMiddleware>();
 app.UseStaticFiles();
 app.UseRouting();

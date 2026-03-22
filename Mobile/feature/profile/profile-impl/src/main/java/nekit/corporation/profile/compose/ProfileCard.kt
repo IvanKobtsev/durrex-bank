@@ -50,11 +50,12 @@ internal fun ProfileCard(accountModel: AccountModel, modifier: Modifier = Modifi
             stringRes = R.string.status,
             text = stringResource(if (accountModel.isBlocked) R.string.blocked else R.string.unblocked),
         )
-        InfoRow(
-            iconRes = R.drawable.star_ic,
-            stringRes = R.string.credit_rating,
-            text = accountModel.rating.toString(),
-        )
+        if (accountModel.rating != null)
+            InfoRow(
+                iconRes = R.drawable.star_ic,
+                stringRes = R.string.credit_rating,
+                text = accountModel.rating.toString(),
+            )
     }
 }
 
@@ -69,7 +70,7 @@ private fun PreviewProfileCard() {
                 email = "william.rufus.day@pet-store.com",
                 phone = "+79999999999",
                 isBlocked = false,
-                rating = 5.0f
+                rating = 5
             )
         )
     }

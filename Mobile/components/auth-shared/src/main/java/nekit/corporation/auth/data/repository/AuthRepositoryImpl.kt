@@ -1,5 +1,7 @@
 package nekit.corporation.auth.data.repository
 
+import dev.zacsweers.metro.AppScope
+import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.Inject
 import kotlinx.coroutines.flow.first
 import nekit.corporation.auth.data.datasource.local.AuthDataStore
@@ -14,6 +16,7 @@ import nekit.corporation.auth.domain.toToken
 import nekit.corporation.auth.domain.toTokenLocal
 
 @Inject
+@ContributesBinding(AppScope::class)
 class AuthRepositoryImpl(
     private val authDataStore: AuthDataStore,
     private val authApi: AuthApi

@@ -1,5 +1,6 @@
 package nekit.corporation.history_impl.presentation.all.accounts
 
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ClassKey
@@ -17,11 +18,8 @@ import nekit.corporation.history_impl.presentation.models.AllAccountsState
 
 @Inject
 @ViewModelKey(AllAccountsViewModel::class)
-@ContributesIntoMap(
-    AppScope::class,
-    binding<@ClassKey(AllAccountsViewModel::class) StatefulViewModel<AllAccountsState>>()
-)
-internal class AllAccountsViewModel(
+@ContributesIntoMap(AppScope::class, binding<ViewModel>())
+class AllAccountsViewModel(
     private val allActionsNavigation: AllAccountsNavigator,
     private val accountRepository: AccountRepository,
 ) : StatefulViewModel<AllAccountsState>() {

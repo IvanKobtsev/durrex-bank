@@ -67,8 +67,8 @@ abstract class StatefulViewModel<State : ScreenState> : ViewModel() {
 
     protected suspend fun <T> fallback(
         action: suspend () -> T,
-        onComplete: suspend (T) -> Unit,
         onFailure: suspend (Throwable) -> Unit = {},
+        onComplete: suspend (T) -> Unit,
         maxTries: Int = 4,
         dispatcher: CoroutineDispatcher = Dispatchers.IO
     ) = withContext(dispatcher) {
@@ -105,7 +105,7 @@ abstract class StatefulViewModel<State : ScreenState> : ViewModel() {
                 return action()
             } catch (e: Exception) {
                 onFailure(e)
-                if (attempt == maxTries - 1) throw e
+                if (attempt == maxTries - 1) return null
                 delay(retryTime)
                 retryTime = (retryTime * 2).coerceAtMost(10000)
             }

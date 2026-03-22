@@ -18,6 +18,4 @@ internal annotation class AuthRetrofit
 @Retention(AnnotationRetention.BINARY)
 internal annotation class DefaultRetrofit
 
-@Qualifier
-@Retention(AnnotationRetention.BINARY)
-internal annotation class MainServerUrl
+

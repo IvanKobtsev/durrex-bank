@@ -4,7 +4,7 @@ import nekit.corporation.architecture.presentation.ScreenState
 import nekit.corporation.profile.model.AccountModel
 import nekit.corporation.profile.model.SettingsUi
 
-internal data class ProfileState(
+data class ProfileState(
     val isLoading: Boolean,
     val account: AccountModel?,
     val settings: SettingsUi?,

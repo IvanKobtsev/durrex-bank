@@ -1,8 +1,10 @@
 package nekit.corporation.auth_impl.presentation.sign.up
 
+import android.content.Intent
+
 internal interface SignUpInteract {
 
-    fun onLoginChange(login: String)
+    /*fun onLoginChange(login: String)
 
     fun onEmailChange(email: String)
 
@@ -18,7 +20,7 @@ internal interface SignUpInteract {
 
     fun onRepeatPasswordChange(repeatPassword: String)
 
-    fun onRepeatPasswordIconClick()
+    fun onRepeatPasswordIconClick()*/
 
     fun onSignUpClick()
 }

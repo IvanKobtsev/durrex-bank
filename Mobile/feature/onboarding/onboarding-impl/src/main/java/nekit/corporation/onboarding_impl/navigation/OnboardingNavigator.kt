@@ -1,13 +1,15 @@
 package nekit.corporation.onboarding_impl.navigation
 
+import com.github.terrakok.cicerone.Router
 import dev.zacsweers.metro.Inject
 import nekit.corporation.shell_main_api.MainShellApi
 import nekit.corporation.shell_main_api.model.Tab
 
 @Inject
 class OnboardingNavigator(
+    private val router: Router,
     private val mainShellApi: MainShellApi
 ) {
 
-    fun openMain() = mainShellApi.onTab(Tab.Main)
+    fun openMain() = router.newRootScreen(mainShellApi.onTab(Tab.Main))
 }

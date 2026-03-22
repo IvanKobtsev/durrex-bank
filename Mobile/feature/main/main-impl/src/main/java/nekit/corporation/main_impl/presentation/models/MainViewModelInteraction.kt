@@ -22,4 +22,8 @@ internal interface MainViewModelInteraction {
     fun onOpenCurrencyMenu()
 
     fun onAccountClick(id: Int)
+
+    fun onHiddenSwitch()
+
+    fun onCreateTransactionClick()
 }

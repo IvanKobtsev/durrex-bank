@@ -17,4 +17,5 @@
     <string name="look_all">Посмотреть все</string>
     <string name="not_connection_failure">Соединение с интернетом пропало, попробуйте позже</string>
     <string name="strange_error">Упс… Что-то пошло не так, попробуйте позже</string>
+    <string name="create_transaction">Создать перевод</string>
 </resources>

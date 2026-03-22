@@ -36,4 +36,6 @@ dependencies {
     implementation(projects.feature.history.historyApi)
     implementation(projects.feature.loanDetails.loanDetailsApi)
     implementation(projects.feature.shellMain.shellMainApi)
+    implementation(projects.feature.auth.authApi)
+    implementation(projects.feature.transaction.transactionApi)
 }

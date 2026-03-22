@@ -2,6 +2,7 @@ plugins {
     id("android-library-convention")
     alias(stack.plugins.kotlin.ksp)
     `kotlinx-serialization`
+    alias(stack.plugins.metro)
 }
 
 android {

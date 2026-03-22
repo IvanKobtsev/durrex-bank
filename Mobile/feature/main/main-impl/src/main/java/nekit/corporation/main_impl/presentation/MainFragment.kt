@@ -26,12 +26,12 @@ internal class MainFragment(
 
     override val defaultViewModelProviderFactory: ViewModelProvider.Factory
         get() = viewModelFactory
+    val viewModel by viewModels<MainViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val viewModel by viewModels<MainViewModel>()
         return ComposeView(requireContext()).apply {
             setContent {
                 DurexBankTheme {
@@ -40,5 +40,10 @@ internal class MainFragment(
                 }
             }
         }
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        viewModel.onNavigate()
     }
 }

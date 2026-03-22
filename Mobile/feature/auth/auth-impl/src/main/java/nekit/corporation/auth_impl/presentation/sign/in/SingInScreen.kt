@@ -29,7 +29,7 @@ internal fun SingInScreen(state: AuthState.SignInState, signInInteract: SignInIn
             .padding(horizontal = 16.dp)
             .padding(bottom = WindowInsets.systemBars.asPaddingValues().calculateBottomPadding())
     ) {
-        PrimaryInputField(
+        /*PrimaryInputField(
             value = state.login.text,
             label = stringResource(R.string.login),
             onValueChange = signInInteract::onLoginChange,
@@ -52,7 +52,7 @@ internal fun SingInScreen(state: AuthState.SignInState, signInInteract: SignInIn
                 VisualTransformation.None
             else
                 PasswordVisualTransformation()
-        )
+        )*/
         PrimaryButton(
             text = stringResource(R.string.sign_up_action),
             onClick = signInInteract::onSignInClick,
@@ -64,6 +64,7 @@ internal fun SingInScreen(state: AuthState.SignInState, signInInteract: SignInIn
     }
 }
 
+/*
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun PreviewSingInScreen() {
@@ -104,3 +105,4 @@ fun PreviewSingInScreen() {
         )
     }
 }
+*/

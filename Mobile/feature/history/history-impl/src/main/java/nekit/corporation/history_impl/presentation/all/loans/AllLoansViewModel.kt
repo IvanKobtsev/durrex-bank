@@ -1,5 +1,6 @@
 package nekit.corporation.history_impl.presentation.all.loans
 
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ClassKey
@@ -18,10 +19,9 @@ import nekit.corporation.history_impl.presentation.models.AllLoansState
 @Inject
 @ViewModelKey(AllLoansViewModel::class)
 @ContributesIntoMap(
-    AppScope::class,
-    binding<@ClassKey(AllLoansViewModel::class) StatefulViewModel<AllLoansState>>()
+    AppScope::class, binding = binding<ViewModel>()
 )
-internal class AllLoansViewModel(
+class AllLoansViewModel(
     private val allLoansNavigation: AllLoansNavigator,
     private val getLoansUseCase: GetCreditsUseCase
 ) : StatefulViewModel<AllLoansState>() {

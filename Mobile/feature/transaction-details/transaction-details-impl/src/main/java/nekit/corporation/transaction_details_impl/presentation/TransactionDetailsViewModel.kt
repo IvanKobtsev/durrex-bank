@@ -1,6 +1,7 @@
 package nekit.corporation.transaction_details_impl.presentation
 
 import android.util.Log
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ClassKey
@@ -27,8 +28,8 @@ import nekit.corporation.util.domain.common.UnknownFailure
 
 @Inject
 @ViewModelKey(TransactionDetailsViewModel::class)
-@ContributesIntoMap(AppScope::class, binding<@ClassKey(TransactionDetailsViewModel::class) TransactionInteractions>())
-internal class TransactionDetailsViewModel(
+@ContributesIntoMap(AppScope::class, binding = binding<ViewModel>())
+class TransactionDetailsViewModel(
     private val accountRepository: AccountRepository,
     private val navigator: TransactionDetailsNavigator
 ) : StatefulViewModel<TransactionDetailsState>(), TransactionInteractions {
@@ -69,7 +70,7 @@ internal class TransactionDetailsViewModel(
                 }
 
                 is ServerFailure, is UnknownFailure, is BadRequestFailure -> {
-                     offerEvent(TransactionDetailsEvent.ShowToast(R.string.strange_error))
+                    offerEvent(TransactionDetailsEvent.ShowToast(R.string.strange_error))
                 }
 
                 is ForbiddenFailure -> navigator.toAuth()

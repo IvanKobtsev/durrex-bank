@@ -5,16 +5,17 @@ import com.example.shift_project.presentation.di.AppGraph
 import com.github.terrakok.cicerone.Cicerone
 import com.github.terrakok.cicerone.Router
 import com.google.crypto.tink.aead.AeadConfig
+import dev.zacsweers.metro.AppScope
+import dev.zacsweers.metro.Inject
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 import dev.zacsweers.metro.createGraphFactory
 import dev.zacsweers.metrox.android.MetroAppComponentProviders
 import dev.zacsweers.metrox.android.MetroApplication
 
-class App : Application(), MetroApplication{
+class App : Application(), MetroApplication {
 
     private val appGraph by lazy { createGraphFactory<AppGraph.Factory>().create(this) }
-    private val cicerone = Cicerone.create(Router())
-    val router get() = cicerone.router
-    val navigatorHolder get() = cicerone.getNavigatorHolder()
 
     override val appComponentProviders: MetroAppComponentProviders
         get() = appGraph

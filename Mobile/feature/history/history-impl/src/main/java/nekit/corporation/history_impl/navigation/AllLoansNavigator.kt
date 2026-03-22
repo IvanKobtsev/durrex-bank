@@ -5,7 +5,7 @@ import nekit.corporation.loan_details_api.LoanDetailsApi
 import nekit.corporation.shell_main_api.MainShellApi
 
 @Inject
-internal class AllLoansNavigator(
+class AllLoansNavigator(
     private val mainShellApi: MainShellApi,
     private val loanDetailsApi: LoanDetailsApi
 ) {

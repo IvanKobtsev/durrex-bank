@@ -1,5 +1,6 @@
 package nekit.corporation.create_loan_impl
 
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ClassKey
@@ -25,10 +26,9 @@ import nekit.corporation.tariff.domain.usecase.GetTariffsUseCase
 @Inject
 @ViewModelKey(CreateLoanViewModel::class)
 @ContributesIntoMap(
-    AppScope::class,
-    binding = binding<@ClassKey(CreateLoanViewModel::class) CreateLoanInteractions>()
+    AppScope::class, binding = binding<ViewModel>()
 )
-internal class CreateLoanViewModel(
+class CreateLoanViewModel(
     private val navigation: CreateCreditNavigator,
     private val createCreditUseCase: CreateCreditUseCase,
     private val getTariffsUseCase: GetTariffsUseCase,

@@ -1,5 +1,7 @@
 package nekit.corporation.transaction_impl
 
+import android.util.Log
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ClassKey
@@ -7,9 +9,11 @@ import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.binding
 import dev.zacsweers.metrox.viewmodel.ViewModelKey
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
@@ -21,6 +25,7 @@ import nekit.corporation.loan_shared.domain.usecase.GetAccountsUseCase
 import nekit.corporation.transaction.model.TransactionInteractions
 import nekit.corporation.transaction.model.TransactionState
 import nekit.corporation.transaction.model.toUi
+import nekit.corporation.transaction_impl.model.TransactionEvents
 import nekit.corporation.user.domain.usecase.GetUserByIdUseCase
 import nekit.corporation.user.domain.usecase.GetUserUseCase
 import nekit.corporation.util.domain.common.NotFoundFailure
@@ -28,13 +33,14 @@ import nekit.corporation.util.domain.common.NotFoundFailure
 @OptIn(FlowPreview::class)
 @Inject
 @ViewModelKey(TransactionViewModel::class)
-@ContributesIntoMap(AppScope::class, binding<@ClassKey(TransactionViewModel::class) TransactionInteractions>())
+@ContributesIntoMap(AppScope::class, binding = binding<ViewModel>())
 class TransactionViewModel(
     private val getAccountsUseCase: GetAccountsUseCase,
     private val getAccountByIdUseCase: GetAccountByIdUseCase,
     private val createTransferUseCase: CreateTransferUseCase,
     private val getUserByIdUseCase: GetUserByIdUseCase,
     private val getUserUseCase: GetUserUseCase,
+    private val navigator: TransactionNavigator
 ) : StatefulViewModel<TransactionState>(), TransactionInteractions {
 
     override fun createInitialState(): TransactionState {
@@ -43,25 +49,41 @@ class TransactionViewModel(
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            val accounts = getAccountsUseCase()
-            val user = getUserUseCase()
+            val accounts = async {
+                fallback(
+                    action = { getAccountsUseCase() },
+                    onFailure = {
+                        getAccountsUseCase()
+                    }
+                )
+            }
+            val user = async {
+                fallback(
+                    action = { getUserUseCase() },
+                    onFailure = {
+                        screenEvents.offerEvent(TransactionEvents.ShowToast(R.string.strange_error))
+                    }
+                )
+            }
             updateState {
                 copy(
-                    userAccounts = accounts.map { it.toUi() }.toImmutableList(),
-                    accountFrom = accounts.firstOrNull()?.toUi(),
-                    user = user.toUi()
+                    userAccounts = accounts.await()?.map { it.toUi() }?.toImmutableList()
+                        ?: persistentListOf(),
+                    accountFrom = accounts.await()?.firstOrNull()?.toUi(),
+                    user = user.await()?.toUi()
                 )
             }
         }
-    }
 
-    init {
         viewModelScope.launch(Dispatchers.Default) {
             screenState.distinctUntilChanged { old, new ->
                 old.currentState.accountTo == new.currentState.accountTo
             }.debounce(400L).collect {
                 try {
+                    if (it.currentState.accountTo == "")
+                        return@collect
                     val account = getAccountByIdUseCase(it.currentState.accountTo.toInt())
+                    Log.d("RAG", "account " + account.toString())
                     val user = getUserByIdUseCase(account.ownerId)
                     updateState {
                         copy(
@@ -74,6 +96,21 @@ class TransactionViewModel(
                             accountToError = R.string.account_not_found_exception
                         )
                     }
+                } catch (_: Throwable) {
+                    screenEvents.offerEvent(TransactionEvents.ShowToast(R.string.strange_error))
+                }
+            }
+        }
+
+        viewModelScope.launch {
+            screenState.distinctUntilChanged { old, new ->
+                old.currentState == new.currentState
+            }.collect {
+                val state = it.currentState
+                updateState {
+                    copy(
+                        isButtonEnable = state.recipient != null && state.user != null && state.accountToError == null
+                    )
                 }
             }
         }
@@ -107,14 +144,25 @@ class TransactionViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             val state = currentScreenState
             if (state.recipient != null && state.user != null) {
-                createTransferUseCase(
-                    transfer = Transfer(
-                        targetAccountId = state.recipient.id,
-                        amount = state.sum,
-                        description = state.description
-                    ),
-                    id = state.user.id
-                )
+                try {
+                    updateState {
+                        copy(isLoading = true, isButtonEnable = false)
+                    }
+                    createTransferUseCase(
+                        transfer = Transfer(
+                            targetAccountId = state.recipient.id,
+                            amount = state.sum,
+                            description = state.description
+                        ),
+                        id = state.user.id
+                    )
+                } catch (_: Throwable) {
+                    screenEvents.offerEvent(TransactionEvents.ShowToast(R.string.strange_error))
+                    navigator.toMain()
+                }
+                updateState {
+                    copy(isLoading = false, isButtonEnable = true)
+                }
             }
         }
     }

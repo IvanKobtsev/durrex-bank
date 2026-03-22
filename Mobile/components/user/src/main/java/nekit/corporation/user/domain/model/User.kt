@@ -11,5 +11,4 @@ data class User(
     val telephoneNumber: String,
     val role: UserRole,
     val isBlocked: Boolean,
-    val rating: Float,
 )

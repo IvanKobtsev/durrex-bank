@@ -5,6 +5,7 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -32,6 +33,7 @@ import nekit.corporation.transaction_impl.R
 import nekit.corporation.ui.component.AccountDetailsCard
 import nekit.corporation.ui.component.PrimaryInputField
 import nekit.corporation.ui.component.Headline2
+import nekit.corporation.ui.component.LoadingScreen
 import nekit.corporation.ui.component.PrimaryButton
 import nekit.corporation.ui.component.SecondaryInputText
 import nekit.corporation.ui.theme.LocalAppColors
@@ -40,65 +42,72 @@ import nekit.corporation.ui.theme.LocalAppColors
 fun TransactionContent(state: TransactionState, interactions: TransactionInteractions) {
     val scrollState = rememberScrollState()
     val color = LocalAppColors.current
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 24.dp)
-            .verticalScroll(scrollState)
-            .padding(WindowInsets.systemBars.asPaddingValues())
-    ) {
-        if (state.userAccounts.isNotEmpty()) {
-            val pagerState = rememberPagerState(0) { state.userAccounts.size }
-            HorizontalPager(pagerState) {
-                val account = state.userAccounts[it]
-                AccountDetailsCard(account.id, "${account.sum} ${account.currency}")
+    Box() {
+        if (state.isLoading)
+            LoadingScreen(modifier = Modifier.fillMaxSize())
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 24.dp)
+                .verticalScroll(scrollState)
+                .padding(WindowInsets.systemBars.asPaddingValues())
+        ) {
+            Spacer(Modifier.height(24.dp))
+
+            if (state.userAccounts.isNotEmpty()) {
+                val pagerState = rememberPagerState(0) { state.userAccounts.size }
+                HorizontalPager(pagerState) {
+                    val account = state.userAccounts[it]
+                    AccountDetailsCard(account.id, "${account.sum} ${account.currency}")
+                }
+                Spacer(Modifier.height(32.dp))
+            }
+            PrimaryInputField(
+                value = state.accountTo,
+                onValueChange = interactions::onAccountToChange,
+                label = stringResource(R.string.transfer_to),
+                isError = state.accountToError != null,
+                supportingText = state.accountToError?.let { stringResource(it) } ?: "",
+                modifier = Modifier.fillMaxWidth()
+            )
+            AnimatedVisibility(
+                visible = state.recipient != null,
+                enter = fadeIn() + expandVertically(),
+                exit = fadeOut() + shrinkVertically()
+            ) {
+                Column {
+                    Spacer(Modifier.height(32.dp))
+                    UserDetailsCard(
+                        firstName = state.recipient?.firstName ?: return@AnimatedVisibility,
+                        lastName = state.recipient.lastName,
+                        phone = state.recipient.phone,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
             }
             Spacer(Modifier.height(32.dp))
+            Headline2(
+                text = stringResource(R.string.description),
+                color = color.fontPrimary
+            )
+            SecondaryInputText(
+                text = state.description,
+                onValueChange = interactions::descriptionChange,
+                placeholder = stringResource(R.string.description_enter),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+            )
+            Spacer(Modifier.weight(1f))
+            PrimaryButton(
+                text = stringResource(R.string.transfer),
+                onClick = interactions::onTransferClick,
+                modifier = Modifier
+                    .fillMaxWidth()
+            )
         }
-        PrimaryInputField(
-            value = state.accountTo,
-            onValueChange = interactions::onAccountToChange,
-            label = stringResource(R.string.transfer_to),
-            isError = state.accountToError != null,
-            supportingText = state.accountToError?.let { stringResource(it) } ?: "",
-            modifier = Modifier.fillMaxWidth()
-        )
-        AnimatedVisibility(
-            visible = state.recipient != null,
-            enter = fadeIn() + expandVertically(),
-            exit = fadeOut() + shrinkVertically()
-        ) {
-            Column {
-                Spacer(Modifier.height(32.dp))
-                UserDetailsCard(
-                    firstName = state.recipient?.firstName ?: return@AnimatedVisibility,
-                    lastName = state.recipient.lastName,
-                    phone = state.recipient.phone,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-        }
-        Spacer(Modifier.height(32.dp))
-        Headline2(
-            text = stringResource(R.string.description),
-            color = color.fontPrimary
-        )
-        SecondaryInputText(
-            text = state.description,
-            onValueChange = interactions::descriptionChange,
-            placeholder = stringResource(R.string.description_enter),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
-        )
-        Spacer(Modifier.weight(1f))
-        PrimaryButton(
-            text = stringResource(R.string.transfer),
-            onClick = interactions::onTransferClick,
-            modifier = Modifier
-                .fillMaxWidth()
-        )
     }
+
 }
 
 @Preview(showBackground = true, showSystemUi = true)

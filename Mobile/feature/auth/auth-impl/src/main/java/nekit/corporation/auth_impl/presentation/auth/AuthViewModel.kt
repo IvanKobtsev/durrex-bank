@@ -1,9 +1,9 @@
 package nekit.corporation.auth_impl.presentation.auth
 
 import android.util.Log
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.zacsweers.metro.AppScope
-import dev.zacsweers.metro.ClassKey
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.binding
@@ -12,6 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -21,13 +22,15 @@ import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
 import nekit.corporation.architecture.presentation.StatefulViewModel
 import nekit.corporation.auth.domain.Validator
-import nekit.corporation.auth.domain.model.Credentials
-import nekit.corporation.auth.domain.model.RegisterModel
+import nekit.corporation.auth.domain.model.TokenDto
+import nekit.corporation.auth.domain.repository.AuthRepository
 import nekit.corporation.auth.domain.usecase.GetCredentialsUseCase
 import nekit.corporation.auth.domain.usecase.LoginUseCase
 import nekit.corporation.auth.domain.usecase.RegisterUseCase
+import nekit.corporation.auth_impl.AuthManager
 import nekit.corporation.auth_impl.R
 import nekit.corporation.auth_impl.navigation.AuthNavigator
+import nekit.corporation.auth_impl.presentation.model.AuthEvent
 import nekit.corporation.auth_impl.presentation.model.AuthEvent.ShowToast
 import nekit.corporation.auth_impl.presentation.model.AuthState
 import nekit.corporation.auth_impl.presentation.model.Field
@@ -36,6 +39,7 @@ import nekit.corporation.auth_impl.presentation.sign.`in`.SignInInteract
 import nekit.corporation.auth_impl.presentation.sign.up.SignUpInteract
 import nekit.corporation.loan_shared.domain.repository.AccountRepository
 import nekit.corporation.onboarding_shared.domain.usecase.GetSettingsUseCase
+import nekit.corporation.user.domain.model.Scheme
 import nekit.corporation.util.domain.common.BadRequestFailure
 import nekit.corporation.util.domain.common.CommonBackendFailure
 import nekit.corporation.util.domain.common.CredentialsError
@@ -44,32 +48,45 @@ import nekit.corporation.util.domain.common.NoConnectionFailure
 import nekit.corporation.util.domain.common.NotFoundFailure
 import nekit.corporation.util.domain.common.ServerFailure
 import nekit.corporation.util.domain.common.UnknownFailure
-import nekit.corporation.utils.PhoneNumberUtils
 
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 @Inject
 @ViewModelKey(AuthViewModel::class)
-@ContributesIntoMap(
-    AppScope::class,
-    binding = binding<@ClassKey(AuthViewModel::class) SignUpInteract>()
-)
+@ContributesIntoMap(AppScope::class, binding<ViewModel>())
 class AuthViewModel(
     private val registerUseCase: RegisterUseCase,
+    private val oidcAuthManager: AuthManager,
     private val loginUseCase: LoginUseCase,
     private val getSettingsUseCase: GetSettingsUseCase,
     private val getCredentialsUseCase: GetCredentialsUseCase,
     private val accountRepository: AccountRepository,
     private val navigator: AuthNavigator,
+    private val authRepository: AuthRepository,
+    private val getNetworkSettingsUseCase: nekit.corporation.user.domain.usecase.GetSettingsUseCase
 ) : StatefulViewModel<AuthState>(), SignUpInteract, SignInInteract {
     init {
         observeSignUpState()
         observeSignInState()
+
         viewModelScope.launch(Dispatchers.IO) {
             reduceError {
-                val credentials = getCredentialsUseCase()
+                val credentials = async {
+                    fallback(
+                        action = { getCredentialsUseCase() },
+                        onFailure = { onSignInOpen() }
+                    )
+                }
+                launch {
+                    fallback(
+                        action = { getNetworkSettingsUseCase() },
+                        onFailure = { onSignInOpen() }
+                    )?.let {
+                        screenEvents.offerEvent(AuthEvent.ChangeTheme(it.theme == Scheme.Dark))
+                    }
+                }
                 try {
                     accountRepository.getAllAccounts()
-                    if (credentials == null)
+                    if (credentials.await() == null)
                         onSignInOpen()
                     else if (!getSettingsUseCase.execute().isShowedOnboarding)
                         navigator.onOnboardingOpen()
@@ -87,194 +104,40 @@ class AuthViewModel(
         return AuthState.Init
     }
 
-    override fun onLoginChange(login: String) {
-        if (currentScreenState is AuthState.SignUpState) {
-            updateStateOf<AuthState.SignUpState> {
-                if (!this.login.isObserverActive) {
-                    observeSignUpLogin()
-                }
-
-                copy(login = this.login.copy(text = login, isObserverActive = true))
-            }
-        }
-
-        if (currentScreenState is AuthState.SignInState) {
-            updateStateOf<AuthState.SignInState> {
-                if (!this.login.isObserverActive) {
-                    observeSignInLogin()
-                }
-                copy(login = this.login.copy(text = login, isObserverActive = true))
-            }
-        }
-    }
-
-    override fun onEmailChange(email: String) {
-        updateStateOf<AuthState.SignUpState> {
-            if (!this.email.isObserverActive) {
-                observeSignUpEmail()
-            }
-            copy(
-                email = this.email.copy(
-                    text = email,
-                    isObserverActive = true
-                )
-            )
-        }
-    }
-
-    override fun onFirstNameChange(firstName: String) {
-        updateStateOf<AuthState.SignUpState> {
-            if (!this.firstName.isObserverActive) {
-                observeSignUpFirstName()
-            }
-            copy(
-                firstName = this.firstName.copy(
-                    text = firstName,
-                    isObserverActive = true
-                )
-            )
-        }
-    }
-
-    override fun onLastNameChange(lastName: String) {
-        updateStateOf<AuthState.SignUpState> {
-            if (!this.lastName.isObserverActive) {
-                observeSignUpLastName()
-            }
-            copy(
-                lastName = this.lastName.copy(
-                    text = lastName,
-                    isObserverActive = true
-                )
-            )
-        }
-    }
-
-    override fun onPhoneChange(phone: String) {
-        updateStateOf<AuthState.SignUpState> {
-            if (!this.phone.isObserverActive) {
-                observeSignUpPhone()
-            }
-            copy(
-                phone = this.phone.copy(
-                    text = PhoneNumberUtils.getFilteredPhone(phone),
-                    isObserverActive = true
-                )
-            )
-        }
-    }
-
-    override fun onPasswordChange(password: String) {
-        if (currentScreenState is AuthState.SignUpState) {
-            updateStateOf<AuthState.SignUpState> {
-                if (!this.password.isObserverActive) {
-                    observeSignUpPassword()
-                }
-                copy(password = this.password.copy(password = password, isObserverActive = true))
-            }
-        }
-        if (currentScreenState is AuthState.SignInState) {
-            updateStateOf<AuthState.SignInState> {
-                if (!this.password.isObserverActive) {
-                    observeSignInPassword()
-                }
-                copy(password = this.password.copy(password = password, isObserverActive = true))
-            }
-        }
-    }
-
-    override fun onPasswordIconClick() {
-        if (currentScreenState is AuthState.SignUpState) {
-            updateStateOf<AuthState.SignUpState> {
-                copy(password = this.password.copy(isVisible = !this.password.isVisible))
-            }
-        }
-        if (currentScreenState is AuthState.SignInState) {
-            updateStateOf<AuthState.SignInState> {
-                copy(password = this.password.copy(isVisible = !this.password.isVisible))
-            }
-        }
-    }
-
     override fun onSignInClick() {
-        val localState = currentScreenState
-        viewModelScope.launch(Dispatchers.IO) {
-            if (localState is AuthState.SignInState) {
-                reduceError {
-                    updateStateOf<AuthState.SignInState> {
-                        copy(isLoading = true)
-                    }
-                    with(localState) {
-                        loginUseCase.execute(
-                            Credentials(
-                                login = login.text,
-                                password = password.password
-                            )
-                        )
-                    }
-                    navigator.onOnboardingOpen()
-                }
-
-                updateStateOf<AuthState.SignInState> {
-                    copy(isLoading = false)
-                }
-            }
+        val intent = oidcAuthManager.buildLoginIntent()
+        if (intent != null) {
+            screenEvents.offerEvent(AuthEvent.OpenLogin(intent))
+        } else {
+            offerEvent(ShowToast(R.string.strange_error))
         }
     }
 
-    override fun onRepeatPasswordChange(repeatPassword: String) {
-        if (currentScreenState is AuthState.SignUpState) {
-            updateStateOf<AuthState.SignUpState> {
-                if (!this.repeatPassword.isObserverActive) {
-                    observeSignUpRepeatPassword()
-                }
-                copy(
-                    repeatPassword = this.repeatPassword.copy(
-                        password = repeatPassword,
-                        isObserverActive = true
+    fun onAuthCodeReceived(accessToken: String, idToken: String?, refreshToken: String?) {
+        viewModelScope.launch {
+            try {
+                authRepository.saveToken(
+                    TokenDto(
+                        token = accessToken,
+                        expiresAt = ""
                     )
                 )
-            }
-        }
-    }
-
-    override fun onRepeatPasswordIconClick() {
-        if (currentScreenState is AuthState.SignUpState) {
-            updateStateOf<AuthState.SignUpState> {
-                copy(password = this.repeatPassword.copy(isVisible = !this.repeatPassword.isVisible))
+                if (!getSettingsUseCase.execute().isShowedOnboarding)
+                    navigator.onOnboardingOpen()
+                else
+                    navigator.onMainOpen()
+            } catch (e: Exception) {
+                offerEvent(ShowToast(R.string.strange_error))
             }
         }
     }
 
     override fun onSignUpClick() {
-        val localState = currentScreenState
-        viewModelScope.launch(Dispatchers.IO) {
-            if (localState is AuthState.SignUpState) {
-                reduceError {
-                    updateStateOf<AuthState.SignUpState> {
-                        copy(isLoading = true)
-                    }
-
-                    with(localState) {
-                        registerUseCase.execute(
-                            RegisterModel(
-                                login = login.text,
-                                password = password.password,
-                                email = email.text,
-                                firstName = firstName.text,
-                                lastName = lastName.text,
-                                phone = phone.text
-                            )
-                        )
-                    }
-                    navigator.onOnboardingOpen()
-
-                }
-
-                updateStateOf<AuthState.SignUpState> {
-                    copy(isLoading = false)
-                }
-            }
+        val intent = oidcAuthManager.buildLoginIntent()
+        if (intent != null) {
+            screenEvents.offerEvent(AuthEvent.OpenLogin(intent))
+        } else {
+            offerEvent(ShowToast(R.string.strange_error))
         }
     }
 
@@ -345,9 +208,13 @@ class AuthViewModel(
                 phone = Field(text = "", error = null, false)
             )
         }
+        viewModelScope.launch(Dispatchers.Default) {
+            observeSignUpState()
+        }
     }
 
     fun onSignInOpen() {
+        Log.d("RAG", "opem")
         updateState {
             AuthState.SignInState(
                 login = Field(text = "", error = null, false),
@@ -360,6 +227,9 @@ class AuthViewModel(
                 isSignInButtonEnable = false,
                 isLoading = false
             )
+        }
+        viewModelScope.launch(Dispatchers.Default) {
+            observeSignInState()
         }
     }
 
@@ -385,30 +255,6 @@ class AuthViewModel(
                     }
                 }
         }
-    }
-
-    private fun observeSignUpPhone() = with(viewModelScope) {
-        /*launch(Dispatchers.Default + SupervisorJob()) {
-            screenState.map { it.currentState }
-                .filterIsInstance<AuthState.SignUpState>()
-                .distinctUntilChanged { lastValue, newValue ->
-                    lastValue.phone.text == newValue.phone.text
-                }
-                .debounce(DELAY_BETWEEN_CHECKING)
-                .mapLatest {
-                    validator.phoneValidator(it.phone.text)
-                }
-                .collect {
-                    updateStateOf<AuthState.SignUpState> {
-                        copy(
-                            phone = phone.copy(error = reduceValidationError(it))
-                        )
-                    }
-                    if (currentScreenState is AuthState.SignInState) {
-                        cancel()
-                    }
-                }
-        }*/
     }
 
     private fun observeSignUpEmail() = with(viewModelScope) {
@@ -505,80 +351,6 @@ class AuthViewModel(
                         )
                     }
                     if (currentScreenState is AuthState.SignInState) {
-                        cancel()
-                    }
-                }
-        }
-    }
-
-    private fun observeSignUpLogin() = with(viewModelScope) {
-        launch(Dispatchers.Default + SupervisorJob()) {
-            screenState.map { it.currentState }
-                .filterIsInstance<AuthState.SignUpState>()
-                .distinctUntilChanged { lastValue, newValue ->
-                    lastValue.login.text == newValue.login.text
-                }
-                .debounce(DELAY_BETWEEN_CHECKING)
-                .mapLatest {
-                    Validator.validateEmptyField(it.login.text)
-                        ?: Validator.validateLogin(it.login.text)
-                }
-                .collect {
-                    updateStateOf<AuthState.SignUpState> {
-                        copy(
-                            login = login.copy(error = reduceValidationError(it))
-                        )
-                    }
-                    if (currentScreenState is AuthState.SignInState) {
-                        cancel()
-                    }
-                }
-        }
-    }
-
-    private fun observeSignInLogin() = with(viewModelScope) {
-        launch(Dispatchers.Default + SupervisorJob()) {
-            screenState.map { it.currentState }
-                .filterIsInstance<AuthState.SignInState>()
-                .distinctUntilChanged { lastValue, newValue ->
-                    lastValue.login.text == newValue.login.text
-                }
-                .debounce(DELAY_BETWEEN_CHECKING)
-                .mapLatest {
-                    Validator.validateEmptyField(it.login.text)
-                        ?: Validator.validateLogin(it.login.text)
-                }
-                .collect {
-                    updateStateOf<AuthState.SignInState> {
-                        copy(
-                            login = login.copy(error = reduceValidationError(it))
-                        )
-                    }
-                    if (currentScreenState is AuthState.SignUpState) {
-                        cancel()
-                    }
-                }
-        }
-    }
-
-    private fun observeSignInPassword() = with(viewModelScope) {
-        launch(Dispatchers.Default + SupervisorJob()) {
-            screenState
-                .map { it.currentState }
-                .filterIsInstance<AuthState.SignInState>()
-                .distinctUntilChanged { lastValue, newValue ->
-                    lastValue.password.password == newValue.password.password
-                }
-                .debounce(DELAY_BETWEEN_CHECKING)
-                .mapLatest {
-                    Validator.validateEmptyField(it.password.password)
-                }.collect {
-                    updateStateOf<AuthState.SignInState> {
-                        copy(
-                            password = password.copy(error = reduceValidationError(it))
-                        )
-                    }
-                    if (currentScreenState is AuthState.SignUpState) {
                         cancel()
                     }
                 }

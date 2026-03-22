@@ -14,10 +14,10 @@ class AuthNavigator(
 ) {
 
     fun onMainOpen() {
-        router.navigateTo(mainShellApi.onTab(Tab.Main))
+        router.newRootScreen(mainShellApi.onTab(Tab.Main))
     }
 
     fun onOnboardingOpen() {
-        router.navigateTo(onboardingApi.onboarding())
+        router.newRootScreen(onboardingApi.onboarding())
     }
 }

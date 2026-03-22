@@ -26,8 +26,10 @@ dependencies {
 
     implementation(projects.components.authShared)
     implementation(projects.components.account)
+    implementation(projects.components.user)
 
     implementation(projects.feature.auth.authApi)
     implementation(projects.feature.onboarding.onboardingApi)
     implementation(projects.feature.shellMain.shellMainApi)
+    api("net.openid:appauth:0.11.1")
 }

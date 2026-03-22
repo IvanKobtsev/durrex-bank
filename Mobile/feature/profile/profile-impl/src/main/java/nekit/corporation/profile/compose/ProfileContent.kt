@@ -26,7 +26,6 @@ import nekit.corporation.profile_impl.R
 import nekit.corporation.ui.component.SelectionPanel
 import nekit.corporation.ui.theme.DurexBankTheme
 import nekit.corporation.ui.theme.LocalAppColors
-import nekit.corporation.user.domain.model.Language
 import nekit.corporation.user.domain.model.Scheme
 import nekit.corporation.user.domain.model.getRes
 import okhttp3.internal.toImmutableList
@@ -34,6 +33,7 @@ import okhttp3.internal.toImmutableList
 @Composable
 internal fun ProfileContent(state: ProfileState, interaction: ProfileInteractions) {
     val colors = LocalAppColors.current
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -51,21 +51,7 @@ internal fun ProfileContent(state: ProfileState, interaction: ProfileInteraction
             )
         }
         Spacer(Modifier.height(8.dp))
-        AnimatedVisibility(
-            visible = state.settings?.language != null,
-            enter = fadeIn() + slideInVertically { it / 4 },
-            exit = fadeOut() + slideOutVertically { -it / 4 }
-        ) {
-            SelectionPanel(
-                label = stringResource(R.string.selected_language),
-                isVisible = true,
-                onExpandedChange = interaction::onLanguageClick,
-                items = Language.entries.toImmutableList(),
-                selectedItem = state.settings?.language,
-                onItemSelected = interaction::onLanguageChange,
-                itemLabel = { el -> stringResource(el.getRes()) },
-            )
-        }
+
         AnimatedVisibility(
             visible = state.settings?.scheme != null,
             enter = fadeIn() + slideInVertically { it / 4 },
@@ -79,6 +65,7 @@ internal fun ProfileContent(state: ProfileState, interaction: ProfileInteraction
                 selectedItem = state.settings?.scheme,
                 onItemSelected = interaction::onSchemeSwitch,
                 itemLabel = { el -> stringResource(el.getRes()) },
+                modifier = Modifier.padding(horizontal = 16.dp)
             )
         }
     }
@@ -97,10 +84,9 @@ private fun PreviewProfileContent() {
                     email = "william.rufus.day@pet-store.com",
                     phone = "+79999999999",
                     isBlocked = false,
-                    rating = 5.0f
+                    rating = 5
                 ),
                 settings = SettingsUi(
-                    language = Language.En,
                     scheme = Scheme.Dark
                 ),
                 isSchemeOpen = false,
@@ -115,14 +101,6 @@ private fun PreviewProfileContent() {
                 }
 
                 override fun onSchemeClick() {
-                    TODO("Not yet implemented")
-                }
-
-                override fun onLanguageChange(language: Language) {
-                    TODO("Not yet implemented")
-                }
-
-                override fun onLanguageClick() {
                     TODO("Not yet implemented")
                 }
             }

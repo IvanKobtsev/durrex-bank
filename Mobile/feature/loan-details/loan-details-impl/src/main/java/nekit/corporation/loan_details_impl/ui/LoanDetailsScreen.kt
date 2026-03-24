@@ -72,15 +72,18 @@ internal fun LoanDetailsScreen(
         LoanDetailsState.Loading -> LoadingScreen(modifier = Modifier.fillMaxSize())
         is LoanDetailsState.Content -> {
             Column {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(
+                        top = WindowInsets.systemBars.asPaddingValues()
+                            .calculateTopPadding()
+                    )
+                ) {
                     BaseIconButton(
                         onClick = interactions::onBack,
                         modifier = Modifier
                             .padding(16.dp)
-                            .padding(
-                                top = WindowInsets.systemBars.asPaddingValues()
-                                    .calculateTopPadding()
-                            )
+
                     )
                     Spacer(Modifier.width(16.dp))
                     Headline2(

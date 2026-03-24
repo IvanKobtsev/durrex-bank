@@ -1,6 +1,8 @@
 package nekit.corporation.history_impl.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -29,11 +31,15 @@ internal fun TransactionsRow(transaction: Transaction, onIconClick: () -> Unit) 
     Row(
         modifier = Modifier
             .padding(horizontal = 16.dp)
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .clickable(onClick = onIconClick, indication = null, interactionSource = null),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
-        Body2Text(text = transaction.id.toString(), color = colors.fontPrimary)
+        Column() {
+            Body2Text(text = transaction.id.toString(), color = colors.fontPrimary)
+            Body2Text(text = transaction.type.name, color = colors.fontPrimary)
+        }
         Spacer(Modifier.weight(1f))
         IconButton(
             onClick = onIconClick,
@@ -56,7 +62,7 @@ private fun PreviewTransactionsRow() {
             Transaction(
                 id = 120,
                 accountId = 123,
-                type = TransactionTypeDomain.TRANSFER,
+                type = TransactionTypeDomain.Transfer,
                 amount = 400.0,
                 balanceBefore = 300.00,
                 balanceAfter = 400.00,

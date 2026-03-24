@@ -29,6 +29,6 @@ class MainBottomBarNavigator(
     }
 
     fun changeScreen(screen: () -> Screen){
-        mainBottomBarRouter.replaceScreen(screen())
+        mainBottomBarRouter.navigateTo(screen())
     }
 }

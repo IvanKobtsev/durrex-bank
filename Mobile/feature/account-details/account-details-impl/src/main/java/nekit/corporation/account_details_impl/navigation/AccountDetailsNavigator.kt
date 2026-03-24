@@ -3,11 +3,13 @@ package nekit.corporation.account_details_impl.navigation
 import com.github.terrakok.cicerone.Router
 import dev.zacsweers.metro.Inject
 import nekit.corporation.auth_api.AuthApi
+import nekit.corporation.loan_shared.domain.repository.AccountRepository
 import nekit.corporation.shell_main_api.MainShellApi
+import nekit.corporation.shell_main_api.model.Tab
 import nekit.corporation.transaction_details_api.TransactionDetailsApi
 
 @Inject
-internal class AccountDetailsNavigator(
+class AccountDetailsNavigator(
     private val mainShellApi: MainShellApi,
     private val transactionDetailsApi: TransactionDetailsApi,
     private val router: Router,

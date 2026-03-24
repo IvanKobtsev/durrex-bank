@@ -45,7 +45,8 @@ import nekit.corporation.ui.theme.LocalAppColors
 internal fun MainScreen(
     state: MainState,
     eventQueue: EventQueue,
-    interaction: MainViewModelInteraction
+    interaction: MainViewModelInteraction,
+    onThemeUpdate: (Boolean) -> Unit = {}
 ) {
     val colors = LocalAppColors.current
     val context = LocalContext.current
@@ -58,11 +59,13 @@ internal fun MainScreen(
                     it.textRes,
                     Toast.LENGTH_SHORT
                 ).show()
+
+                is MainEvent.UpdateTheme -> onThemeUpdate(it.isDarkTheme)
             }
         }
     }
 
-    if (state is MainState.Content) {
+    if (state is MainState.Content && !state.isLoading) {
         Column(
             modifier = Modifier
                 .background(colors.bgSecondary)
@@ -149,7 +152,7 @@ internal fun MainScreen(
                         IconButton(interaction::onHiddenSwitch) {
                             Icon(
                                 imageVector = ImageVector.vectorResource(
-                                    if (state.showHidden) R.drawable.eye
+                                    if (!state.showHidden) R.drawable.eye
                                     else R.drawable.eye_cross
                                 ),
                                 null
@@ -176,7 +179,7 @@ internal fun MainScreen(
             }
             Spacer(Modifier.height(16.dp))
         }
-    } else if (state is MainState.Loading) {
+    } else if (state is MainState.Loading || (state is MainState.Content)) {
         LoadingScreen(modifier = Modifier.fillMaxSize())
     }
 
@@ -187,16 +190,7 @@ internal fun MainScreen(
 fun PreviewMainScreen() {
     DurexBankTheme {
         MainScreen(
-            MainState.Content(
-                loanSum = 200,
-                isCurrencyMenuOpen = false,
-                selectedCurrency = Currency.RUB,
-                credits = persistentListOf(),
-                accounts = persistentListOf(),
-                allAccounts = persistentListOf(),
-                showHidden = true,
-                hidden = persistentListOf()
-            ),
+            MainState.Content.default,
             eventQueue = EventQueue(),
             interaction = object : MainViewModelInteraction {
                 override fun openOnboarding() {

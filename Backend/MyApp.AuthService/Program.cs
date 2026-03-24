@@ -1,4 +1,5 @@
 using Duende.IdentityServer.Models;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MyApp.AuthService.Data;
@@ -48,6 +49,19 @@ var apiResources =
 
 var clients = builder.Configuration.GetSection("IdentityServer:Clients").Get<List<Client>>() ?? [];
 
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders =
+        ForwardedHeaders.XForwardedFor |
+        ForwardedHeaders.XForwardedProto |
+        ForwardedHeaders.XForwardedHost;
+
+    options.ForwardLimit = 1;
+
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
+});
+
 builder
     .Services.AddIdentityServer(options =>
     {
@@ -93,7 +107,7 @@ using (var scope = app.Services.CreateScope())
     var seeder = scope.ServiceProvider.GetRequiredService<AuthSeeder>();
     await seeder.SeedAsync();
 }
-
+app.UseForwardedHeaders();
 app.UsePathBase("/auth");
 app.UseMiddleware<InternalApiKeyMiddleware>();
 app.UseStaticFiles();

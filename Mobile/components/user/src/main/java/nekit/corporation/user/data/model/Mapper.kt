@@ -1,5 +1,6 @@
 package nekit.corporation.user.data.model
 
+import android.util.Log
 import nekit.corporation.user.domain.model.Scheme
 import nekit.corporation.user.domain.model.Settings
 import nekit.corporation.user.domain.model.User
@@ -19,13 +20,14 @@ fun SettingsDto.toSettings() = Settings(
     theme = try {
         Scheme.valueOf(theme)
     } catch (_: Throwable) {
-        Scheme.Light
+        Log.d("RAG","fail get scheme")
+        Scheme.light
     },
     hiddenAccountIds = hiddenAccountIds
 )
 
 fun Settings.toSettingsDto() = SettingsDto(
-    theme = theme.name,
+    theme = theme.name.lowercase(),
     hiddenAccountIds = hiddenAccountIds
 )
 

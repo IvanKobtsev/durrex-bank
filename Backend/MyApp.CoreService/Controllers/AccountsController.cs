@@ -50,6 +50,7 @@ public class AccountsController : ControllerBase
                 return BadRequest(new { error = "X-User-Id header is missing or invalid." });
             cmd = cmd with { OwnerId = _user.UserId.Value };
         }
+
         var account = await _mediator.Send(cmd, ct);
         return CreatedAtAction(nameof(GetById), new { id = account.Id }, account);
     }
@@ -65,11 +66,13 @@ public class AccountsController : ControllerBase
             var byOwner = await _mediator.Send(new GetAccountsByOwnerIdQuery(_user.UserId.Value), ct);
             return Ok(byOwner);
         }
+
         if (ownerId.HasValue)
         {
             var byOwner = await _mediator.Send(new GetAccountsByOwnerIdQuery(ownerId.Value), ct);
             return Ok(byOwner);
         }
+
         var all = await _mediator.Send(new GetAllAccountsQuery(), ct);
         return Ok(all);
     }
@@ -99,6 +102,7 @@ public class AccountsController : ControllerBase
             var denied = EnforceClientOwnership(account.OwnerId);
             if (denied is not null) return denied;
         }
+
         var result = await _mediator.Send(new CloseAccountCommand(id), ct);
         return Ok(result);
     }
@@ -116,6 +120,7 @@ public class AccountsController : ControllerBase
             var denied = EnforceClientOwnership(account.OwnerId);
             if (denied is not null) return denied;
         }
+
         var tx = await _mediator.Send(new DepositCommand(id, req.Amount, req.Description), ct);
         return Ok(tx);
     }
@@ -133,6 +138,7 @@ public class AccountsController : ControllerBase
             var denied = EnforceClientOwnership(account.OwnerId);
             if (denied is not null) return denied;
         }
+
         var tx = await _mediator.Send(new WithdrawCommand(id, req.Amount, req.Description), ct);
         return Ok(tx);
     }
@@ -150,6 +156,7 @@ public class AccountsController : ControllerBase
             var denied = EnforceClientOwnership(account.OwnerId);
             if (denied is not null) return denied;
         }
+
         var tx = await _mediator.Send(new TransferCommand(id, req.TargetAccountId, req.Amount, req.Description), ct);
         return Ok(tx);
     }
@@ -161,7 +168,7 @@ public class AccountsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Debit(int id, [FromBody] DebitRequest req, CancellationToken ct)
     {
-        if (!_user.IsInternal)
+        if (!_user.IsInternal && !_user.IsClient)
             return StatusCode(StatusCodes.Status403Forbidden);
 
         var tx = await _mediator.Send(new DebitCommand(id, req.Amount, req.Description), ct);
@@ -184,13 +191,16 @@ public class AccountsController : ControllerBase
             var denied = EnforceClientOwnership(account.OwnerId);
             if (denied is not null) return denied;
         }
+
         var result = await _mediator.Send(new GetTransactionsQuery(id, page, pageSize), ct);
         return Ok(result);
     }
-
 }
 
 public record DepositRequest(decimal Amount, string? Description = null);
+
 public record WithdrawRequest(decimal Amount, string? Description = null);
+
 public record TransferRequest(int TargetAccountId, decimal Amount, string? Description = null);
+
 public record DebitRequest(decimal Amount, string? Description = null);

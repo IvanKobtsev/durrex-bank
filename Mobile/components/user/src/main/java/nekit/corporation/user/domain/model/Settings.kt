@@ -7,7 +7,7 @@ data class Settings(
     companion object {
         val default = Settings(
             hiddenAccountIds = emptyList(),
-            theme = Scheme.Light
+            theme = Scheme.light
         )
     }
 }

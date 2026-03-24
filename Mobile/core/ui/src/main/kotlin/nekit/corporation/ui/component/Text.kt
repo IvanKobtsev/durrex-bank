@@ -18,7 +18,11 @@ import nekit.corporation.ui.theme.firaSansFontFamily
 
 
 @Composable
-fun Caption(string: String, color: Color, modifier: Modifier = Modifier) {
+fun Caption(
+    string: String,
+    color: Color = LocalAppColors.current.fontPrimary,
+    modifier: Modifier = Modifier
+) {
     Text(string, style = Typography.labelSmall, color = color, modifier = modifier)
 }
 
@@ -27,7 +31,7 @@ fun Body2Text(
     text: String,
     modifier: Modifier = Modifier,
     textAlign: TextAlign? = null,
-    color: Color = Typography.bodySmall.color
+    color: Color = LocalAppColors.current.fontPrimary
 ) {
     Text(
         text = text,
@@ -43,7 +47,7 @@ fun BodyText(
     text: String,
     modifier: Modifier = Modifier,
     textAlign: TextAlign? = null,
-    color: Color = Typography.bodyMedium.color
+    color: Color = LocalAppColors.current.fontPrimary
 ) {
     Text(
         text = text,
@@ -55,7 +59,7 @@ fun BodyText(
 }
 
 @Composable
-fun LogoText(text: String, color: Color) {
+fun LogoText(text: String, color: Color = LocalAppColors.current.fontPrimary) {
     Text(
         text = text.uppercase(),
         fontFamily = firaSansFontFamily,
@@ -98,7 +102,7 @@ fun Body3Text(
     text: String,
     modifier: Modifier = Modifier,
     textAlign: TextAlign? = null,
-    color: Color = Typography.bodyMedium.color
+    color: Color = LocalAppColors.current.fontPrimary
 ) {
     Text(
         text = text,
@@ -118,7 +122,7 @@ fun HighlightedText(
     style: TextStyle,
     modifier: Modifier = Modifier,
     textAlign: TextAlign? = null,
-    defaultColor: Color = Typography.bodyMedium.color
+    defaultColor: Color = LocalAppColors.current.fontPrimary
 ) {
     val annotatedString = buildAnnotatedString {
         if (wordsToHighlight.isEmpty()) {

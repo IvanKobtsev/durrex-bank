@@ -47,7 +47,6 @@ class UserRepositoryImpl(
     }
 
     override suspend fun updateTheme(theme: Scheme): Settings {
-        return settingsApi.updateTheme(UpdateThemeDto(theme)).toSettings()
-
+        return settingsApi.updateTheme(UpdateThemeDto(theme.name)).toSettings()
     }
 }

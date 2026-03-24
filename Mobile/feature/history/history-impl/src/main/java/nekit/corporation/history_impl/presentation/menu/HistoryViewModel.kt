@@ -1,5 +1,6 @@
 package nekit.corporation.history_impl.presentation.menu
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.zacsweers.metro.AppScope
@@ -32,32 +33,29 @@ class HistoryViewModel(
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            accountRepository.getTransactionHubEvents().collect {
-                fallback(
-                    action = {
-                        accountRepository.getAllAccounts()
-                            .map { account ->
-                                async {
-                                    runCatching { accountRepository.getTransactions(account.id) }
-                                        .getOrDefault(emptyList())
-                                }
-                            }.awaitAll()
-                            .flatten()
-                    },
-                    onFailure = { error ->
-                        when (error) {
-                            is NoConnectionFailure -> offerEvent(HistoryEvent.ShowToast(R.string.network_error))
-                            else -> offerEvent(HistoryEvent.ShowToast(R.string.strange_error))
-                        }
+
+            fallback(
+                action = {
+                    accountRepository.getAllAccounts()
+                        .map { account ->
+                            async {
+                                runCatching { accountRepository.getTransactions(account.id) }
+                                    .getOrDefault(emptyList())
+                            }
+                        }.awaitAll()
+                        .flatten()
+                        .sortedBy { it.id }
+                },
+                onFailure = { error ->
+                    when (error) {
+                        is NoConnectionFailure -> offerEvent(HistoryEvent.ShowToast(R.string.network_error))
+                        else -> offerEvent(HistoryEvent.ShowToast(R.string.strange_error))
                     }
-                )?.let {
-                    updateState {
-                        copy(transactions = it.toImmutableList())
-                    }
+                    Log.d(TAG, "error: ${error.message}")
                 }
-                it.onFailure {
-                    offerEvent(HistoryEvent.ShowToast(R.string.auth_error))
-                    navigation.openAuth()
+            )?.let {
+                updateState {
+                    copy(transactions = it.toImmutableList())
                 }
             }
         }
@@ -78,5 +76,9 @@ class HistoryViewModel(
 
     fun openOnboarding() {
         navigation.openOnboarding()
+    }
+
+    companion object {
+        private const val TAG = "HistoryViewModel"
     }
 }

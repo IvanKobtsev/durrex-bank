@@ -40,8 +40,8 @@ import nekit.corporation.loan_shared.domain.model.Account
 import nekit.corporation.loan_shared.domain.model.Transaction
 import nekit.corporation.loan_shared.domain.model.TransactionTypeDomain
 import nekit.corporation.presentation.model.AccountDetailsEvent
-import nekit.corporation.presentation.model.AccountDetailsInteractions
-import nekit.corporation.presentation.model.AccountDetailsState
+import nekit.corporation.account_details_impl.presentation.model.AccountDetailsInteractions
+import nekit.corporation.account_details_impl.presentation.model.AccountDetailsState
 import nekit.corporation.ui.component.AccountDetailsCard
 import nekit.corporation.ui.component.BaseIconButton
 import nekit.corporation.ui.component.PrimaryInputField
@@ -82,7 +82,11 @@ internal fun AccountDetailsScreen(
         is AccountDetailsState.Content -> {
             if (state.isLoading) LoadingScreen(modifier = Modifier.fillMaxSize())
             else {
-                Column {
+                Column(
+                    Modifier
+                        .fillMaxSize()
+                        .background(colors.bgSecondary)
+                ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
@@ -104,6 +108,14 @@ internal fun AccountDetailsScreen(
                             color = colors.fontPrimary
                         )
                         Spacer(Modifier.weight(1f))
+
+                        BaseIconButton(
+                            onClick = interactions::onHide,
+                            modifier = Modifier
+                                .padding(16.dp),
+                            iconRes = if (!state.isHidden) R.drawable.eye else R.drawable.eye_cross
+                        )
+                        Spacer(Modifier.width(16.dp))
                         if (state.isDeleteCan) {
                             BaseIconButton(
                                 onClick = interactions::onDeleteClick,
@@ -189,8 +201,8 @@ internal fun AccountDetailsScreen(
                                         containerColor = colors.bgPrimary
                                     ) {
                                         persistentListOf(
-                                            TransactionTypeDomain.DEBIT,
-                                            TransactionTypeDomain.DEPOSIT,
+                                            TransactionTypeDomain.Debit,
+                                            TransactionTypeDomain.Deposit,
                                         ).forEach { currency ->
                                             DropdownMenuItem(
                                                 text = {
@@ -225,7 +237,7 @@ internal fun AccountDetailsScreen(
                                 Spacer(Modifier.height(16.dp))
                             }
                         }
-                        items(state.transactions) {
+                        items(state.transactions, key = { it.id }) {
                             AccountOperation(it, interactions::onTransactionOpen)
                             Spacer(Modifier.height(8.dp))
                         }
@@ -256,11 +268,12 @@ private fun PreviewLoanDetailsScreen() {
                 ),
                 isApplyButtonEnable = true,
                 sum = "0.0",
-                selectedOperation = TransactionTypeDomain.DEBIT,
+                selectedOperation = TransactionTypeDomain.Debit,
                 isOperationTypeOpen = true,
                 isLoading = false,
                 transactions = persistentListOf(),
-                isDeleteCan = false
+                isDeleteCan = false,
+                isHidden = true
             ),
             interactions = object : AccountDetailsInteractions {
                 override fun onBack() {
@@ -277,6 +290,10 @@ private fun PreviewLoanDetailsScreen() {
 
 
                 override fun onDeleteClick() {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onHide() {
                     TODO("Not yet implemented")
                 }
 

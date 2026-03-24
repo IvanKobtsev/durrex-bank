@@ -21,7 +21,7 @@ import kotlin.getValue
 @Inject
 @ContributesIntoMap(AppScope::class)
 @FragmentKey(AccountDetailsFragment::class)
-internal class AccountDetailsFragment(
+class AccountDetailsFragment(
     private val viewModelFactory: ViewModelProvider.Factory
 ) : Fragment() {
 

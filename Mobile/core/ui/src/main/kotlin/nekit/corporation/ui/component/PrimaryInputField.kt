@@ -66,6 +66,7 @@ fun PrimaryInputField(
             cursorColor = colors.borderPrimary,
             focusedBorderColor = colors.borderPrimary,
             unfocusedContainerColor = if (value.isBlank()) colors.bgSecondary else colors.bgPrimary,
+            focusedContainerColor = if (value.isBlank()) colors.bgSecondary else colors.bgPrimary,
             errorSupportingTextColor = colors.indicatorError,
             unfocusedBorderColor = if (value.isBlank()) colors.bgSecondary else colors.fontPrimary
         ),

@@ -17,7 +17,7 @@ interface AppGraph : MetroAppComponentProviders, ViewModelGraph {
 
     @Provides
     fun provideApplicationContext(application: Application): Context = application
-    fun inject(activity: MainActivity)
+
     @DependencyGraph.Factory
     fun interface Factory {
         fun create(@Provides application: Application): AppGraph

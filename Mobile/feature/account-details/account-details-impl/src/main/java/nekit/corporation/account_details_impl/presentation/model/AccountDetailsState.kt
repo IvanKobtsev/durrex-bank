@@ -1,4 +1,4 @@
-package nekit.corporation.presentation.model
+package nekit.corporation.account_details_impl.presentation.model
 
 import kotlinx.collections.immutable.ImmutableList
 import nekit.corporation.architecture.presentation.ScreenState
@@ -18,6 +18,7 @@ sealed interface AccountDetailsState : ScreenState {
         val isOperationTypeOpen: Boolean,
         val isLoading: Boolean,
         val transactions: ImmutableList<Transaction>,
-        val isDeleteCan: Boolean
+        val isDeleteCan: Boolean,
+        val isHidden: Boolean
     ) : AccountDetailsState
 }

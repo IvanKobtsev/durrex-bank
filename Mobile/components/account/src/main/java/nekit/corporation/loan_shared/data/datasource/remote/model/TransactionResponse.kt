@@ -15,5 +15,7 @@ data class TransactionResponse(
     val balanceAfter: Double,
     @SerialName("relatedAccountId") val relatedAccountId: Int? = null,
     val description: String? = null,
-    @SerialName("createdAt")  @Contextual val createdAt: OffsetDateTime
+    @SerialName("createdAt")  @Contextual val createdAt: OffsetDateTime,
+    val exchangeRate: Double?,
+    val sourceCurrency: String?
 )

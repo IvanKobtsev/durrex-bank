@@ -3,6 +3,7 @@ package nekit.corporation.ui.component
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -48,7 +49,7 @@ fun CreditRow(
                 .padding(horizontal = 16.dp)
         ) {
             BodyText(
-                text = stringResource(R.string.tariff) + " $tariffName",
+                text = stringResource(R.string.tariff) + " $tariffName".take(10) + "${tariffName?.length?.let { if (it > 10) "..." else "" }}",
                 color = colors.fontPrimary,
             )
             Spacer(Modifier.weight(1f))
@@ -84,11 +85,12 @@ fun InfoRow(
     @StringRes stringRes: Int,
     text: String,
     modifier: Modifier = Modifier,
-    textColor: Color = LocalAppColors.current.permanentPrimaryDark
+    textColor: Color = LocalAppColors.current.permanentPrimaryDark,
+    tint: Color = LocalAppColors.current.iconPrimary
 ) {
     val colors = LocalAppColors.current
     Row(modifier = modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        Icon(ImageVector.vectorResource(iconRes), null)
+        Icon(ImageVector.vectorResource(iconRes), null, tint = tint)
         Spacer(Modifier.width(32.dp))
         Column() {
             Caption(string = stringResource(stringRes), color = colors.fontSecondary)
@@ -116,7 +118,8 @@ fun AccountRow(
             .padding(vertical = 8.dp)
             .clickable(
                 enabled = onClick != null,
-                interactionSource = null
+                interactionSource = null,
+                indication = null
             ) {
                 onClick?.invoke(account)
             },
@@ -142,9 +145,17 @@ fun AccountRow(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun PreviewLoanRow() {
-    InfoRow(
-        iconRes = R.drawable.question_ic,
-        stringRes = R.string.account,
-        text = "bad son"
-    )
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+
+        InfoRow(
+            iconRes = R.drawable.question_ic,
+            stringRes = R.string.account,
+            text = "bad son"
+        )
+        CreditRow(
+            creditId = 1,
+            tariffName = "best of th e",
+            amount = 123.123
+        )
+    }
 }

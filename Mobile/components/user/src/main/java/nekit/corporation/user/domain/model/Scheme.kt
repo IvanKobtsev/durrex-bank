@@ -2,10 +2,10 @@ package nekit.corporation.user.domain.model
 
 import nekit.corporation.user.R
 enum class Scheme {
-    Dark,Light
+    dark,light
 }
 
 fun Scheme.getRes() = when (this) {
-        Scheme.Dark -> R.string.dark
-        Scheme.Light -> R.string.light
+        Scheme.dark -> R.string.dark
+        Scheme.light -> R.string.light
 }

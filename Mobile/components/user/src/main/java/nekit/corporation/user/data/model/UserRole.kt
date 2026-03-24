@@ -11,6 +11,6 @@ enum class UserRole {
     @SerialName("Admin")
     ADMIN,
 
-    @SerialName("Manager")
+    @SerialName("Employee")
     MANAGER;
 }

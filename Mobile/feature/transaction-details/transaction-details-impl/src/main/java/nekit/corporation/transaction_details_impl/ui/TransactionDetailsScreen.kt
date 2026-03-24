@@ -110,7 +110,7 @@ private fun PreviewTransactionDetailsScreen() {
                 transaction = Transaction(
                     id = 123L,
                     accountId = 132123,
-                    type = TransactionTypeDomain.TRANSFER,
+                    type = TransactionTypeDomain.Transfer,
                     amount = 13213.0,
                     balanceBefore = 123123.0,
                     balanceAfter = 12313.0,

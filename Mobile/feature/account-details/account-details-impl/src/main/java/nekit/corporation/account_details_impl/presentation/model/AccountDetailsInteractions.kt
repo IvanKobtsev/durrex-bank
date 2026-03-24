@@ -1,4 +1,4 @@
-package nekit.corporation.presentation.model
+package nekit.corporation.account_details_impl.presentation.model
 
 import nekit.corporation.loan_shared.domain.model.Transaction
 import nekit.corporation.loan_shared.domain.model.TransactionTypeDomain
@@ -12,6 +12,8 @@ interface AccountDetailsInteractions {
     fun onSumChange(sum: String)
 
     fun onDeleteClick()
+
+    fun onHide()
 
     fun onSelectOperation(operation: TransactionTypeDomain)
 

@@ -29,5 +29,5 @@ interface AccountRepository {
 
     suspend fun getTransactions(accountId: Int): List<Transaction>
 
-    fun getTransactionHubEvents():  Flow<Result<Unit>>
+    fun getTransactionHubEvents(accountId: Int):  Flow<Result<Unit>>
 }

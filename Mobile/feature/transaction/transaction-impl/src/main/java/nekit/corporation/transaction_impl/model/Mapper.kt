@@ -1,6 +1,7 @@
-package nekit.corporation.transaction.model
+package nekit.corporation.transaction_impl.model
 
 import nekit.corporation.loan_shared.domain.model.Account
+import nekit.corporation.transaction.model.UserUi
 import nekit.corporation.user.domain.model.User
 
 fun Account.toUi() = AccountUi(

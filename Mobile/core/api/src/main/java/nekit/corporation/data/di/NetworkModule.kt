@@ -121,7 +121,7 @@ interface NetworkModule {
 
     @Provides
     @MainServerUrl
-    fun provideMainServerUrl(): String = "https://9fe6-185-93-3-35.ngrok-free.app".trim()
+    fun provideMainServerUrl(): String = "https://df3e-84-17-62-53.ngrok-free.app/"
 
     companion object {
         private val contentType = "application/json".toMediaType()

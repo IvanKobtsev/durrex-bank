@@ -1,9 +1,9 @@
-package nekit.corporation.create_loan_impl
+package nekit.corporation.create_loan_impl.presentation
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.zacsweers.metro.AppScope
-import dev.zacsweers.metro.ClassKey
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.binding
@@ -14,7 +14,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import nekit.corporation.architecture.presentation.StatefulViewModel
+import nekit.corporation.create_loan_impl.R
 import nekit.corporation.create_loan_impl.model.AccountUi
+import nekit.corporation.create_loan_impl.model.CreateLoanEvents
 import nekit.corporation.create_loan_impl.model.CreateLoanInteractions
 import nekit.corporation.create_loan_impl.model.CreateLoanState
 import nekit.corporation.create_loan_impl.model.toUi
@@ -37,31 +39,46 @@ class CreateLoanViewModel(
     init {
         viewModelScope.launch(Dispatchers.IO) {
             val accounts = async {
-                accountRepository.getAllAccounts()
-            }
-            val tariffs = async { getTariffsUseCase() }
-            updateState {
-                copy(
-                    selectedAccount = accounts.await().firstOrNull()?.toUi(),
-                    selectedTariff = tariffs.await().firstOrNull(),
-                    accounts = accounts.await().map { it.toUi() }.toImmutableList(),
-                    tariffs = tariffs.await().toImmutableList(),
+                fallback(
+                    action = { accountRepository.getAllAccounts() },
+                    onFailure = {
+                        screenEvents.offerEvent(CreateLoanEvents.ShowToast(R.string.error))
+                        Log.d(TAG, "accounts error: ${it.message}")
+                    }
                 )
             }
+            val tariffs = async {
+                fallback(
+                    action = { getTariffsUseCase() },
+                    onFailure = {
+                        screenEvents.offerEvent(CreateLoanEvents.ShowToast(R.string.error))
+                        Log.d(TAG, "tariffs error: ${it.message}")
+                    }
+                )
+            }
+            if (accounts.await() == null || tariffs.await() == null)
+                updateState {
+                    copy(
+                        isFatalError = true,
+                        isLoading = false
+                    )
+                }
+            else
+                updateState {
+                    copy(
+                        selectedAccount = accounts.await()?.firstOrNull()?.toUi(),
+                        selectedTariff = tariffs.await()?.firstOrNull(),
+                        accounts = accounts.await()?.map { it.toUi() }?.toImmutableList()
+                            ?: persistentListOf(),
+                        tariffs = tariffs.await()?.toImmutableList() ?: persistentListOf(),
+                        isLoading = false
+                    )
+                }
         }
     }
 
     override fun createInitialState(): CreateLoanState {
-        return CreateLoanState(
-            selectedAccount = null,
-            selectedTariff = null,
-            tariffs = persistentListOf(),
-            isTariffOpen = false,
-            isAccountOpen = false,
-            accounts = persistentListOf(),
-            amount = 0.0,
-            isLoading = true
-        )
+        return CreateLoanState.default
     }
 
     override fun onBackClick() {
@@ -96,14 +113,19 @@ class CreateLoanViewModel(
     override fun onCreateCredit() {
         viewModelScope.launch(Dispatchers.IO) {
             with(currentScreenState) {
-                if (selectedAccount != null && selectedTariff != null) {
-                    createCreditUseCase(
-                        accountId = selectedAccount.id,
-                        tariffId = selectedTariff.id,
-                        amount = amount
-                    )
-                    navigation.onBack()
+                try {
+                    if (selectedAccount != null && selectedTariff != null) {
+                        createCreditUseCase(
+                            accountId = selectedAccount.id,
+                            tariffId = selectedTariff.id,
+                            amount = amount
+                        )
+                    }
+                } catch (e: Throwable) {
+                    screenEvents.offerEvent(CreateLoanEvents.ShowToast(R.string.error))
+                    Log.d(TAG, "error: ${e.message}")
                 }
+                navigation.onBack()
             }
         }
 
@@ -113,5 +135,9 @@ class CreateLoanViewModel(
         updateState {
             copy(amount = amount.toDouble())
         }
+    }
+
+    companion object {
+        private const val TAG = "CreateLoanViewModel"
     }
 }

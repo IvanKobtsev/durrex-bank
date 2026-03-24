@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -15,7 +14,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.shift_project.R
 import com.example.shift_project.databinding.LaunchScreenBinding
-import com.example.shift_project.presentation.model.toLocaleListCompat
 import com.github.terrakok.cicerone.Cicerone
 import com.github.terrakok.cicerone.Router
 import com.github.terrakok.cicerone.androidx.AppNavigator
@@ -25,16 +23,12 @@ import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.binding
 import dev.zacsweers.metrox.android.ActivityKey
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import nekit.corporation.ThemeViewModel
 import nekit.corporation.auth_api.AuthApi
 import nekit.corporation.common.MainNav
 import nekit.corporation.language_shared.data.datasorce.local.LocaleManager
-import nekit.corporation.user.domain.SettingsManager
 import java.util.Locale
-import kotlin.getValue
 
 @ContributesIntoMap(AppScope::class, binding<Activity>())
 @ActivityKey(MainActivity::class)
@@ -76,13 +70,13 @@ class MainActivity(
     private lateinit var binding: LaunchScreenBinding
 
     private val themeViewModel: ThemeViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = LaunchScreenBinding.inflate(layoutInflater)
         setContentView(binding.root)
         enableEdgeToEdge()
 
-        navigatorHolder.setNavigator(ciceroneNavigator)
         if (savedInstanceState == null) {
             router.newRootScreen(authApi.auth())
         }
@@ -98,17 +92,13 @@ class MainActivity(
         }
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun onResumeFragments() {
+        super.onResumeFragments()
         navigatorHolder.setNavigator(ciceroneNavigator)
     }
 
     override fun onPause() {
-        super.onPause()
         navigatorHolder.removeNavigator()
-    }
-
-    override fun onStart() {
-        super.onStart()
+        super.onPause()
     }
 }

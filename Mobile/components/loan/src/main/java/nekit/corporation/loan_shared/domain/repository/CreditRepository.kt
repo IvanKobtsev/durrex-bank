@@ -16,9 +16,7 @@ interface CreditRepository {
         amount: Double
     ): Credit
 
-    suspend fun getCredits(
-        clientId: Int
-    ): List<Credit>
+    suspend fun getCredits(): List<Credit>
 
     suspend fun getCreditDetail(
         creditId: Int

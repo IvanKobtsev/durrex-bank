@@ -57,7 +57,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SERVER_PORT || 22 }}
           script: |
-            cd /durrex-bank
+            cd /durrex-bank/Backend
             git pull origin main
             docker compose down
             docker compose up -d --build

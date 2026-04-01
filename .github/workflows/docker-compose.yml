@@ -4,13 +4,12 @@ on:
   push:
     branches:
       - main
-      - develop    # если хотите тестировать develop, но деплоить только с main
+      - develop
   pull_request:
     branches:
       - main
 
 jobs:
-  # CI — проверка сборки и тестов (на GitHub runner)
   ci:
     runs-on: ubuntu-latest
     steps:
@@ -21,7 +20,9 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Build and start containers
-        run: docker compose up -d --build
+        run: |
+          cd Backend
+          docker compose up -d --build
 
       - name: Wait for services to be ready
         run: |
@@ -35,19 +36,18 @@ jobs:
           done
 
       - name: Run tests (optional)
-        run: |
-          # например, dotnet test
-          echo "All services are running — tests would go here"
+        run: echo "All services are running — tests would go here"
 
       - name: Stop containers
         if: always()
-        run: docker compose down -v
+        run: |
+          cd Backend
+          docker compose down -v
 
-  # CD — деплой на сервер (только после успешного CI и только для main)
   cd:
     runs-on: ubuntu-latest
-    needs: ci               # ждёт успешного завершения ci
-    if: github.ref == 'refs/heads/main'   # деплоим только с main
+    needs: ci
+    if: github.ref == 'refs/heads/main'
     steps:
       - name: Deploy to server via SSH
         uses: appleboy/ssh-action@v1

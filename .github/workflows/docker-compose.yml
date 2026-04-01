@@ -22,7 +22,8 @@ jobs:
 
       - name: Build and start containers
         run: docker compose up -d --build
-        - name: Wait for services to be ready
+
+      - name: Wait for services to be ready
         run: |
           for i in {1..30}; do
             if curl -s -f http://localhost:5260/health; then
@@ -56,7 +57,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SERVER_PORT || 22 }}
           script: |
-            cd /durrex-bank
+            cd /path/to/your/project   # путь к проекту на сервере
             git pull origin main
             docker compose down
             docker compose up -d --build

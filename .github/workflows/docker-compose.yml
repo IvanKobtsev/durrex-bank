@@ -1,0 +1,37 @@
+name: Docker Compose Test
+
+on:
+  push:                # Запуск после каждого push в любую ветку
+    branches: [ main, develop ]   # можно указать нужные ветки
+  pull_request:        # Опционально: запуск при PR
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Run docker-compose up
+        run: |
+          docker-compose up -d --build
+          # Ждём, пока все контейнеры запустятся (можно добавить sleep или проверку health)
+          sleep 30
+
+      - name: Check running containers
+        run: docker ps
+
+      - name: Run health checks (пример)
+        run: |
+          # Проверяем, что шлюз отвечает (порт 5260)
+          curl --fail http://localhost:5260/health || exit 1
+          # Добавьте другие проверки для нужных сервисов
+
+      - name: Stop and clean up
+        if: always()   # Выполнится даже при ошибке
+        run: docker-compose down -v

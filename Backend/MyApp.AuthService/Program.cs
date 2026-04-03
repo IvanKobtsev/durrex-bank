@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.HttpOverrides;
 using Duende.IdentityServer.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,13 @@ using MyApp.AuthService.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")!;
+
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost;
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
+});
 
 builder.Services.AddRazorPages();
 builder.Services.AddControllers();
@@ -94,6 +102,7 @@ using (var scope = app.Services.CreateScope())
     await seeder.SeedAsync();
 }
 
+app.UseForwardedHeaders();
 app.UsePathBase("/auth");
 app.UseMiddleware<InternalApiKeyMiddleware>();
 app.UseStaticFiles();

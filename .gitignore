@@ -3,3 +3,4 @@
 [Oo]bj
 /Backend/MyApp.AuthService/tempkey.jwk
 /Backend/MyApp.AuthService/keys
+nginx/ssl/

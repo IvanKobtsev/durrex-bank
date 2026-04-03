@@ -1,30 +1,21 @@
-# Этап 1: Сборка приложения
-FROM node:20-alpine AS builder
-
+FROM node:22-alpine AS build
 WORKDIR /app
 
-# Копируем манифесты зависимостей
+# Install dependencies first for better layer caching.
 COPY package.json yarn.lock ./
+RUN yarn install --frozen-lockfile
 
+# Build the production bundle.
 COPY . .
-# Устанавливаем зависимости через yarn (аналог npm ci для yarn)
-RUN yarn install
-# Собираем приложение
-# Если нужно передать URL API во время сборки (опционально)
-ARG VITE_API_URL
-ENV VITE_API_URL=$VITE_API_URL
+RUN yarn build
 
-RUN npx vite build
+FROM nginx:1.27-alpine AS runtime
 
-# Этап 2: Раздача статики через Nginx
-FROM nginx:alpine
-
-# Копируем собранные файлы из этапа builder
-COPY --from=builder /app/dist /usr/share/nginx/html
-
-# (Опционально) копируем кастомный конфиг nginx, если нужен
-# COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Use SPA-friendly Nginx config.
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=build /app/dist /usr/share/nginx/html
 
 EXPOSE 80
 
 CMD ["nginx", "-g", "daemon off;"]
+

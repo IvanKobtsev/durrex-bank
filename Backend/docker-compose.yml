@@ -137,6 +137,14 @@ services:
       - core-service
       - credit-service
 
+  frontend:
+    build:
+      context: ..
+      dockerfile: Frontend/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - gateway
+
   proxy:
     image: nginx:alpine
     restart: unless-stopped
@@ -148,6 +156,7 @@ services:
       - ../nginx/ssl:/etc/nginx/ssl:ro
     depends_on:
       - gateway
+      - frontend
     networks:
       - default
 volumes:

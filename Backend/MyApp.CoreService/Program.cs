@@ -162,11 +162,11 @@ static (int status, string message) MapRequestFault(RequestFaultException rex)
     return (StatusCodes.Status400BadRequest, rex.Message);
 }
 
-if (app.Environment.IsDevelopment())
-{
+// if (app.Environment.IsDevelopment())
+// {
     app.MapOpenApi();
     app.MapScalarApiReference();
-}
+// }
 
 app.UseHttpsRedirection();
 

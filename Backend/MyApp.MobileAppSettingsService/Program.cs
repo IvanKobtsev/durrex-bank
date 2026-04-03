@@ -60,7 +60,7 @@ app.UseExceptionHandler(errApp =>
     })
 );
 
-if (app.Environment.IsDevelopment())
+// if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 
 app.UseMiddleware<InternalApiKeyMiddleware>();

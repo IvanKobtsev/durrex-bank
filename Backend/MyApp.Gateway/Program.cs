@@ -103,12 +103,12 @@ app.UseSwagger();
 
 app.UseSwaggerUI(options =>
 {
-    options.SwaggerEndpoint("/core/openapi/v1.json", "CoreService API");
-    options.SwaggerEndpoint("/credit/swagger/v1/swagger.json", "CreditService API");
-    options.SwaggerEndpoint("/user/swagger/v1/swagger.json", "UserService API");
-    options.SwaggerEndpoint("/web-app-settings/openapi/v1.json", "Web App Settings Service API");
+    options.SwaggerEndpoint("/services/core/openapi/v1.json", "CoreService API");
+    options.SwaggerEndpoint("/services/credit/swagger/v1/swagger.json", "CreditService API");
+    options.SwaggerEndpoint("/services/user/swagger/v1/swagger.json", "UserService API");
+    options.SwaggerEndpoint("/services/web-app-settings/openapi/v1.json", "Web App Settings Service API");
     options.SwaggerEndpoint(
-        "/mobile-app-settings/openapi/v1.json",
+        "/services/mobile-app-settings/openapi/v1.json",
         "Mobile App Settings Service API"
     );
     options.RoutePrefix = "swagger";

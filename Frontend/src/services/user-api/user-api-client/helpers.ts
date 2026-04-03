@@ -75,7 +75,7 @@ export function isParameterObject(param: unknown) {
   return true;
 }
 
-let _baseUrl = "http://localhost:5260/user";
+let _baseUrl = "https://swagor-time.ru/services/user";
 /*
   Returns the base URL for http requests
 */

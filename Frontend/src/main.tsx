@@ -6,10 +6,10 @@ import axios, { AxiosError, AxiosResponse } from "axios";
 import { AuthProvider } from "react-oidc-context";
 
 const oidcConfig = {
-  authority: "http://localhost:5260/auth", // ← Gateway, not direct AuthService
+  authority: "https://swagor-time.ru/services/auth",
   client_id: "web-spa",
-  redirect_uri: "http://localhost:5173/callback",
-  post_logout_redirect_uri: "http://localhost:5173",
+  redirect_uri: "https://swagor-time.ru/callback",
+  post_logout_redirect_uri: "https://swagor-time.ru",
   scope: "openid profile bank_role bank.api offline_access",
   response_type: "code",
 };

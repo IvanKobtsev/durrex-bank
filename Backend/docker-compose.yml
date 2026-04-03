@@ -139,8 +139,8 @@ services:
 
   frontend:
     build:
-      context: ..
-      dockerfile: Frontend/Dockerfile
+      context: ../Frontend
+      dockerfile: Dockerfile
     restart: unless-stopped
     depends_on:
       - gateway

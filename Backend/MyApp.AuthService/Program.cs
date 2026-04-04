@@ -103,7 +103,7 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.UseForwardedHeaders();
-app.UsePathBase("/services/auth");
+app.UsePathBase("/auth");
 app.UseMiddleware<InternalApiKeyMiddleware>();
 app.UseStaticFiles();
 app.UseRouting();

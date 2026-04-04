@@ -47,6 +47,7 @@ builder
         options =>
         {
             options.Authority = builder.Configuration["Oidc:Authority"];
+            options.Audience = builder.Configuration["Oidc:Audience"];
             options.RequireHttpsMetadata = false;
             options.MapInboundClaims = false;
 
@@ -56,6 +57,11 @@ builder
                 ValidateAudience = false,
                 ValidAudiences = [builder.Configuration["Oidc:Audience"]!],
                 ValidateLifetime = false,
+                // <remove>
+                // Remove after debugging
+                ValidateIssuerSigningKey = false,
+                RequireSignedTokens = false,
+                // </remove>
                 ClockSkew = TimeSpan.FromSeconds(30),
                 NameClaimType = "sub",
                 RoleClaimType = "role",

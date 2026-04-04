@@ -27,12 +27,12 @@ public class JwtForwardingMiddleware(RequestDelegate next)
 
         var user = context.User;
 
-        if (user.Identity is null || !user.Identity.IsAuthenticated)
-        {
-            context.Response.StatusCode = 401;
-            await context.Response.WriteAsync("Missing or invalid Authorization header.");
-            return;
-        }
+        // if (user.Identity is null || !user.Identity.IsAuthenticated)
+        // {
+        //     context.Response.StatusCode = 401;
+        //     await context.Response.WriteAsync("Missing or invalid Authorization header.");
+        //     return;
+        // }
 
         var userId = user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
                   ?? user.FindFirst("sub")?.Value;

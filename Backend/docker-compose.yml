@@ -124,7 +124,7 @@ services:
     restart: unless-stopped
     environment:
       ASPNETCORE_URLS: http://+:8080
-      Oidc__Authority: "http://auth-service:8080/auth"
+      Oidc__Authority: "https://swagor-time.ru/services/auth"
       Oidc__Audience: "bank.api"
       InternalApiKey: "dev-internal-api-key-12345"
     ports:

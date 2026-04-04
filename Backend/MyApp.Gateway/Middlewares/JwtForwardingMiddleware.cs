@@ -1,3 +1,7 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using Microsoft.IdentityModel.Tokens;
+
 namespace MyApp.Gateway.Middlewares;
 
 public class JwtForwardingMiddleware(RequestDelegate next)
@@ -25,7 +29,7 @@ public class JwtForwardingMiddleware(RequestDelegate next)
             return;
         }
 
-        var user = context.User;
+        // var user = context.User;
 
         // if (user.Identity is null || !user.Identity.IsAuthenticated)
         // {
@@ -34,21 +38,81 @@ public class JwtForwardingMiddleware(RequestDelegate next)
         //     return;
         // }
 
-        var userId = user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
-                  ?? user.FindFirst("sub")?.Value;
+        // var userId = user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
+        //           ?? user.FindFirst("sub")?.Value;
+        //
+        // var roles = user.FindAll("role").Select(c => c.Value).ToList();
+        //
+        // if (userId is null || roles.Count == 0)
+        // {
+        //     context.Response.StatusCode = 401;
+        //     await context.Response.WriteAsync("Invalid token claims.");
+        //     return;
+        // }
+        //
+        // context.Request.Headers["X-User-Id"] = userId;
+        // context.Request.Headers["X-User-Roles"] = string.Join(",", roles);
+        //
+        // await next(context);
+        
+        var authHeader = context.Request.Headers.Authorization.FirstOrDefault();
 
-        var roles = user.FindAll("role").Select(c => c.Value).ToList();
-
-        if (userId is null || roles.Count == 0)
+        if (authHeader is null || !authHeader.StartsWith("Bearer "))
         {
             context.Response.StatusCode = 401;
-            await context.Response.WriteAsync("Invalid token claims.");
+            await context.Response.WriteAsync("Missing or invalid Authorization header.");
             return;
         }
 
-        context.Request.Headers["X-User-Id"] = userId;
-        context.Request.Headers["X-User-Roles"] = string.Join(",", roles);
+        var token = authHeader.Substring("Bearer ".Length);
 
-        await next(context);
+        var handler = new JwtSecurityTokenHandler();
+
+        try
+        {
+            var principal = handler.ValidateToken(
+                token,
+                new TokenValidationParameters
+                {
+                    ValidateIssuer = false,
+
+                    ValidateAudience = false,
+
+                    ValidateIssuerSigningKey = false,
+
+                    ValidateLifetime = false,
+                    ClockSkew = TimeSpan.FromSeconds(30),
+
+                    ValidateActor = false
+                },
+                out var validatedToken
+            );
+
+            var userId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var role = principal.FindFirst(ClaimTypes.Role)?.Value;
+
+            if (userId is null || role is null)
+            {
+                context.Response.StatusCode = 401;
+                await context.Response.WriteAsync("Invalid token claims.");
+                return;
+            }
+
+            // Inject headers for downstream services
+            context.Request.Headers["X-User-Id"] = userId;
+            context.Request.Headers["X-User-Role"] = role;
+
+            await next(context);
+        }
+        // catch (SecurityTokenException)
+        // {
+        //     context.Response.StatusCode = 401;
+        //     await context.Response.WriteAsync("Invalid or expired token.");
+        // }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.ToString());
+            throw;
+        }
     }
 }

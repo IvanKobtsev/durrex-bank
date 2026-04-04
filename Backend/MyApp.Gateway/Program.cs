@@ -52,10 +52,10 @@ builder
 
             options.TokenValidationParameters = new TokenValidationParameters
             {
-                ValidateIssuer = true,
-                ValidateAudience = true,
+                ValidateIssuer = false,
+                ValidateAudience = false,
                 ValidAudiences = [builder.Configuration["Oidc:Audience"]!],
-                ValidateLifetime = true,
+                ValidateLifetime = false,
                 ClockSkew = TimeSpan.FromSeconds(30),
                 NameClaimType = "sub",
                 RoleClaimType = "role",

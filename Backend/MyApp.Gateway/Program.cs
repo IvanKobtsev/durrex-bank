@@ -53,15 +53,10 @@ builder
 
             options.TokenValidationParameters = new TokenValidationParameters
             {
-                ValidateIssuer = false,
-                ValidateAudience = false,
+                ValidateIssuer = true,
+                ValidateAudience = true,
                 ValidAudiences = [builder.Configuration["Oidc:Audience"]!],
-                ValidateLifetime = false,
-                // <remove>
-                // Remove after debugging
-                ValidateIssuerSigningKey = false,
-                RequireSignedTokens = false,
-                // </remove>
+                ValidateLifetime = true,
                 ClockSkew = TimeSpan.FromSeconds(30),
                 NameClaimType = "sub",
                 RoleClaimType = "role",

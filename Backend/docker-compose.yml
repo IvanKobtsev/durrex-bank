@@ -117,6 +117,25 @@ services:
     depends_on:
       - postgres
 
+  monitoring-service:
+    build:
+      context: .
+      dockerfile: MyApp.MonitoringService/Dockerfile
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__Default: "Host=postgres;Port=5432;Database=durrex_monitoring;Username=postgres;Password=postgres"
+      InternalApiKey: "dev-internal-api-key-12345"
+      Monitoring__RetentionDays: "30"
+      Monitoring__MaxEventsOnDashboard: "250"
+      Monitoring__MaxRequestsOnDashboard: "250"
+      Monitoring__RequestTracing__Enabled: "true"
+      Monitoring__RequestTracing__CaptureSuccessResponses: "true"
+    ports:
+      - "5230:8080"
+    depends_on:
+      - postgres
+
   gateway:
     build:
       context: .
@@ -136,6 +155,7 @@ services:
       - user-service
       - core-service
       - credit-service
+      - monitoring-service
 
   frontend:
     build:

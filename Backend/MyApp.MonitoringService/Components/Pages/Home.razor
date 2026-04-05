@@ -1,0 +1,198 @@
+﻿@page "/"
+@page "/events"
+@inject MonitoringEventService MonitoringEventService
+@implements IDisposable
+
+<PageTitle>Monitoring Dashboard</PageTitle>
+
+<div class="dashboard-page">
+	<div class="dashboard-header">
+		<div>
+			<p class="eyebrow">Sentry-like internal monitoring</p>
+			<h1>Error events</h1>
+			<p class="lead text-muted">Capture exceptions over HTTP and inspect them from one Razor page.</p>
+		</div>
+		<button class="btn btn-primary" @onclick="RefreshAsync" disabled="@_isRefreshing">
+			@(_isRefreshing ? "Refreshing..." : "Refresh")
+		</button>
+	</div>
+
+	@if (!string.IsNullOrWhiteSpace(_loadError))
+	{
+		<div class="alert alert-danger" role="alert">
+			@_loadError
+		</div>
+	}
+
+	@if (_snapshot is null)
+	{
+		<div class="dashboard-loading">
+			<div class="spinner-border text-primary" role="status"></div>
+			<span>Loading captured events...</span>
+		</div>
+	}
+	else
+	{
+		<div class="summary-grid">
+			<section class="summary-card">
+				<span class="summary-label">Stored events</span>
+				<strong>@_snapshot.TotalEvents</strong>
+				<span>Newest first</span>
+			</section>
+			<section class="summary-card">
+				<span class="summary-label">Last 24 hours</span>
+				<strong>@_snapshot.EventsLast24Hours</strong>
+				<span>Recent activity</span>
+			</section>
+			<section class="summary-card">
+				<span class="summary-label">Services</span>
+				<strong>@_snapshot.AffectedServices</strong>
+				<span>Distinct producers</span>
+			</section>
+			<section class="summary-card">
+				<span class="summary-label">Latest received</span>
+				<strong>@(_snapshot.LatestReceivedAtUtc?.ToLocalTime().ToString("g") ?? "—")</strong>
+				<span>Local time</span>
+			</section>
+		</div>
+
+		@if (_snapshot.Events.Count == 0)
+		{
+			<div class="empty-state card shadow-sm border-0">
+				<div class="card-body">
+					<h2>No events yet</h2>
+					<p class="text-muted mb-3">Send a JSON payload to <code>/api/events</code> with the internal API key header and it will appear here.</p>
+					<pre class="sample-request mb-0">{
+  "service": "core-service",
+  "environment": "Development",
+  "level": "error",
+  "message": "NullReferenceException while creating transfer",
+  "exceptionType": "System.NullReferenceException",
+  "stackTrace": "at Transfers.CreateAsync()"
+}</pre>
+				</div>
+			</div>
+		}
+		else
+		{
+			<div class="events-list">
+				@foreach (var item in _snapshot.Events)
+				{
+					<article class="event-card card shadow-sm border-0">
+						<div class="card-body">
+							<div class="event-card__header">
+								<div>
+									<div class="event-badges">
+										<span class="badge @GetSeverityBadgeClass(item.Level)">@item.LevelLabel</span>
+										<span class="badge text-bg-light">@item.Service</span>
+										<span class="badge text-bg-light">@item.Environment</span>
+									</div>
+									<h2>@item.Message</h2>
+									<p class="text-muted mb-0">@item.ExceptionType</p>
+								</div>
+								<div class="event-meta text-muted">
+									<div><strong>Occurred:</strong> @item.OccurredAtUtc.ToLocalTime().ToString("g")</div>
+									<div><strong>Received:</strong> @item.ReceivedAtUtc.ToLocalTime().ToString("g")</div>
+									<div><strong>Fingerprint:</strong> <code>@item.Fingerprint</code></div>
+								</div>
+							</div>
+
+							<div class="event-details-grid">
+								<div>
+									<span class="detail-label">Request</span>
+									<div>@(item.RequestMethod is null && item.RequestPath is null ? "—" : $"{item.RequestMethod ?? "?"} {item.RequestPath ?? ""}")</div>
+								</div>
+								<div>
+									<span class="detail-label">Trace</span>
+									<div>@(item.TraceId ?? "—")</div>
+								</div>
+								<div>
+									<span class="detail-label">User</span>
+									<div>@(item.UserId ?? "—")</div>
+								</div>
+								<div>
+									<span class="detail-label">Event id</span>
+									<div><code>@item.EventId</code></div>
+								</div>
+							</div>
+
+							@if (item.Tags.Count > 0)
+							{
+								<div class="event-tags">
+									@foreach (var tag in item.Tags)
+									{
+										<span class="badge rounded-pill text-bg-secondary-subtle text-secondary-emphasis">@tag.Key: @tag.Value</span>
+									}
+								</div>
+							}
+
+							@if (!string.IsNullOrWhiteSpace(item.StackTrace))
+							{
+								<details class="event-block">
+									<summary>Stack trace</summary>
+									<pre>@item.StackTrace</pre>
+								</details>
+							}
+
+							@if (!string.IsNullOrWhiteSpace(item.AdditionalDataJson))
+							{
+								<details class="event-block">
+									<summary>Additional data</summary>
+									<pre>@item.AdditionalDataJson</pre>
+								</details>
+							}
+						</div>
+					</article>
+				}
+			</div>
+		}
+	}
+</div>
+
+@code {
+	private MonitoringDashboardSnapshot? _snapshot;
+	private string? _loadError;
+	private bool _isRefreshing;
+
+	protected override async Task OnInitializedAsync()
+	{
+		await LoadAsync();
+	}
+
+	private async Task RefreshAsync()
+	{
+		await LoadAsync();
+	}
+
+	private async Task LoadAsync()
+	{
+		_isRefreshing = true;
+		_loadError = null;
+
+		try
+		{
+			_snapshot = await MonitoringEventService.GetDashboardSnapshotAsync();
+		}
+		catch (Exception ex)
+		{
+			_loadError = $"Failed to load events: {ex.Message}";
+		}
+		finally
+		{
+			_isRefreshing = false;
+		}
+	}
+
+	private static string GetSeverityBadgeClass(string level) => level.ToLowerInvariant() switch
+	{
+		"fatal" => "text-bg-dark",
+		"critical" => "text-bg-danger",
+		"warning" => "text-bg-warning",
+		"info" => "text-bg-info",
+		_ => "text-bg-danger",
+	};
+
+	public void Dispose()
+	{
+	}
+}

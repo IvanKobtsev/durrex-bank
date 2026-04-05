@@ -4,6 +4,7 @@
   <Project Path="MyApp.CreditService/MyApp.CreditService.csproj" />
   <Project Path="MyApp.Gateway/MyApp.Gateway.csproj" />
   <Project Path="MyApp.MobileAppSettingsService/MyApp.MobileAppSettingsService.csproj" />
+  <Project Path="MyApp.MonitoringService/MyApp.MonitoringService.csproj" />
   <Project Path="MyApp.UserService/MyApp.UserService.csproj" />
   <Project Path="MyApp.WebAppSettingsService/MyApp.WebAppSettingsService.csproj" />
 </Solution>

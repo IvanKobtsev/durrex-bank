@@ -7,7 +7,7 @@ public class JwtForwardingMiddleware(RequestDelegate next)
         "/auth/connect/",
         "/auth/.well-known/",
         "/auth/account/",
-        "/monitoring/",
+        "/monitoring",
     ];
 
     private static bool IsPublicPath(PathString path)

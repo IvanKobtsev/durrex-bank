@@ -5,6 +5,7 @@ Internal monitoring dashboard for Durrex services with PostgreSQL-backed error c
 ## Features
 
 - `POST /api/events` to ingest error events from other services
+- `POST /api/requests` to ingest request traces from other services
 - PostgreSQL-backed persistence using EF Core + Npgsql
 - Automatic request trace logging via middleware
 - Dashboard pages:
@@ -61,6 +62,7 @@ Invoke-RestMethod -Method Post -Uri "http://localhost:5230/api/events" -Headers 
 ```powershell
 $headers = @{ "X-Internal-Api-Key" = "dev-internal-api-key-12345" }
 
+Invoke-RestMethod -Method Post -Uri "http://localhost:5230/api/requests" -Headers $headers -ContentType "application/json" -Body '{"method":"GET","path":"/core/accounts","statusCode":200,"durationMs":12.7,"traceId":"trace-456","timestampUtc":"2026-04-05T10:15:30Z"}'
 Invoke-RestMethod -Uri "http://localhost:5230/api/requests" -Headers $headers | ConvertTo-Json -Depth 6
 Invoke-RestMethod -Uri "http://localhost:5230/api/requests/summary" -Headers $headers | ConvertTo-Json -Depth 6
 ```

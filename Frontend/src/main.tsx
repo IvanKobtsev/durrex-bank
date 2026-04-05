@@ -4,12 +4,14 @@ import "./index.css";
 import App from "./App.tsx";
 import axios, { AxiosError, AxiosResponse } from "axios";
 import { AuthProvider } from "react-oidc-context";
+import { generateTraceparent } from "./helpers/traceparent.ts";
 
 type ViteImportMeta = ImportMeta & {
   env?: Record<string, string | undefined>;
 };
 
 const appEnv = (import.meta as ViteImportMeta).env ?? {};
+export const traceId = generateTraceparent();
 
 const monitoringClient = axios.create({
   timeout: 5000,
@@ -59,7 +61,10 @@ const getErrorMessage = (error: AxiosError<unknown>): string => {
 };
 
 const wasAlreadyReported = (value: unknown): boolean => {
-  if ((typeof value !== "object" && typeof value !== "function") || value === null) {
+  if (
+    (typeof value !== "object" && typeof value !== "function") ||
+    value === null
+  ) {
     return false;
   }
 
@@ -67,7 +72,10 @@ const wasAlreadyReported = (value: unknown): boolean => {
 };
 
 const markAsReported = (value: unknown): void => {
-  if ((typeof value !== "object" && typeof value !== "function") || value === null) {
+  if (
+    (typeof value !== "object" && typeof value !== "function") ||
+    value === null
+  ) {
     return;
   }
 
@@ -128,7 +136,11 @@ const sendAxiosErrorToMonitoring = async (
   const monitoringPath = getRequestPath(monitoringEventsUrl);
 
   // Avoid reporting failures produced by monitoring ingestion itself.
-  if (failedRequestPath && monitoringPath && failedRequestPath === monitoringPath) {
+  if (
+    failedRequestPath &&
+    monitoringPath &&
+    failedRequestPath === monitoringPath
+  ) {
     return;
   }
 
@@ -141,9 +153,7 @@ const sendAxiosErrorToMonitoring = async (
     stackTrace: error.stack,
     requestMethod: error.config?.method?.toUpperCase(),
     requestPath: failedRequestPath,
-    traceId:
-      (error.response?.headers?.["x-trace-id"] as string | undefined) ??
-      (error.response?.headers?.["trace-id"] as string | undefined),
+    traceId: error.response?.headers?.["traceparent"] as string | undefined,
     occurredAtUtc: new Date().toISOString(),
     tags: {
       source: "frontend",
@@ -226,6 +236,9 @@ const registerGlobalErrorHandlers = (): void => {
 axios.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("access_token");
+
+    config.headers = config.headers ?? {};
+    config.headers["traceparent"] = traceId;
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;

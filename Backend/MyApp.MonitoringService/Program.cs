@@ -61,8 +61,6 @@ if (!app.Environment.IsDevelopment())
 app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
 app.UseHttpsRedirection();
 
-app.UseMiddleware<RequestTracingMiddleware>();
-
 app.UseAntiforgery();
 
 app.MapPost(
@@ -143,6 +141,21 @@ app.MapGet(
     )
     .AddEndpointFilter<RequireInternalApiKeyEndpointFilter>()
     .WithName("GetRequestTraces");
+
+app.MapPost(
+        "/api/requests",
+        async (
+            CaptureRequestTraceRequest request,
+            MonitoringEventService monitoringEventService,
+            CancellationToken cancellationToken
+        ) =>
+        {
+            await monitoringEventService.CaptureRequestTraceAsync(request, cancellationToken);
+            return Results.Accepted();
+        }
+    )
+    .AddEndpointFilter<RequireInternalApiKeyEndpointFilter>()
+    .WithName("CaptureRequestTrace");
 
 app.MapGet(
         "/api/requests/summary",

@@ -1,5 +1,5 @@
-using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.IdentityModel.Tokens;
 using MyApp.Gateway;
 using MyApp.Gateway.Middlewares;
@@ -8,6 +8,15 @@ using Yarp.ReverseProxy.Transforms;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Logging.AddConsole();
+
+var monitoringServiceBaseAddress =
+    builder.Configuration["Monitoring:ServiceBaseUrl"]
+    ?? builder.Configuration[
+        "ReverseProxy:Clusters:monitoringCluster:Destinations:monitoringDestination:Address"
+    ]
+    ?? throw new InvalidOperationException(
+        "Monitoring service base address is not configured. Set Monitoring:ServiceBaseUrl or the monitoring reverse proxy destination."
+    );
 
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
@@ -37,7 +46,6 @@ builder
             }
             return ValueTask.CompletedTask;
         });
-
     });
 
 builder
@@ -80,6 +88,19 @@ builder
 
 builder.Services.AddAuthorization();
 
+builder.Services.AddHttpClient(
+    RequestTracingMiddleware.MonitoringClientName,
+    client =>
+    {
+        client.BaseAddress = new Uri(monitoringServiceBaseAddress, UriKind.Absolute);
+        client.DefaultRequestHeaders.Add(
+            "X-Internal-Api-Key",
+            builder.Configuration["InternalApiKey"]
+                ?? throw new InvalidOperationException("InternalApiKey is not configured.")
+        );
+    }
+);
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -107,7 +128,10 @@ app.UseSwaggerUI(options =>
     options.SwaggerEndpoint("/services/core/openapi/v1.json", "CoreService API");
     options.SwaggerEndpoint("/services/credit/swagger/v1/swagger.json", "CreditService API");
     options.SwaggerEndpoint("/services/user/swagger/v1/swagger.json", "UserService API");
-    options.SwaggerEndpoint("/services/web-app-settings/openapi/v1.json", "Web App Settings Service API");
+    options.SwaggerEndpoint(
+        "/services/web-app-settings/openapi/v1.json",
+        "Web App Settings Service API"
+    );
     options.SwaggerEndpoint(
         "/services/mobile-app-settings/openapi/v1.json",
         "Mobile App Settings Service API"
@@ -116,6 +140,7 @@ app.UseSwaggerUI(options =>
 });
 
 app.UseForwardedHeaders();
+app.UseMiddleware<RequestTracingMiddleware>();
 app.UseCors("DevCors");
 app.UseAuthentication();
 app.UseAuthorization();

@@ -13,6 +13,9 @@ export default defineConfig({
       include: "**/*.svg?react",
     }),
   ],
+  build: {
+    sourcemap: true,
+  },
   css: {
     modules: {
       localsConvention: "camelCase",

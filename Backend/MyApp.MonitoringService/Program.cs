@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using MyApp.MonitoringService.Components;
 using MyApp.MonitoringService.Data;
@@ -11,6 +12,13 @@ var connectionString =
     builder.Configuration.GetConnectionString("Default")
     ?? throw new InvalidOperationException("ConnectionStrings:Default is not configured.");
 
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost;
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
+});
+
 // Add services to the container.
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 builder.Services.AddDbContextFactory<MonitoringDbContext>(options =>
@@ -19,6 +27,19 @@ builder.Services.AddDbContextFactory<MonitoringDbContext>(options =>
 builder.Services.AddScoped<MonitoringEventService>();
 
 var app = builder.Build();
+
+app.UseForwardedHeaders();
+app.UsePathBase("/monitoring");
+
+// Nginx strips the /services prefix before forwarding to the gateway,
+// so restore it to keep generated links and static asset URLs under /services/monitoring.
+app.Use(
+    (context, next) =>
+    {
+        context.Request.PathBase = new PathString("/services") + context.Request.PathBase;
+        return next();
+    }
+);
 
 await using (var scope = app.Services.CreateAsyncScope())
 {

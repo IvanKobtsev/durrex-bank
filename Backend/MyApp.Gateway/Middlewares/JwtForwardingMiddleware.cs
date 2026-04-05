@@ -7,14 +7,15 @@ public class JwtForwardingMiddleware(RequestDelegate next)
         "/auth/connect/",
         "/auth/.well-known/",
         "/auth/account/",
+        "/monitoring/",
     ];
 
     private static bool IsPublicPath(PathString path)
     {
         var p = path.ToString();
         return PublicPrefixes.Any(prefix =>
-                   p.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
-               || p.EndsWith(".json", StringComparison.OrdinalIgnoreCase);
+                p.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)
+            ) || p.EndsWith(".json", StringComparison.OrdinalIgnoreCase);
     }
 
     public async Task InvokeAsync(HttpContext context)
@@ -34,8 +35,9 @@ public class JwtForwardingMiddleware(RequestDelegate next)
             return;
         }
 
-        var userId = user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
-                     ?? user.FindFirst("sub")?.Value;
+        var userId =
+            user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
+            ?? user.FindFirst("sub")?.Value;
 
         var roles = user.FindAll("role").Select(c => c.Value).ToList();
 

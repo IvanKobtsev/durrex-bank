@@ -39,7 +39,6 @@ export function UserCreationPage() {
     defaultValues: {
       email: "",
       username: "",
-      password: "",
       firstName: "",
       lastName: "",
       telephoneNumber: "",
@@ -63,11 +62,6 @@ export function UserCreationPage() {
           <Input
             {...registerString(form, "username")}
             fieldProps={{ title: "Имя пользователя" }}
-          />
-
-          <Input
-            {...registerPassword(form, "password")}
-            fieldProps={{ title: "Пароль" }}
           />
 
           <Input

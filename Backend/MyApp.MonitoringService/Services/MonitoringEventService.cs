@@ -9,7 +9,8 @@ namespace MyApp.MonitoringService.Services;
 public sealed class MonitoringEventService(
     IDbContextFactory<MonitoringDbContext> dbContextFactory,
     IConfiguration configuration,
-    ILogger<MonitoringEventService> logger
+    ILogger<MonitoringEventService> logger,
+    SourceMapResolver sourceMapResolver
 )
 {
     private static readonly JsonSerializerOptions SerializerOptions = new(
@@ -58,6 +59,8 @@ public sealed class MonitoringEventService(
         var service = NormalizeRequired(request.Service, "unknown-service", 120);
         var environment = NormalizeRequired(request.Environment, "Production", 80);
         var level = NormalizeRequired(request.Level, "error", 32).ToLowerInvariant();
+        var normalizedStackTrace = NormalizeOptional(request.StackTrace);
+        var resolvedStackTrace = sourceMapResolver.ResolveStackTrace(service, normalizedStackTrace);
         var fingerprint = NormalizeRequired(
             request.Fingerprint,
             $"{service}:{NormalizeOptional(request.ExceptionType, 120) ?? "error"}:{message}".ToLowerInvariant(),
@@ -72,7 +75,7 @@ public sealed class MonitoringEventService(
             Level = level,
             Message = message,
             ExceptionType = NormalizeOptional(request.ExceptionType, 500),
-            StackTrace = NormalizeOptional(request.StackTrace),
+            StackTrace = NormalizeOptional(resolvedStackTrace),
             RequestMethod = NormalizeOptional(request.RequestMethod, 16)?.ToUpperInvariant(),
             RequestPath = NormalizeOptional(request.RequestPath, 2048),
             TraceId = NormalizeOptional(request.TraceId, 128),

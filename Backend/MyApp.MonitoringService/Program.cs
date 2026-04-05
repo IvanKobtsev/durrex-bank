@@ -24,6 +24,7 @@ builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 builder.Services.AddDbContextFactory<MonitoringDbContext>(options =>
     options.UseNpgsql(connectionString)
 );
+builder.Services.AddSingleton<SourceMapResolver>();
 builder.Services.AddScoped<MonitoringEventService>();
 
 var app = builder.Build();

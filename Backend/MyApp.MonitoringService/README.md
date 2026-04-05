@@ -7,6 +7,7 @@ Internal monitoring dashboard for Durrex services with PostgreSQL-backed error c
 - `POST /api/events` to ingest error events from other services
 - `POST /api/requests` to ingest request traces from other services
 - PostgreSQL-backed persistence using EF Core + Npgsql
+- JavaScript stack trace deminification from local source maps in `SourceMaps/`
 - Automatic request trace logging via middleware
 - Dashboard pages:
   - `/` or `/events` for exceptions and error events
@@ -72,4 +73,16 @@ Invoke-RestMethod -Uri "http://localhost:5230/api/requests/summary" -Headers $he
 The service is configured to run with the shared `postgres` container using database `durrex_monitoring`.
 
 Open the UI directly on the monitoring service port after startup.
+
+## Frontend source maps
+
+Run the frontend production build from `Frontend/` to copy fresh source maps into
+`Backend/MyApp.MonitoringService/SourceMaps/frontend-web`:
+
+```powershell
+yarn build
+```
+
+After maps are copied, newly ingested frontend error events will store stack frames as
+original source file/line/column instead of minified bundle locations.
 

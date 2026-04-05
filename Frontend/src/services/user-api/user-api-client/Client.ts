@@ -14,88 +14,22 @@ import { throwException, isAxiosError } from '../user-api-client.types';
 import { getAxios, getBaseUrl } from './helpers';
 
 /**
- * Issue a JWT token for valid credentials
- * @param body (optional) 
- * @return Token issued successfully
+ * @return OK
  */
-export function login(body?: Types.LoginRequest | undefined, config?: AxiosRequestConfig | undefined): Promise<Types.LoginResponse> {
-    let url_ = getBaseUrl() + "/auth/login";
-      url_ = url_.replace(/[?&]$/, "");
-
-    const content_ = Types.serializeLoginRequest(body);
-
-    let options_: AxiosRequestConfig = {
-        ..._requestConfigLogin,
-        ...config,
-        data: content_,
-        method: "POST",
-        url: url_,
-        headers: {
-            ..._requestConfigLogin?.headers,
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-            ...config?.headers,
-        }
-    };
-
-    return getAxios().request(options_).catch((_error: any) => {
-        if (isAxiosError(_error) && _error.response) {
-            return _error.response;
-        } else {
-            throw _error;
-        }
-    }).then((_response: AxiosResponse) => {
-        return processLogin(_response);
-    });
-}
-
-function processLogin(response: AxiosResponse): Promise<Types.LoginResponse> {
-    const status = response.status;
-    let _headers: any = {};
-    if (response.headers && typeof response.headers === "object") {
-        for (let k in response.headers) {
-            if (response.headers.hasOwnProperty(k)) {
-                _headers[k] = response.headers[k];
-            }
-        }
-    }
-    if (status === 200) {
-        const _responseText = response.data;
-        let result200: any = null;
-        let resultData200  = _responseText;
-        result200 = Types.initLoginResponse(resultData200);
-        return Promise.resolve<Types.LoginResponse>(result200);
-
-    } else if (status === 401) {
-        const _responseText = response.data;
-        let result401: any = null;
-        let resultData401  = _responseText;
-        result401 = Types.initProblemDetails(resultData401);
-        return throwException("Invalid credentials or user is blocked", status, _responseText, _headers, result401);
-
-    } else if (status !== 200 && status !== 204) {
-        const _responseText = response.data;
-        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-    }
-    return Promise.resolve<Types.LoginResponse>(null as any);
-}
-
-/**
- * Get the RSA public key used to validate issued JWTs
- * @return Public key returned
- */
-export function publicKey(config?: AxiosRequestConfig | undefined): Promise<Types.PublicKeyResponse> {
-    let url_ = getBaseUrl() + "/auth/public-key";
+export function authProfile(id: number, config?: AxiosRequestConfig | undefined): Promise<void> {
+    let url_ = getBaseUrl() + "/internal/users/{id}/auth-profile";
+    if (id === undefined || id === null)
+      throw new Error("The parameter 'id' must be defined.");
+    url_ = url_.replace("{id}", encodeURIComponent("" + id));
       url_ = url_.replace(/[?&]$/, "");
 
     let options_: AxiosRequestConfig = {
-        ..._requestConfigPublicKey,
+        ..._requestConfigAuthProfile,
         ...config,
         method: "GET",
         url: url_,
         headers: {
-            ..._requestConfigPublicKey?.headers,
-            "Accept": "application/json",
+            ..._requestConfigAuthProfile?.headers,
             ...config?.headers,
         }
     };
@@ -107,11 +41,11 @@ export function publicKey(config?: AxiosRequestConfig | undefined): Promise<Type
             throw _error;
         }
     }).then((_response: AxiosResponse) => {
-        return processPublicKey(_response);
+        return processAuthProfile(_response);
     });
 }
 
-function processPublicKey(response: AxiosResponse): Promise<Types.PublicKeyResponse> {
+function processAuthProfile(response: AxiosResponse): Promise<void> {
     const status = response.status;
     let _headers: any = {};
     if (response.headers && typeof response.headers === "object") {
@@ -123,16 +57,13 @@ function processPublicKey(response: AxiosResponse): Promise<Types.PublicKeyRespo
     }
     if (status === 200) {
         const _responseText = response.data;
-        let result200: any = null;
-        let resultData200  = _responseText;
-        result200 = Types.initPublicKeyResponse(resultData200);
-        return Promise.resolve<Types.PublicKeyResponse>(result200);
+        return Promise.resolve<void>(null as any);
 
     } else if (status !== 200 && status !== 204) {
         const _responseText = response.data;
         return throwException("An unexpected server error occurred.", status, _responseText, _headers);
     }
-    return Promise.resolve<Types.PublicKeyResponse>(null as any);
+    return Promise.resolve<void>(null as any);
 }
 
 /**
@@ -206,7 +137,7 @@ function processUsersAll(response: AxiosResponse): Promise<Types.UserResponse[]>
  * @param body (optional) 
  * @return User created successfully
  */
-export function usersPOST(body?: Types.CreateUserRequest | undefined, config?: AxiosRequestConfig | undefined): Promise<Types.UserResponse> {
+export function usersPOST(body?: Types.CreateUserRequest | undefined, config?: AxiosRequestConfig | undefined): Promise<void> {
     let url_ = getBaseUrl() + "/users";
       url_ = url_.replace(/[?&]$/, "");
 
@@ -221,7 +152,6 @@ export function usersPOST(body?: Types.CreateUserRequest | undefined, config?: A
         headers: {
             ..._requestConfigUsersPOST?.headers,
             "Content-Type": "application/json",
-            "Accept": "application/json",
             ...config?.headers,
         }
     };
@@ -237,7 +167,7 @@ export function usersPOST(body?: Types.CreateUserRequest | undefined, config?: A
     });
 }
 
-function processUsersPOST(response: AxiosResponse): Promise<Types.UserResponse> {
+function processUsersPOST(response: AxiosResponse): Promise<void> {
     const status = response.status;
     let _headers: any = {};
     if (response.headers && typeof response.headers === "object") {
@@ -249,10 +179,7 @@ function processUsersPOST(response: AxiosResponse): Promise<Types.UserResponse> 
     }
     if (status === 201) {
         const _responseText = response.data;
-        let result201: any = null;
-        let resultData201  = _responseText;
-        result201 = Types.initUserResponse(resultData201);
-        return Promise.resolve<Types.UserResponse>(result201);
+        return Promise.resolve<void>(null as any);
 
     } else if (status === 403) {
         const _responseText = response.data;
@@ -268,11 +195,15 @@ function processUsersPOST(response: AxiosResponse): Promise<Types.UserResponse> 
         result409 = Types.initProblemDetails(resultData409);
         return throwException("Username or email is already taken", status, _responseText, _headers, result409);
 
+    } else if (status === 503) {
+        const _responseText = response.data;
+        return throwException("Service Unavailable", status, _responseText, _headers);
+
     } else if (status !== 200 && status !== 204) {
         const _responseText = response.data;
         return throwException("An unexpected server error occurred.", status, _responseText, _headers);
     }
-    return Promise.resolve<Types.UserResponse>(null as any);
+    return Promise.resolve<void>(null as any);
 }
 
 /**
@@ -311,6 +242,75 @@ export function usersGET(id: number, config?: AxiosRequestConfig | undefined): P
 }
 
 function processUsersGET(response: AxiosResponse): Promise<Types.UserResponse> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && typeof response.headers === "object") {
+        for (let k in response.headers) {
+            if (response.headers.hasOwnProperty(k)) {
+                _headers[k] = response.headers[k];
+            }
+        }
+    }
+    if (status === 200) {
+        const _responseText = response.data;
+        let result200: any = null;
+        let resultData200  = _responseText;
+        result200 = Types.initUserResponse(resultData200);
+        return Promise.resolve<Types.UserResponse>(result200);
+
+    } else if (status === 403) {
+        const _responseText = response.data;
+        let result403: any = null;
+        let resultData403  = _responseText;
+        result403 = Types.initProblemDetails(resultData403);
+        return throwException("Client may only view their own profile", status, _responseText, _headers, result403);
+
+    } else if (status === 404) {
+        const _responseText = response.data;
+        let result404: any = null;
+        let resultData404  = _responseText;
+        result404 = Types.initProblemDetails(resultData404);
+        return throwException("User not found", status, _responseText, _headers, result404);
+
+    } else if (status !== 200 && status !== 204) {
+        const _responseText = response.data;
+        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+    }
+    return Promise.resolve<Types.UserResponse>(null as any);
+}
+
+/**
+ * Get current profile
+ * @return User profile returned
+ */
+export function me(config?: AxiosRequestConfig | undefined): Promise<Types.UserResponse> {
+    let url_ = getBaseUrl() + "/users/me";
+      url_ = url_.replace(/[?&]$/, "");
+
+    let options_: AxiosRequestConfig = {
+        ..._requestConfigMe,
+        ...config,
+        method: "GET",
+        url: url_,
+        headers: {
+            ..._requestConfigMe?.headers,
+            "Accept": "application/json",
+            ...config?.headers,
+        }
+    };
+
+    return getAxios().request(options_).catch((_error: any) => {
+        if (isAxiosError(_error) && _error.response) {
+            return _error.response;
+        } else {
+            throw _error;
+        }
+    }).then((_response: AxiosResponse) => {
+        return processMe(_response);
+    });
+}
+
+function processMe(response: AxiosResponse): Promise<Types.UserResponse> {
     const status = response.status;
     let _headers: any = {};
     if (response.headers && typeof response.headers === "object") {
@@ -485,26 +485,15 @@ function processUnblock(response: AxiosResponse): Promise<void> {
     }
     return Promise.resolve<void>(null as any);
 }
-let _requestConfigLogin: Partial<AxiosRequestConfig> | null;
-export function getLoginRequestConfig() {
-  return _requestConfigLogin;
+let _requestConfigAuthProfile: Partial<AxiosRequestConfig> | null;
+export function getAuthProfileRequestConfig() {
+  return _requestConfigAuthProfile;
 }
-export function setLoginRequestConfig(value: Partial<AxiosRequestConfig>) {
-  _requestConfigLogin = value;
+export function setAuthProfileRequestConfig(value: Partial<AxiosRequestConfig>) {
+  _requestConfigAuthProfile = value;
 }
-export function patchLoginRequestConfig(patch: (value: Partial<AxiosRequestConfig>) => Partial<AxiosRequestConfig>) {
-  _requestConfigLogin = patch(_requestConfigLogin ?? {});
-}
-
-let _requestConfigPublicKey: Partial<AxiosRequestConfig> | null;
-export function getPublicKeyRequestConfig() {
-  return _requestConfigPublicKey;
-}
-export function setPublicKeyRequestConfig(value: Partial<AxiosRequestConfig>) {
-  _requestConfigPublicKey = value;
-}
-export function patchPublicKeyRequestConfig(patch: (value: Partial<AxiosRequestConfig>) => Partial<AxiosRequestConfig>) {
-  _requestConfigPublicKey = patch(_requestConfigPublicKey ?? {});
+export function patchAuthProfileRequestConfig(patch: (value: Partial<AxiosRequestConfig>) => Partial<AxiosRequestConfig>) {
+  _requestConfigAuthProfile = patch(_requestConfigAuthProfile ?? {});
 }
 
 let _requestConfigUsersAll: Partial<AxiosRequestConfig> | null;
@@ -538,6 +527,17 @@ export function setUsersGETRequestConfig(value: Partial<AxiosRequestConfig>) {
 }
 export function patchUsersGETRequestConfig(patch: (value: Partial<AxiosRequestConfig>) => Partial<AxiosRequestConfig>) {
   _requestConfigUsersGET = patch(_requestConfigUsersGET ?? {});
+}
+
+let _requestConfigMe: Partial<AxiosRequestConfig> | null;
+export function getMeRequestConfig() {
+  return _requestConfigMe;
+}
+export function setMeRequestConfig(value: Partial<AxiosRequestConfig>) {
+  _requestConfigMe = value;
+}
+export function patchMeRequestConfig(patch: (value: Partial<AxiosRequestConfig>) => Partial<AxiosRequestConfig>) {
+  _requestConfigMe = patch(_requestConfigMe ?? {});
 }
 
 let _requestConfigBlock: Partial<AxiosRequestConfig> | null;

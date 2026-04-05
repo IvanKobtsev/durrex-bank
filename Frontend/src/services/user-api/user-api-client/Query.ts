@@ -18,6 +18,9 @@ import * as Client from './Client'
 export { Client };
 import type { AxiosRequestConfig } from 'axios';
 
+export type AuthProfileQueryParameters = {
+  id: number ;
+}
 
 export type UsersGETQueryParameters = {
   id: number ;
@@ -31,102 +34,90 @@ export type UnblockQueryParameters = {
   id: number ;
 }
 
-export function loginUrl(): string {
-  let url_ = getBaseUrl() + "/auth/login";
+export function authProfileUrl(id: number): string {
+  let url_ = getBaseUrl() + "/internal/users/{id}/auth-profile";
+if (id === undefined || id === null)
+  throw new Error("The parameter 'id' must be defined.");
+url_ = url_.replace("{id}", encodeURIComponent("" + id));
   url_ = url_.replace(/[?&]$/, "");
   return url_;
 }
 
-export function loginMutationKey(): MutationKey {
-  return trimArrayEnd([
-      'Client',
-      'login',
-    ]);
-}
-
-/**
- * Issue a JWT token for valid credentials
- * @param body (optional) 
- * @return Token issued successfully
- */
-export function useLoginMutation<TContext>(options?: Omit<UseMutationOptions<Types.LoginResponse, unknown, Types.LoginRequest, TContext>, 'mutationKey' | 'mutationFn'>): UseMutationResult<Types.LoginResponse, unknown, Types.LoginRequest, TContext> {
-  const key = loginMutationKey();
-  
-  const metaContext = useContext(QueryMetaContext);
-  options = addMetaToOptions(options, metaContext);
-  
-  return useMutation({
-    ...options,
-    mutationFn: (body: Types.LoginRequest) => Client.login(body),
-    mutationKey: key,
-  });
-}
-  
-export function publicKeyUrl(): string {
-  let url_ = getBaseUrl() + "/auth/public-key";
-  url_ = url_.replace(/[?&]$/, "");
-  return url_;
-}
-
-let publicKeyDefaultOptions: Omit<UseQueryOptions<Types.PublicKeyResponse, unknown, Types.PublicKeyResponse>, 'queryKey' | 'queryFn'> & Partial<Pick<UseQueryOptions<Types.PublicKeyResponse, unknown, Types.PublicKeyResponse>, 'queryFn'>> = {
+let authProfileDefaultOptions: Omit<UseQueryOptions<void, unknown, void>, 'queryKey' | 'queryFn'> & Partial<Pick<UseQueryOptions<void, unknown, void>, 'queryFn'>> = {
 };
-export function getPublicKeyDefaultOptions() {
-  return publicKeyDefaultOptions;
+export function getAuthProfileDefaultOptions() {
+  return authProfileDefaultOptions;
 };
-export function setPublicKeyDefaultOptions(options: typeof publicKeyDefaultOptions) {
-  publicKeyDefaultOptions = options;
+export function setAuthProfileDefaultOptions(options: typeof authProfileDefaultOptions) {
+  authProfileDefaultOptions = options;
 }
 
-export function publicKeyQueryKey(): QueryKey;
-export function publicKeyQueryKey(...params: any[]): QueryKey {
-  return trimArrayEnd([
-      'Client',
-      'publicKey',
-    ]);
+export function authProfileQueryKey(id: number): QueryKey;
+export function authProfileQueryKey(...params: any[]): QueryKey {
+  if (params.length === 1 && isParameterObject(params[0])) {
+    const { id,  } = params[0] as AuthProfileQueryParameters;
+
+    return trimArrayEnd([
+        'Client',
+        'authProfile',
+        id as any,
+      ]);
+  } else {
+    return trimArrayEnd([
+        'Client',
+        'authProfile',
+        ...params
+      ]);
+  }
 }
-export function __publicKey(context: QueryFunctionContext, axiosConfig?: AxiosRequestConfig | undefined) {
-  return Client.publicKey(
-axiosConfig    );
+export function __authProfile(context: QueryFunctionContext, axiosConfig?: AxiosRequestConfig | undefined) {
+  return Client.authProfile(
+      context.queryKey[2] as number,axiosConfig    );
 }
 
+export function useAuthProfileQuery<TSelectData = void, TError = unknown>(dto: AuthProfileQueryParameters, options?: Omit<UseQueryOptions<void, TError, TSelectData>, 'queryKey'>, axiosConfig?: Partial<AxiosRequestConfig>): UseQueryResult<TSelectData, TError>;
 /**
- * Get the RSA public key used to validate issued JWTs
- * @return Public key returned
+ * @return OK
  */
-export function usePublicKeyQuery<TSelectData = Types.PublicKeyResponse, TError = unknown>(options?: Omit<UseQueryOptions<Types.PublicKeyResponse, TError, TSelectData>, 'queryKey'>, axiosConfig?: Partial<AxiosRequestConfig>): UseQueryResult<TSelectData, TError>;
-export function usePublicKeyQuery<TSelectData = Types.PublicKeyResponse, TError = unknown>(...params: any []): UseQueryResult<TSelectData, TError> {
-  let options: UseQueryOptions<Types.PublicKeyResponse, TError, TSelectData> | undefined = undefined;
+export function useAuthProfileQuery<TSelectData = void, TError = unknown>(id: number, options?: Omit<UseQueryOptions<void, TError, TSelectData>, 'queryKey'>, axiosConfig?: Partial<AxiosRequestConfig>): UseQueryResult<TSelectData, TError>;
+export function useAuthProfileQuery<TSelectData = void, TError = unknown>(...params: any []): UseQueryResult<TSelectData, TError> {
+  let options: UseQueryOptions<void, TError, TSelectData> | undefined = undefined;
   let axiosConfig: AxiosRequestConfig |undefined = undefined;
+  let id: any = undefined;
   
-
-  options = params[0] as any;
-  axiosConfig = params[1] as any;
+  if (params.length > 0) {
+    if (isParameterObject(params[0])) {
+      ({ id,  } = params[0] as AuthProfileQueryParameters);
+      options = params[1];
+      axiosConfig = params[2];
+    } else {
+      [id, options, axiosConfig] = params;
+    }
+  }
 
   const metaContext = useContext(QueryMetaContext);
   options = addMetaToOptions(options, metaContext);
 
-  return useQuery<Types.PublicKeyResponse, TError, TSelectData>({
-    queryFn: axiosConfig ? (context) => __publicKey(context, axiosConfig) : __publicKey,
-    queryKey: publicKeyQueryKey(),
-    ...publicKeyDefaultOptions as unknown as Omit<UseQueryOptions<Types.PublicKeyResponse, TError, TSelectData>, 'queryKey'>,
+  return useQuery<void, TError, TSelectData>({
+    queryFn: axiosConfig ? (context) => __authProfile(context, axiosConfig) : __authProfile,
+    queryKey: authProfileQueryKey(id),
+    ...authProfileDefaultOptions as unknown as Omit<UseQueryOptions<void, TError, TSelectData>, 'queryKey'>,
     ...options,
   });
 }
 /**
- * Get the RSA public key used to validate issued JWTs
- * @return Public key returned
+ * @return OK
  */
-export function setPublicKeyData(queryClient: QueryClient, updater: (data: Types.PublicKeyResponse | undefined) => Types.PublicKeyResponse, ) {
-  queryClient.setQueryData(publicKeyQueryKey(),
+export function setAuthProfileData(queryClient: QueryClient, updater: (data: void | undefined) => void, id: number) {
+  queryClient.setQueryData(authProfileQueryKey(id),
     updater
   );
 }
 
 /**
- * Get the RSA public key used to validate issued JWTs
- * @return Public key returned
+ * @return OK
  */
-export function setPublicKeyDataByQueryId(queryClient: QueryClient, queryKey: QueryKey, updater: (data: Types.PublicKeyResponse | undefined) => Types.PublicKeyResponse) {
+export function setAuthProfileDataByQueryId(queryClient: QueryClient, queryKey: QueryKey, updater: (data: void | undefined) => void) {
   queryClient.setQueryData(queryKey, updater);
 }
     
@@ -216,7 +207,7 @@ export function usersPOSTMutationKey(): MutationKey {
  * @param body (optional) 
  * @return User created successfully
  */
-export function useUsersPOSTMutation<TContext>(options?: Omit<UseMutationOptions<Types.UserResponse, unknown, Types.CreateUserRequest, TContext>, 'mutationKey' | 'mutationFn'>): UseMutationResult<Types.UserResponse, unknown, Types.CreateUserRequest, TContext> {
+export function useUsersPOSTMutation<TContext>(options?: Omit<UseMutationOptions<void, unknown, Types.CreateUserRequest, TContext>, 'mutationKey' | 'mutationFn'>): UseMutationResult<void, unknown, Types.CreateUserRequest, TContext> {
   const key = usersPOSTMutationKey();
   
   const metaContext = useContext(QueryMetaContext);
@@ -319,6 +310,74 @@ export function setUsersGETData(queryClient: QueryClient, updater: (data: Types.
  * @return User profile returned
  */
 export function setUsersGETDataByQueryId(queryClient: QueryClient, queryKey: QueryKey, updater: (data: Types.UserResponse | undefined) => Types.UserResponse) {
+  queryClient.setQueryData(queryKey, updater);
+}
+    
+export function meUrl(): string {
+  let url_ = getBaseUrl() + "/users/me";
+  url_ = url_.replace(/[?&]$/, "");
+  return url_;
+}
+
+let meDefaultOptions: Omit<UseQueryOptions<Types.UserResponse, unknown, Types.UserResponse>, 'queryKey' | 'queryFn'> & Partial<Pick<UseQueryOptions<Types.UserResponse, unknown, Types.UserResponse>, 'queryFn'>> = {
+};
+export function getMeDefaultOptions() {
+  return meDefaultOptions;
+};
+export function setMeDefaultOptions(options: typeof meDefaultOptions) {
+  meDefaultOptions = options;
+}
+
+export function meQueryKey(): QueryKey;
+export function meQueryKey(...params: any[]): QueryKey {
+  return trimArrayEnd([
+      'Client',
+      'me',
+    ]);
+}
+export function __me(context: QueryFunctionContext, axiosConfig?: AxiosRequestConfig | undefined) {
+  return Client.me(
+axiosConfig    );
+}
+
+/**
+ * Get current profile
+ * @return User profile returned
+ */
+export function useMeQuery<TSelectData = Types.UserResponse, TError = unknown>(options?: Omit<UseQueryOptions<Types.UserResponse, TError, TSelectData>, 'queryKey'>, axiosConfig?: Partial<AxiosRequestConfig>): UseQueryResult<TSelectData, TError>;
+export function useMeQuery<TSelectData = Types.UserResponse, TError = unknown>(...params: any []): UseQueryResult<TSelectData, TError> {
+  let options: UseQueryOptions<Types.UserResponse, TError, TSelectData> | undefined = undefined;
+  let axiosConfig: AxiosRequestConfig |undefined = undefined;
+  
+
+  options = params[0] as any;
+  axiosConfig = params[1] as any;
+
+  const metaContext = useContext(QueryMetaContext);
+  options = addMetaToOptions(options, metaContext);
+
+  return useQuery<Types.UserResponse, TError, TSelectData>({
+    queryFn: axiosConfig ? (context) => __me(context, axiosConfig) : __me,
+    queryKey: meQueryKey(),
+    ...meDefaultOptions as unknown as Omit<UseQueryOptions<Types.UserResponse, TError, TSelectData>, 'queryKey'>,
+    ...options,
+  });
+}
+/**
+ * Get current profile
+ * @return User profile returned
+ */
+export function setMeData(queryClient: QueryClient, updater: (data: Types.UserResponse | undefined) => Types.UserResponse, ) {
+  queryClient.setQueryData(meQueryKey(),
+    updater
+  );
+}
+
+/**
+ * Get current profile
+ * @return User profile returned
+ */
+export function setMeDataByQueryId(queryClient: QueryClient, queryKey: QueryKey, updater: (data: Types.UserResponse | undefined) => Types.UserResponse) {
   queryClient.setQueryData(queryKey, updater);
 }
     

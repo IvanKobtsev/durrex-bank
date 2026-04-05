@@ -111,9 +111,9 @@ export function getResultTypeClassKey(queryKey: QueryKey): string {
 
 export function initPersister() {
   
-  addResultTypeFactory('Client___publicKey', (data: any) => Types.initPublicKeyResponse(data));
   addResultTypeFactory('Client___usersAll', (data: any) => Types.initUserResponse(data));
   addResultTypeFactory('Client___usersGET', (data: any) => Types.initUserResponse(data));
+  addResultTypeFactory('Client___me', (data: any) => Types.initUserResponse(data));
 
 
 }

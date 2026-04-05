@@ -1904,6 +1904,10 @@
   color: var(--bs-secondary-color) !important;
 }
 
+.query-string {
+  max-width: 60vw;
+}
+
 .text-black-50 {
   --bs-text-opacity: 1;
   color: rgba(0, 0, 0, 0.5) !important;

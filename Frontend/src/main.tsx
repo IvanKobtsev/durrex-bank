@@ -12,6 +12,7 @@ type ViteImportMeta = ImportMeta & {
 
 const appEnv = (import.meta as ViteImportMeta).env ?? {};
 export const traceId = generateTraceparent();
+export const userData: { userId: number | undefined } = { userId: undefined };
 
 const monitoringClient = axios.create({
   timeout: 5000,
@@ -153,7 +154,8 @@ const sendAxiosErrorToMonitoring = async (
     stackTrace: error.stack,
     requestMethod: error.config?.method?.toUpperCase(),
     requestPath: failedRequestPath,
-    traceId: error.response?.headers?.["traceparent"] as string | undefined,
+    traceId: traceId,
+    userId: userData.userId,
     occurredAtUtc: new Date().toISOString(),
     tags: {
       source: "frontend",

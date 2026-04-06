@@ -84,7 +84,7 @@ services:
     restart: unless-stopped
     environment:
       ASPNETCORE_URLS: http://+:8080
-      ConnectionStrings__Default: "Host=postgres;Port=5432;Database=durrex_credit;Username=postgres;Password=postgres;GssEncMode=Disable"
+      ConnectionStrings__Default: "Host=postgres;Port=5432;Database=durrex_credit;Username=postgres;Password=postgres"
       InternalApiKey: "dev-internal-api-key-12345"
       Bank__MasterAccountId: "1"
       RabbitMQ__Host: rabbitmq

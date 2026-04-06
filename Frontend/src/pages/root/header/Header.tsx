@@ -25,7 +25,8 @@ export function Header() {
           title={"Выйти"}
           onClick={async () => {
             await auth.signoutSilent();
-            localStorage.removeItem("access_token");
+            localStorage.clear();
+            sessionStorage.clear();
             navigate(AppLinks.Login.link());
           }}
         />

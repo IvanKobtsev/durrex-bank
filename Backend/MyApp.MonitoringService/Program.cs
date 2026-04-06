@@ -34,13 +34,14 @@ app.UsePathBase("/monitoring");
 
 // Nginx strips the /services prefix before forwarding to the gateway,
 // so restore it to keep generated links and static asset URLs under /services/monitoring.
-app.Use(
-    (context, next) =>
-    {
-        context.Request.PathBase = new PathString("/services") + context.Request.PathBase;
-        return next();
-    }
-);
+if (!app.Environment.IsDevelopment())
+    app.Use(
+        (context, next) =>
+        {
+            context.Request.PathBase = new PathString("/services") + context.Request.PathBase;
+            return next();
+        }
+    );
 
 await using (var scope = app.Services.CreateAsyncScope())
 {

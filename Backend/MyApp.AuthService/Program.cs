@@ -1,5 +1,5 @@
-using Microsoft.AspNetCore.HttpOverrides;
 using Duende.IdentityServer.Models;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MyApp.AuthService.Data;
@@ -108,11 +108,14 @@ app.UsePathBase("/auth");
 // Nginx strips the /services prefix before forwarding to the gateway,
 // so we restore it in PathBase to ensure generated URLs (redirects, login, etc.)
 // use the correct external path /services/auth.
-app.Use((context, next) =>
-{
-    context.Request.PathBase = new PathString("/services") + context.Request.PathBase;
-    return next();
-});
+if (!app.Environment.IsDevelopment())
+    app.Use(
+        (context, next) =>
+        {
+            context.Request.PathBase = new PathString("/services") + context.Request.PathBase;
+            return next();
+        }
+    );
 
 app.UseMiddleware<InternalApiKeyMiddleware>();
 app.UseStaticFiles();

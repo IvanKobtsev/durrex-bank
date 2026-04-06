@@ -14,9 +14,13 @@ public sealed class SourceMapResolver(
         RegexOptions.Compiled | RegexOptions.IgnoreCase
     );
 
-    private readonly string _sourceMapsRoot = Path.Combine(hostEnvironment.ContentRootPath, "SourceMaps");
-    private readonly ConcurrentDictionary<string, CachedSourceMap> _cache =
-        new(StringComparer.OrdinalIgnoreCase);
+    private readonly string _sourceMapsRoot = Path.Combine(
+        hostEnvironment.ContentRootPath,
+        "SourceMaps"
+    );
+    private readonly ConcurrentDictionary<string, CachedSourceMap> _cache = new(
+        StringComparer.OrdinalIgnoreCase
+    );
 
     public string? ResolveStackTrace(string? service, string? stackTrace)
     {
@@ -51,18 +55,9 @@ public sealed class SourceMapResolver(
         }
 
         var sourceMap = GetSourceMap(sourceMapPath);
-        if (sourceMap is null)
-        {
-            return null;
-        }
 
-        var original = sourceMap.FindOriginalPosition(line, column);
-        if (original is null)
-        {
-            return null;
-        }
-
-        return $"{original.Source}:{original.Line}:{original.Column}";
+        var original = sourceMap?.FindOriginalPosition(line, column);
+        return original is null ? null : $"{original.Source}:{original.Line}:{original.Column}";
     }
 
     private string? FindSourceMapPath(string? service, string assetPath)
@@ -192,14 +187,19 @@ public sealed class SourceMapResolver(
                 return null;
             }
 
-            var normalizedSources = payload.Sources
-                .Select(source => string.IsNullOrWhiteSpace(source) ? "unknown-source" : source)
+            var normalizedSources = payload
+                .Sources.Select(source =>
+                    string.IsNullOrWhiteSpace(source) ? "unknown-source" : source
+                )
                 .ToArray();
 
             return new SourceMapDocument(mappings, normalizedSources);
         }
 
-        public OriginalPosition? FindOriginalPosition(int generatedLineOneBased, int generatedColumnOneBased)
+        public OriginalPosition? FindOriginalPosition(
+            int generatedLineOneBased,
+            int generatedColumnOneBased
+        )
         {
             if (generatedLineOneBased <= 0 || generatedColumnOneBased <= 0)
             {
@@ -372,5 +372,3 @@ public sealed class SourceMapResolver(
 
     private sealed record OriginalPosition(string Source, int Line, int Column);
 }
-
-

@@ -107,11 +107,23 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(
-        "DevCors",
+        "ProdCors",
         policy =>
         {
             policy
                 .WithOrigins("https://swagor-time.ru")
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials();
+        }
+    );
+
+    options.AddPolicy(
+        "DevCors",
+        policy =>
+        {
+            policy
+                .WithOrigins("http://localhost:5173")
                 .AllowAnyHeader()
                 .AllowAnyMethod()
                 .AllowCredentials();
@@ -125,15 +137,26 @@ app.UseSwagger();
 
 app.UseSwaggerUI(options =>
 {
-    options.SwaggerEndpoint("/services/core/openapi/v1.json", "CoreService API");
-    options.SwaggerEndpoint("/services/credit/swagger/v1/swagger.json", "CreditService API");
-    options.SwaggerEndpoint("/services/user/swagger/v1/swagger.json", "UserService API");
     options.SwaggerEndpoint(
-        "/services/web-app-settings/openapi/v1.json",
+        !app.Environment.IsDevelopment() ? "/services" : "" + "/core/openapi/v1.json",
+        "CoreService API"
+    );
+    options.SwaggerEndpoint(
+        !app.Environment.IsDevelopment() ? "/services" : "" + "/credit/swagger/v1/swagger.json",
+        "CreditService API"
+    );
+    options.SwaggerEndpoint(
+        !app.Environment.IsDevelopment() ? "/services" : "" + "/user/swagger/v1/swagger.json",
+        "UserService API"
+    );
+    options.SwaggerEndpoint(
+        !app.Environment.IsDevelopment() ? "/services" : "" + "/web-app-settings/openapi/v1.json",
         "Web App Settings Service API"
     );
     options.SwaggerEndpoint(
-        "/services/mobile-app-settings/openapi/v1.json",
+        !app.Environment.IsDevelopment()
+            ? "/services"
+            : "" + "/mobile-app-settings/openapi/v1.json",
         "Mobile App Settings Service API"
     );
     options.RoutePrefix = "swagger";
@@ -141,7 +164,7 @@ app.UseSwaggerUI(options =>
 
 app.UseForwardedHeaders();
 app.UseMiddleware<RequestTracingMiddleware>();
-app.UseCors("DevCors");
+app.UseCors(!app.Environment.IsDevelopment() ? "ProdCors" : "DevCors");
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseMiddleware<JwtForwardingMiddleware>();

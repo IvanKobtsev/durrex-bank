@@ -5,6 +5,7 @@ import { UserCard } from "../userCard/UserCard.tsx";
 import { useNavigate } from "react-router-dom";
 import { AppLinks } from "application/constants/appLinks.ts";
 import { PageWrapper } from "components/PageWrapper/PageWrapper.tsx";
+import { Loading } from "components/uikit/suspense/Loading.tsx";
 
 export function UsersManagementPage() {
   const navigate = useNavigate();
@@ -20,11 +21,13 @@ export function UsersManagementPage() {
         />
       </div>
       <div className={styles.usersList}>
-        {usersQuery.data
-          ?.sort((u1, u2) => (u1.id ?? 0) - (u2.id ?? 0))
-          .map((u) => (
-            <UserCard key={u.id} user={u} type={"management"} />
-          ))}
+        <Loading loading={usersQuery.isLoading} doNotWrapChildren>
+          {usersQuery.data
+            ?.sort((u1, u2) => (u1.id ?? 0) - (u2.id ?? 0))
+            .map((u) => (
+              <UserCard key={u.id} user={u} type={"management"} />
+            ))}
+        </Loading>
       </div>
     </PageWrapper>
   );

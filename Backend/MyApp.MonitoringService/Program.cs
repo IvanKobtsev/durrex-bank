@@ -30,7 +30,9 @@ builder.Services.AddScoped<MonitoringEventService>();
 var app = builder.Build();
 
 app.UseForwardedHeaders();
-app.UsePathBase("/monitoring");
+
+if (!app.Environment.IsDevelopment())
+    app.UsePathBase("/monitoring");
 
 // Nginx strips the /services prefix before forwarding to the gateway,
 // so restore it to keep generated links and static asset URLs under /services/monitoring.

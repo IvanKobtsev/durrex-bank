@@ -11,8 +11,6 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
     ports:
       - "5433:5432"
 
@@ -186,6 +184,3 @@ services:
       - frontend
     networks:
       - default
-volumes:
-  postgres_data:
-

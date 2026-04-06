@@ -1,7 +1,11 @@
 ﻿@page "/"
 @page "/events"
+@rendermode InteractiveServer
 @inject MonitoringEventService MonitoringEventService
-@implements IDisposable
+@inject NavigationManager NavigationManager
+@implements IAsyncDisposable
+@using Microsoft.AspNetCore.SignalR.Client
+@using MyApp.MonitoringService.Hubs
 
 <PageTitle>Monitoring Dashboard</PageTitle>
 
@@ -12,9 +16,6 @@
 			<h1>Error events</h1>
 			<p class="lead text-muted">Capture exceptions over HTTP and inspect them from one Razor page.</p>
 		</div>
-		<button class="btn btn-primary" @onclick="RefreshAsync" disabled="@_isRefreshing">
-			@(_isRefreshing ? "Refreshing..." : "Refresh")
-		</button>
 	</div>
 
 	@if (!string.IsNullOrWhiteSpace(_loadError))
@@ -152,21 +153,27 @@
 @code {
 	private MonitoringDashboardSnapshot? _snapshot;
 	private string? _loadError;
-	private bool _isRefreshing;
+	private HubConnection? _hubConnection;
 
 	protected override async Task OnInitializedAsync()
 	{
-		await LoadAsync();
-	}
+		_hubConnection = new HubConnectionBuilder()
+			.WithUrl(NavigationManager.ToAbsoluteUri("hubs/monitoring"))
+			.WithAutomaticReconnect()
+			.Build();
 
-	private async Task RefreshAsync()
-	{
+		_hubConnection.On(MonitoringHub.EventCaptured, async () =>
+		{
+			await LoadAsync();
+			await InvokeAsync(StateHasChanged);
+		});
+
+		await _hubConnection.StartAsync();
 		await LoadAsync();
 	}
 
 	private async Task LoadAsync()
 	{
-		_isRefreshing = true;
 		_loadError = null;
 
 		try
@@ -176,10 +183,6 @@
 		catch (Exception ex)
 		{
 			_loadError = $"Failed to load events: {ex.Message}";
-		}
-		finally
-		{
-			_isRefreshing = false;
 		}
 	}
 
@@ -192,7 +195,9 @@
 		_ => "text-bg-danger",
 	};
 
-	public void Dispose()
+	public async ValueTask DisposeAsync()
 	{
+		if (_hubConnection is not null)
+			await _hubConnection.DisposeAsync();
 	}
 }

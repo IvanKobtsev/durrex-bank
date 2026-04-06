@@ -1,0 +1,186 @@
+@page "/trends"
+@rendermode InteractiveServer
+@inject MonitoringEventService MonitoringEventService
+@inject NavigationManager NavigationManager
+@implements IAsyncDisposable
+@using Microsoft.AspNetCore.SignalR.Client
+@using MyApp.MonitoringService.Hubs
+
+<PageTitle>Monitoring Trends</PageTitle>
+
+<div class="dashboard-page">
+    <div class="dashboard-header">
+        <div>
+            <p class="eyebrow">System overview</p>
+            <h1>Monitoring trends</h1>
+            <p class="lead text-muted">Compare request traffic and captured error activity over time, then zoom the charts to the interval you care about.</p>
+        </div>
+    </div>
+
+    <div class="interval-toolbar">
+        <div class="interval-toolbar__buttons">
+            @foreach (var option in TimeRangeOptions)
+            {
+                <button class="btn btn-sm @(option.Value == _selectedTimeRange ? "btn-primary" : "btn-outline-primary")"
+                        @onclick="() => SelectTimeRangeAsync(option.Value)">
+                    @option.Label
+                </button>
+            }
+        </div>
+        <span class="text-muted small">Live updates are pushed automatically when new requests or events arrive.</span>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(_loadError))
+    {
+        <div class="alert alert-danger" role="alert">
+            @_loadError
+        </div>
+    }
+
+    @if (_snapshot is null)
+    {
+        <div class="dashboard-loading">
+            <div class="spinner-border text-primary" role="status"></div>
+            <span>Loading trend charts...</span>
+        </div>
+    }
+    else
+    {
+        <div class="summary-grid">
+            <section class="summary-card">
+                <span class="summary-label">Interval</span>
+                <strong>@_snapshot.TimeRangeLabel</strong>
+                <span>@GetWindowLabel()</span>
+            </section>
+            <section class="summary-card">
+                <span class="summary-label">Requests in range</span>
+                <strong>@GetSeriesTotal(_snapshot.RequestSeries, 0)</strong>
+                <span>All traced requests</span>
+            </section>
+            <section class="summary-card">
+                <span class="summary-label">5xx in range</span>
+                <strong>@GetSeriesTotal(_snapshot.RequestSeries, 2)</strong>
+                <span>Server-side failures</span>
+            </section>
+            <section class="summary-card">
+                <span class="summary-label">Critical / fatal</span>
+                <strong>@GetSeriesTotal(_snapshot.EventSeries, 2)</strong>
+                <span>High-severity events</span>
+            </section>
+        </div>
+
+        <div class="charts-grid">
+            <TimeSeriesChart Title="Request tracing volume"
+                             Subtitle="Traffic compared with 4xx and 5xx responses across the selected interval."
+                             Series="@_snapshot.RequestSeries" />
+
+            <TimeSeriesChart Title="Error event activity"
+                             Subtitle="Captured events split into total volume, warnings, and critical / fatal spikes."
+                             Series="@_snapshot.EventSeries" />
+        </div>
+    }
+</div>
+
+@code {
+    private static readonly IReadOnlyList<TimeRangeOption> TimeRangeOptions =
+    [
+        new(MonitoringTimeRange.Last5Minutes, "5m"),
+        new(MonitoringTimeRange.LastHour, "1h"),
+        new(MonitoringTimeRange.Last6Hours, "6h"),
+        new(MonitoringTimeRange.Last24Hours, "24h"),
+        new(MonitoringTimeRange.Last7Days, "7d")
+    ];
+
+    private MonitoringTrendsSnapshot? _snapshot;
+    private string? _loadError;
+    private MonitoringTimeRange _selectedTimeRange = MonitoringTimeRange.Last24Hours;
+    private HubConnection? _hubConnection;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAsync();
+        await InitializeRealtimeAsync();
+    }
+
+    private async Task InitializeRealtimeAsync()
+    {
+        _hubConnection = new HubConnectionBuilder()
+            .WithUrl(NavigationManager.ToAbsoluteUri("hubs/monitoring"))
+            .WithAutomaticReconnect()
+            .Build();
+
+        _hubConnection.On(MonitoringHub.EventCaptured, RefreshFromRealtimeAsync);
+        _hubConnection.On(MonitoringHub.RequestTraceCaptured, RefreshFromRealtimeAsync);
+
+        try
+        {
+            await _hubConnection.StartAsync();
+        }
+        catch
+        {
+            // The page still works without the live connection; manual interval changes still reload data.
+        }
+    }
+
+    private async Task RefreshFromRealtimeAsync()
+    {
+        await LoadAsync();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task SelectTimeRangeAsync(MonitoringTimeRange timeRange)
+    {
+        if (_selectedTimeRange == timeRange)
+        {
+            return;
+        }
+
+        _selectedTimeRange = timeRange;
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        _loadError = null;
+
+        try
+        {
+            _snapshot = await MonitoringEventService.GetTrendsSnapshotAsync(_selectedTimeRange);
+        }
+        catch (Exception ex)
+        {
+            _loadError = $"Failed to load trend charts: {ex.Message}";
+        }
+    }
+
+    private string GetWindowLabel()
+    {
+        if (_snapshot is null)
+        {
+            return string.Empty;
+        }
+
+        return $"{_snapshot.FromUtc.ToLocalTime():g} → {_snapshot.ToUtc.ToLocalTime():g}";
+    }
+
+    private static int GetSeriesTotal(IReadOnlyList<MonitoringChartSeries> series, int index)
+    {
+        if (index < 0 || index >= series.Count)
+        {
+            return 0;
+        }
+
+        return (int)Math.Round(series[index].Points.Sum(point => point.Value));
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_hubConnection is not null)
+        {
+            await _hubConnection.DisposeAsync();
+        }
+    }
+
+    private sealed record TimeRangeOption(MonitoringTimeRange Value, string Label);
+}
+

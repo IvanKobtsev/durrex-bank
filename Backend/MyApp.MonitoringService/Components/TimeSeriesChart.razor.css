@@ -1,0 +1,111 @@
+.trend-chart {
+	border-radius: 1rem;
+}
+
+.trend-chart__header {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	gap: 1rem;
+	margin-bottom: 1rem;
+}
+
+.trend-chart__header h2 {
+	margin: 0 0 0.35rem;
+	font-size: 1.25rem;
+}
+
+.trend-chart__legend {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: flex-end;
+	gap: 0.75rem;
+	font-size: 0.9rem;
+	color: #475569;
+}
+
+.trend-chart__legend-item {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+}
+
+.trend-chart__legend-swatch {
+	width: 0.85rem;
+	height: 0.85rem;
+	border-radius: 999px;
+	box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.8);
+}
+
+.trend-chart__canvas {
+	display: grid;
+	grid-template-columns: 3rem 1fr;
+	gap: 0.5rem;
+	align-items: stretch;
+}
+
+.trend-chart__y-axis {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	padding: 0.5rem 0 1.75rem;
+	font-size: 0.8rem;
+	color: #64748b;
+	text-align: right;
+}
+
+.trend-chart svg {
+	width: 100%;
+	height: auto;
+	overflow: visible;
+}
+
+.trend-chart__grid-line {
+	stroke: #e2e8f0;
+	stroke-width: 1;
+}
+
+.trend-chart__grid-line--vertical {
+	stroke-dasharray: 4 4;
+}
+
+.trend-chart__point {
+	transform-box: fill-box;
+	transform-origin: center;
+	transition: transform 0.15s ease;
+}
+
+.trend-chart__point:hover {
+	transform: scale(1.2);
+}
+
+.trend-chart__x-axis {
+	position: relative;
+	height: 1.5rem;
+	margin-left: 3.5rem;
+	font-size: 0.78rem;
+	color: #64748b;
+}
+
+.trend-chart__x-axis span {
+	position: absolute;
+	width: 5rem;
+	text-align: center;
+	white-space: nowrap;
+}
+
+.trend-chart__empty {
+	padding: 2rem 0 0.5rem;
+}
+
+@media (max-width: 992px) {
+	.trend-chart__header {
+		flex-direction: column;
+	}
+
+	.trend-chart__legend {
+		justify-content: flex-start;
+	}
+}
+
+

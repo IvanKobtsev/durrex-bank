@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using MyApp.MonitoringService.Components;
 using MyApp.MonitoringService.Data;
 using MyApp.MonitoringService.DTOs;
+using MyApp.MonitoringService.Hubs;
 using MyApp.MonitoringService.Infrastructure;
 using MyApp.MonitoringService.Middleware;
 using MyApp.MonitoringService.Services;
@@ -21,10 +22,10 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 
 // Add services to the container.
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
+builder.Services.AddSignalR();
 builder.Services.AddDbContextFactory<MonitoringDbContext>(options =>
     options.UseNpgsql(connectionString)
 );
-builder.Services.AddSingleton<SourceMapResolver>();
 builder.Services.AddScoped<MonitoringEventService>();
 
 var app = builder.Build();
@@ -182,6 +183,7 @@ app.MapGet(
     .WithName("GetRequestTracesSummary");
 
 app.MapStaticAssets();
+app.MapHub<MonitoringHub>("/hubs/monitoring");
 app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 
 app.Run();

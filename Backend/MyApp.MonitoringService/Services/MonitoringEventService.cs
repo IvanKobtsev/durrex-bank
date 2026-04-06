@@ -1,7 +1,9 @@
 using System.Text.Json;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using MyApp.MonitoringService.Data;
 using MyApp.MonitoringService.DTOs;
+using MyApp.MonitoringService.Hubs;
 using MyApp.MonitoringService.Models;
 
 namespace MyApp.MonitoringService.Services;
@@ -10,7 +12,7 @@ public sealed class MonitoringEventService(
     IDbContextFactory<MonitoringDbContext> dbContextFactory,
     IConfiguration configuration,
     ILogger<MonitoringEventService> logger,
-    SourceMapResolver sourceMapResolver
+    IHubContext<MonitoringHub> hubContext
 )
 {
     private static readonly JsonSerializerOptions SerializerOptions = new(
@@ -60,7 +62,6 @@ public sealed class MonitoringEventService(
         var environment = NormalizeRequired(request.Environment, "Production", 80);
         var level = NormalizeRequired(request.Level, "error", 32).ToLowerInvariant();
         var normalizedStackTrace = NormalizeOptional(request.StackTrace);
-        var resolvedStackTrace = sourceMapResolver.ResolveStackTrace(service, normalizedStackTrace);
         var fingerprint = NormalizeRequired(
             request.Fingerprint,
             $"{service}:{NormalizeOptional(request.ExceptionType, 120) ?? "error"}:{message}".ToLowerInvariant(),
@@ -75,7 +76,7 @@ public sealed class MonitoringEventService(
             Level = level,
             Message = message,
             ExceptionType = NormalizeOptional(request.ExceptionType, 500),
-            StackTrace = NormalizeOptional(resolvedStackTrace),
+            StackTrace = NormalizeOptional(normalizedStackTrace),
             RequestMethod = NormalizeOptional(request.RequestMethod, 16)?.ToUpperInvariant(),
             RequestPath = NormalizeOptional(request.RequestPath, 2048),
             TraceId = NormalizeOptional(request.TraceId, 128),
@@ -96,6 +97,8 @@ public sealed class MonitoringEventService(
             record.Service,
             record.Level
         );
+
+        await hubContext.Clients.All.SendAsync(MonitoringHub.EventCaptured, cancellationToken);
 
         return Map(record);
     }
@@ -136,6 +139,11 @@ public sealed class MonitoringEventService(
 
         db.RequestTraces.Add(trace);
         await db.SaveChangesAsync(cancellationToken);
+
+        await hubContext.Clients.All.SendAsync(
+            MonitoringHub.RequestTraceCaptured,
+            cancellationToken
+        );
     }
 
     public async Task<IReadOnlyList<MonitoringEventListItem>> GetRecentEventsAsync(
@@ -218,6 +226,7 @@ public sealed class MonitoringEventService(
     {
         var limit = NormalizeLimit(maxRequests, _defaultRequestsLimit);
         var last24HoursThreshold = DateTimeOffset.UtcNow.AddHours(-24);
+        var last5MinThreshold = DateTimeOffset.UtcNow.AddMinutes(-5);
 
         await using var db = await dbContextFactory.CreateDbContextAsync(cancellationToken);
 
@@ -227,7 +236,7 @@ public sealed class MonitoringEventService(
             cancellationToken
         );
         var errorResponsesLast24Hours = await db.RequestTraces.CountAsync(
-            x => x.TimestampUtc >= last24HoursThreshold && !x.IsSuccess,
+            x => x.TimestampUtc >= last24HoursThreshold && !x.IsSuccess && x.StatusCode / 100 == 5,
             cancellationToken
         );
         var avgDurationMsLast24Hours =
@@ -235,6 +244,16 @@ public sealed class MonitoringEventService(
                 .RequestTraces.Where(x => x.TimestampUtc >= last24HoursThreshold)
                 .Select(x => (double?)x.DurationMs)
                 .AverageAsync(cancellationToken) ?? 0;
+        var totalLast5Min = await db.RequestTraces.CountAsync(
+            x => x.TimestampUtc >= last5MinThreshold,
+            cancellationToken
+        );
+        var errorsLast5Min = await db.RequestTraces.CountAsync(
+            x => x.TimestampUtc >= last5MinThreshold && !x.IsSuccess,
+            cancellationToken
+        );
+        var errorRateLast5MinPct =
+            totalLast5Min > 0 ? Math.Round((double)errorsLast5Min / totalLast5Min * 100, 1) : 0.0;
         var latestRequestAtUtc = await db
             .RequestTraces.AsNoTracking()
             .OrderByDescending(x => x.TimestampUtc)
@@ -251,8 +270,129 @@ public sealed class MonitoringEventService(
             requestsLast24Hours,
             errorResponsesLast24Hours,
             Math.Round(avgDurationMsLast24Hours, 2),
+            errorRateLast5MinPct,
             latestRequestAtUtc,
             requests.Select(Map).ToList()
+        );
+    }
+
+    public async Task<MonitoringTrendsSnapshot> GetTrendsSnapshotAsync(
+        MonitoringTimeRange timeRange,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var range = GetTrendRange(timeRange);
+        var toUtcExclusive = AlignDown(DateTimeOffset.UtcNow, range.BucketSize)
+            .Add(range.BucketSize);
+        var fromUtc = toUtcExclusive - range.Duration;
+        var bucketStarts = BuildBucketStarts(fromUtc, toUtcExclusive, range.BucketSize);
+
+        await using var db = await dbContextFactory.CreateDbContextAsync(cancellationToken);
+
+        var requestRows = await db
+            .RequestTraces.AsNoTracking()
+            .Where(x => x.TimestampUtc >= fromUtc && x.TimestampUtc < toUtcExclusive)
+            .Select(x => new RequestTrendRow(x.TimestampUtc, x.StatusCode))
+            .ToListAsync(cancellationToken);
+
+        var eventRows = await db
+            .ErrorEvents.AsNoTracking()
+            .Where(x => x.ReceivedAtUtc >= fromUtc && x.ReceivedAtUtc < toUtcExclusive)
+            .Select(x => new EventTrendRow(x.ReceivedAtUtc, x.Level))
+            .ToListAsync(cancellationToken);
+
+        var totalRequests = bucketStarts.ToDictionary(bucket => bucket, _ => 0d);
+        var clientErrors = bucketStarts.ToDictionary(bucket => bucket, _ => 0d);
+        var serverErrors = bucketStarts.ToDictionary(bucket => bucket, _ => 0d);
+
+        foreach (var row in requestRows)
+        {
+            var bucket = AlignDown(row.TimestampUtc, range.BucketSize);
+
+            if (!totalRequests.ContainsKey(bucket))
+            {
+                continue;
+            }
+
+            totalRequests[bucket] += 1;
+
+            if (row.StatusCode / 100 == 4)
+            {
+                clientErrors[bucket] += 1;
+            }
+            else if (row.StatusCode / 100 == 5)
+            {
+                serverErrors[bucket] += 1;
+            }
+        }
+
+        var totalEvents = bucketStarts.ToDictionary(bucket => bucket, _ => 0d);
+        var warningEvents = bucketStarts.ToDictionary(bucket => bucket, _ => 0d);
+        var criticalEvents = bucketStarts.ToDictionary(bucket => bucket, _ => 0d);
+
+        foreach (var row in eventRows)
+        {
+            var bucket = AlignDown(row.TimestampUtc, range.BucketSize);
+
+            if (!totalEvents.ContainsKey(bucket))
+            {
+                continue;
+            }
+
+            totalEvents[bucket] += 1;
+
+            if (string.Equals(row.Level, "warning", StringComparison.OrdinalIgnoreCase))
+            {
+                warningEvents[bucket] += 1;
+            }
+            else if (
+                string.Equals(row.Level, "critical", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(row.Level, "fatal", StringComparison.OrdinalIgnoreCase)
+            )
+            {
+                criticalEvents[bucket] += 1;
+            }
+        }
+
+        return new MonitoringTrendsSnapshot(
+            range.TimeRange,
+            range.Label,
+            fromUtc,
+            toUtcExclusive,
+            [
+                CreateSeries(
+                    "All requests",
+                    "#2563eb",
+                    bucketStarts,
+                    totalRequests,
+                    range.LabelFormat
+                ),
+                CreateSeries(
+                    "Client errors",
+                    "#f59e0b",
+                    bucketStarts,
+                    clientErrors,
+                    range.LabelFormat
+                ),
+                CreateSeries(
+                    "Server errors",
+                    "#dc2626",
+                    bucketStarts,
+                    serverErrors,
+                    range.LabelFormat
+                ),
+            ],
+            [
+                CreateSeries("All events", "#7c3aed", bucketStarts, totalEvents, range.LabelFormat),
+                CreateSeries("Warnings", "#f59e0b", bucketStarts, warningEvents, range.LabelFormat),
+                CreateSeries(
+                    "Critical / fatal",
+                    "#111827",
+                    bucketStarts,
+                    criticalEvents,
+                    range.LabelFormat
+                ),
+            ]
         );
     }
 
@@ -290,6 +430,93 @@ public sealed class MonitoringEventService(
     {
         var limit = maxItems ?? fallback;
         return Math.Clamp(limit, 1, 1_000);
+    }
+
+    private static MonitoringChartSeries CreateSeries(
+        string name,
+        string color,
+        IReadOnlyList<DateTimeOffset> bucketStarts,
+        IReadOnlyDictionary<DateTimeOffset, double> values,
+        string labelFormat
+    )
+    {
+        return new MonitoringChartSeries(
+            name,
+            color,
+            bucketStarts
+                .Select(bucket => new MonitoringChartPoint(
+                    bucket,
+                    bucket.ToLocalTime().ToString(labelFormat),
+                    values.GetValueOrDefault(bucket)
+                ))
+                .ToList()
+        );
+    }
+
+    private static IReadOnlyList<DateTimeOffset> BuildBucketStarts(
+        DateTimeOffset fromUtc,
+        DateTimeOffset toUtcExclusive,
+        TimeSpan bucketSize
+    )
+    {
+        var buckets = new List<DateTimeOffset>();
+
+        for (var cursor = fromUtc; cursor < toUtcExclusive; cursor = cursor.Add(bucketSize))
+        {
+            buckets.Add(cursor);
+        }
+
+        return buckets;
+    }
+
+    private static DateTimeOffset AlignDown(DateTimeOffset value, TimeSpan bucketSize)
+    {
+        var ticks = value.UtcDateTime.Ticks / bucketSize.Ticks * bucketSize.Ticks;
+        return new DateTimeOffset(ticks, TimeSpan.Zero);
+    }
+
+    private static MonitoringTrendRange GetTrendRange(MonitoringTimeRange timeRange)
+    {
+        var normalized = Enum.IsDefined(timeRange) ? timeRange : MonitoringTimeRange.Last24Hours;
+
+        return normalized switch
+        {
+            MonitoringTimeRange.Last5Minutes => new MonitoringTrendRange(
+                normalized,
+                "Last 5 minutes",
+                TimeSpan.FromMinutes(5),
+                TimeSpan.FromSeconds(30),
+                "mm:ss"
+            ),
+            MonitoringTimeRange.LastHour => new MonitoringTrendRange(
+                normalized,
+                "Last hour",
+                TimeSpan.FromHours(1),
+                TimeSpan.FromMinutes(5),
+                "HH:mm"
+            ),
+            MonitoringTimeRange.Last6Hours => new MonitoringTrendRange(
+                normalized,
+                "Last 6 hours",
+                TimeSpan.FromHours(6),
+                TimeSpan.FromMinutes(15),
+                "HH:mm"
+            ),
+            MonitoringTimeRange.Last7Days => new MonitoringTrendRange(
+                normalized,
+                "Last 7 days",
+                TimeSpan.FromDays(7),
+                TimeSpan.FromHours(6),
+                "dd MMM HH:mm"
+            ),
+            _ => new MonitoringTrendRange(
+                MonitoringTimeRange.Last24Hours,
+                "Last 24 hours",
+                TimeSpan.FromHours(24),
+                TimeSpan.FromHours(1),
+                "HH:mm"
+            ),
+        };
     }
 
     private static MonitoringEventListItem Map(ErrorEvent errorEvent)
@@ -400,4 +627,16 @@ public sealed class MonitoringEventService(
     {
         return value.Length <= maxLength ? value : value[..maxLength];
     }
+
+    private sealed record MonitoringTrendRange(
+        MonitoringTimeRange TimeRange,
+        string Label,
+        TimeSpan Duration,
+        TimeSpan BucketSize,
+        string LabelFormat
+    );
+
+    private sealed record RequestTrendRow(DateTimeOffset TimestampUtc, int StatusCode);
+
+    private sealed record EventTrendRow(DateTimeOffset TimestampUtc, string Level);
 }

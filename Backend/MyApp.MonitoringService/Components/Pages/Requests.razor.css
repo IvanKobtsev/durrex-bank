@@ -137,6 +137,12 @@
 	word-break: break-word;
 }
 
+.filter-bar {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+}
+
 @media (max-width: 992px) {
 	.dashboard-header,
 	.event-card__header {

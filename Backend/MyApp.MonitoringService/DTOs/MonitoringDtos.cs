@@ -36,6 +36,36 @@ public sealed class CaptureRequestTraceRequest
     public DateTimeOffset? TimestampUtc { get; init; }
 }
 
+public enum MonitoringTimeRange
+{
+    Last5Minutes,
+    LastHour,
+    Last6Hours,
+    Last24Hours,
+    Last7Days,
+}
+
+public sealed record MonitoringChartPoint(
+    DateTimeOffset BucketStartUtc,
+    string Label,
+    double Value
+);
+
+public sealed record MonitoringChartSeries(
+    string Name,
+    string Color,
+    IReadOnlyList<MonitoringChartPoint> Points
+);
+
+public sealed record MonitoringTrendsSnapshot(
+    MonitoringTimeRange TimeRange,
+    string TimeRangeLabel,
+    DateTimeOffset FromUtc,
+    DateTimeOffset ToUtc,
+    IReadOnlyList<MonitoringChartSeries> RequestSeries,
+    IReadOnlyList<MonitoringChartSeries> EventSeries
+);
+
 public sealed record MonitoringDashboardSnapshot(
     int TotalEvents,
     int EventsLast24Hours,
@@ -72,6 +102,7 @@ public sealed record MonitoringRequestSnapshot(
     int RequestsLast24Hours,
     int ErrorResponsesLast24Hours,
     double AvgDurationMsLast24Hours,
+    double ErrorRateLast5MinPct,
     DateTimeOffset? LatestRequestAtUtc,
     IReadOnlyList<MonitoringRequestListItem> Requests
 );
@@ -93,5 +124,8 @@ public sealed record MonitoringRequestListItem(
     DateTimeOffset TimestampUtc
 )
 {
-    public string StatusLabel => IsSuccess ? "Success" : "Error";
+    public string StatusLabel =>
+        IsSuccess ? "Success"
+        : StatusCode / 100 == 4 ? "Client Error"
+        : "Server Error";
 }

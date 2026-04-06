@@ -1,0 +1,223 @@
+<div class="trend-chart card shadow-sm border-0">
+    <div class="card-body">
+        <div class="trend-chart__header">
+            <div>
+                <h2>@Title</h2>
+                @if (!string.IsNullOrWhiteSpace(Subtitle))
+                {
+                    <p class="text-muted mb-0">@Subtitle</p>
+                }
+            </div>
+
+            @if (Series.Count > 0)
+            {
+                <div class="trend-chart__legend">
+                    @foreach (var series in Series)
+                    {
+                        <div class="trend-chart__legend-item">
+                            <span class="trend-chart__legend-swatch" style="background-color: @series.Color;"></span>
+                            <span>@series.Name</span>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        @if (!HasValues)
+        {
+            <div class="trend-chart__empty text-muted">No data in the selected interval.</div>
+        }
+        else
+        {
+            <div class="trend-chart__canvas">
+                <div class="trend-chart__y-axis">
+                    @foreach (var tick in YAxisTicks)
+                    {
+                        <span>@FormatAxisValue(tick)</span>
+                    }
+                </div>
+
+                <svg viewBox="0 0 900 300" role="img" aria-label="@Title">
+                    @foreach (var tick in YAxisTicks)
+                    {
+                        <line x1="44"
+                              y1="@GetY(tick)"
+                              x2="884"
+                              y2="@GetY(tick)"
+                              class="trend-chart__grid-line" />
+                    }
+
+                    @for (var i = 0; i < SampledXAxisLabels.Count; i++)
+                    {
+                        var item = SampledXAxisLabels[i];
+                        <line x1="@GetX(item.Index)"
+                              y1="16"
+                              x2="@GetX(item.Index)"
+                              y2="272"
+                              class="trend-chart__grid-line trend-chart__grid-line--vertical" />
+                    }
+
+                    @foreach (var series in Series)
+                    {
+                        <polyline points="@GetPolylinePoints(series)"
+                                  fill="none"
+                                  stroke="@series.Color"
+                                  stroke-width="3"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round" />
+
+                        @for (var i = 0; i < series.Points.Count; i++)
+                        {
+                            var point = series.Points[i];
+                            <circle cx="@GetX(i)"
+                                    cy="@GetY(point.Value)"
+                                    r="4"
+                                    fill="@series.Color"
+                                    class="trend-chart__point">
+                                <title>@($"{series.Name}: {FormatAxisValue(point.Value)} at {point.Label}")</title>
+                            </circle>
+                        }
+                    }
+                </svg>
+            </div>
+
+            <div class="trend-chart__x-axis">
+                @foreach (var item in SampledXAxisLabels)
+                {
+                    <span style="left: calc(@item.PositionPct% - 2.5rem)">@item.Label</span>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private const double Width = 900;
+    private const double Height = 300;
+    private const double PaddingLeft = 44;
+    private const double PaddingRight = 16;
+    private const double PaddingTop = 16;
+    private const double PaddingBottom = 28;
+    private const int PreferredTickCount = 5;
+
+    [Parameter]
+    public string Title { get; set; } = string.Empty;
+
+    [Parameter]
+    public string? Subtitle { get; set; }
+
+    [Parameter]
+    public IReadOnlyList<MonitoringChartSeries> Series { get; set; } = [];
+
+    private IReadOnlyList<MonitoringChartPoint> ReferencePoints =>
+        Series.FirstOrDefault()?.Points ?? [];
+
+    private bool HasValues => Series.SelectMany(x => x.Points).Any(point => point.Value > 0);
+
+    private double PlotWidth => Width - PaddingLeft - PaddingRight;
+
+    private double PlotHeight => Height - PaddingTop - PaddingBottom;
+
+    private double RawMaxValue => Math.Max(
+        1,
+        Series.SelectMany(x => x.Points).DefaultIfEmpty().Max(x => x?.Value ?? 0)
+    );
+
+    private double YAxisStep => GetNiceStep(RawMaxValue, PreferredTickCount - 1);
+
+    private double MaxValue => Math.Max(Math.Ceiling(RawMaxValue / YAxisStep) * YAxisStep, YAxisStep);
+
+    private IReadOnlyList<double> YAxisTicks =>
+        Enumerable.Range(0, (int)Math.Round(MaxValue / YAxisStep) + 1)
+            .Select(i => MaxValue - (YAxisStep * i))
+            .ToList();
+
+    private IReadOnlyList<(int Index, string Label, double PositionPct)> SampledXAxisLabels
+    {
+        get
+        {
+            if (ReferencePoints.Count == 0)
+            {
+                return [];
+            }
+
+            var maxLabels = Math.Min(6, ReferencePoints.Count);
+            var indexes = Enumerable.Range(0, maxLabels)
+                .Select(i => (int)Math.Round(i * (ReferencePoints.Count - 1d) / Math.Max(1, maxLabels - 1)))
+                .Distinct()
+                .ToList();
+
+            return indexes
+                .Select(index => (
+                    index,
+                    ReferencePoints[index].Label,
+                    ReferencePoints.Count == 1 ? 50d : index * 100d / (ReferencePoints.Count - 1)
+                ))
+                .ToList();
+        }
+    }
+
+    private string GetPolylinePoints(MonitoringChartSeries series)
+    {
+        return string.Join(
+            ' ',
+            series.Points.Select((point, index) => $"{GetX(index):0.##},{GetY(point.Value):0.##}")
+        );
+    }
+
+    private double GetX(int index)
+    {
+        if (ReferencePoints.Count <= 1)
+        {
+            return PaddingLeft + (PlotWidth / 2);
+        }
+
+        return PaddingLeft + (PlotWidth * index / (ReferencePoints.Count - 1));
+    }
+
+    private double GetY(double value)
+    {
+        return PaddingTop + ((MaxValue - value) / MaxValue * PlotHeight);
+    }
+
+    private static double GetNiceStep(double maxValue, int intervals)
+    {
+        if (maxValue <= 0 || intervals <= 0)
+        {
+            return 1;
+        }
+
+        var roughStep = maxValue / intervals;
+        var exponent = Math.Floor(Math.Log10(roughStep));
+        var magnitude = Math.Pow(10, exponent);
+        var normalized = roughStep / magnitude;
+
+        double niceNormalized;
+
+        if (normalized < 1.5)
+        {
+            niceNormalized = 1;
+        }
+        else if (normalized < 3)
+        {
+            niceNormalized = 2;
+        }
+        else if (normalized < 7)
+        {
+            niceNormalized = 5;
+        }
+        else
+        {
+            niceNormalized = 10;
+        }
+
+        return niceNormalized * magnitude;
+    }
+
+    private static string FormatAxisValue(double value)
+    {
+        return Math.Round(value).ToString("0");
+    }
+}
+
+

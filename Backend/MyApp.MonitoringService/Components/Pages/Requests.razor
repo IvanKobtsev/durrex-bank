@@ -1,5 +1,10 @@
 @page "/requests"
+@rendermode InteractiveServer
 @inject MonitoringEventService MonitoringEventService
+@inject NavigationManager NavigationManager
+@implements IAsyncDisposable
+@using Microsoft.AspNetCore.SignalR.Client
+@using MyApp.MonitoringService.Hubs
 
 <PageTitle>Request Traces</PageTitle>
 
@@ -10,9 +15,6 @@
             <h1>HTTP request logs</h1>
             <p class="lead text-muted">Inspect recent requests, latency, response codes, and failures in one place.</p>
         </div>
-        <button class="btn btn-primary" @onclick="RefreshAsync" disabled="@_isRefreshing">
-            @(_isRefreshing ? "Refreshing..." : "Refresh")
-        </button>
     </div>
 
     @if (!string.IsNullOrWhiteSpace(_loadError))
@@ -33,9 +35,9 @@
     {
         <div class="summary-grid">
             <section class="summary-card">
-                <span class="summary-label">Total requests</span>
-                <strong>@_snapshot.TotalRequests</strong>
-                <span>Stored entries</span>
+                <span class="summary-label">Error rate (5 min)</span>
+                <strong>@_snapshot.ErrorRateLast5MinPct.ToString("0.#")%</strong>
+                <span>Of all recent requests</span>
             </section>
             <section class="summary-card">
                 <span class="summary-label">Last 24 hours</span>
@@ -43,9 +45,9 @@
                 <span>Recent traffic</span>
             </section>
             <section class="summary-card">
-                <span class="summary-label">Errors (24h)</span>
+                <span class="summary-label">Server errors (24h)</span>
                 <strong>@_snapshot.ErrorResponsesLast24Hours</strong>
-                <span>4xx/5xx responses</span>
+                <span>5xx responses</span>
             </section>
             <section class="summary-card">
                 <span class="summary-label">Avg duration (24h)</span>
@@ -54,26 +56,53 @@
             </section>
         </div>
 
-        @if (_snapshot.Requests.Count == 0)
+        <div class="filter-bar">
+            <button class="btn btn-sm @(_filter is null ? "btn-secondary" : "btn-outline-secondary")"
+                    @onclick="() => SetFilter(null)">
+                All
+                <span class="badge text-bg-light ms-1">@_snapshot.Requests.Count</span>
+            </button>
+            <button class="btn btn-sm @(_filter == "Success" ? "btn-success" : "btn-outline-success")"
+                    @onclick='() => SetFilter("Success")'>
+                Success
+                <span class="badge text-bg-light ms-1">@CountByLabel("Success")</span>
+            </button>
+            <button class="btn btn-sm @(_filter == "Client Error" ? "btn-warning" : "btn-outline-warning")"
+                    @onclick='() => SetFilter("Client Error")'>
+                Client Error
+                <span class="badge text-bg-light ms-1">@CountByLabel("Client Error")</span>
+            </button>
+            <button class="btn btn-sm @(_filter == "Server Error" ? "btn-danger" : "btn-outline-danger")"
+                    @onclick='() => SetFilter("Server Error")'>
+                Server Error
+                <span class="badge text-bg-light ms-1">@CountByLabel("Server Error")</span>
+            </button>
+        </div>
+
+        @if (!FilteredRequests.Any())
         {
             <div class="empty-state card shadow-sm border-0">
                 <div class="card-body">
-                    <h2>No request traces yet</h2>
-                    <p class="text-muted mb-0">As soon as traffic reaches this service, request traces will appear here.</p>
+                    <h2>@(_filter is null ? "No request traces yet" : $"No \"{_filter}\" traces")</h2>
+                    <p class="text-muted mb-0">
+                        @(_filter is null
+                            ? "As soon as traffic reaches this service, request traces will appear here."
+                            : "Try a different filter or wait for new requests to arrive.")
+                    </p>
                 </div>
             </div>
         }
         else
         {
             <div class="events-list">
-                @foreach (var item in _snapshot.Requests)
+                @foreach (var item in FilteredRequests)
                 {
                     <article class="event-card card shadow-sm border-0">
                         <div class="card-body">
                             <div class="event-card__header">
                                 <div>
                                     <div class="event-badges">
-                                        <span class="badge @(item.IsSuccess ? "text-bg-success" : "text-bg-danger")">@item.StatusLabel</span>
+                                        <span class="badge @GetStatusLabelBadgeClass(item.StatusLabel)">@item.StatusLabel</span>
                                         <span class="badge text-bg-light">@item.Method</span>
                                         <span class="badge @(GetStatusCodeBadgeClass(item.StatusCode))">@item.StatusCode</span>
                                     </div>
@@ -94,10 +123,6 @@
                                 <div>
                                     <span class="detail-label">User</span>
                                     <div>@(item.UserId ?? "—")</div>
-                                </div>
-                                <div>
-                                    <span class="detail-label">Remote IP</span>
-                                    <div>@(item.RemoteIp ?? "—")</div>
                                 </div>
                                 <div>
                                     <span class="detail-label">Trace entry id</span>
@@ -128,21 +153,38 @@
 @code {
     private MonitoringRequestSnapshot? _snapshot;
     private string? _loadError;
-    private bool _isRefreshing;
+    private string? _filter;
+    private HubConnection? _hubConnection;
+
+    private IEnumerable<MonitoringRequestListItem> FilteredRequests =>
+        _filter is null
+            ? _snapshot!.Requests
+            : _snapshot!.Requests.Where(r => r.StatusLabel == _filter);
+
+    private int CountByLabel(string label) =>
+        _snapshot?.Requests.Count(r => r.StatusLabel == label) ?? 0;
+
+    private void SetFilter(string? filter) => _filter = filter;
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadAsync();
-    }
+        _hubConnection = new HubConnectionBuilder()
+            .WithUrl(NavigationManager.ToAbsoluteUri("hubs/monitoring"))
+            .WithAutomaticReconnect()
+            .Build();
 
-    private async Task RefreshAsync()
-    {
+        _hubConnection.On(MonitoringHub.RequestTraceCaptured, async () =>
+        {
+            await LoadAsync();
+            await InvokeAsync(StateHasChanged);
+        });
+
+        await _hubConnection.StartAsync();
         await LoadAsync();
     }
 
     private async Task LoadAsync()
     {
-        _isRefreshing = true;
         _loadError = null;
 
         try
@@ -153,11 +195,14 @@
         {
             _loadError = $"Failed to load request traces: {ex.Message}";
         }
-        finally
-        {
-            _isRefreshing = false;
-        }
     }
+
+    private static string GetStatusLabelBadgeClass(string label) => label switch
+    {
+        "Server Error" => "text-bg-danger",
+        "Client Error" => "text-bg-warning",
+        _ => "text-bg-success",
+    };
 
     private static string GetStatusCodeBadgeClass(int statusCode)
     {
@@ -169,5 +214,10 @@
             _ => "text-bg-success",
         };
     }
-}
 
+    public async ValueTask DisposeAsync()
+    {
+        if (_hubConnection is not null)
+            await _hubConnection.DisposeAsync();
+    }
+}

@@ -23,9 +23,6 @@ var rawConnectionString =
 
 var connectionStringBuilder = new NpgsqlConnectionStringBuilder(rawConnectionString);
 
-// Avoid optional Kerberos/GSS negotiation in slim Linux containers.
-connectionStringBuilder["GssEncMode"] = "Disable";
-
 builder.Services.AddDbContext<CreditDbContext>(options =>
     options.UseNpgsql(
         connectionStringBuilder.ConnectionString,

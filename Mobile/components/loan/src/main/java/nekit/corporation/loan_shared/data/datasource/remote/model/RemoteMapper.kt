@@ -49,7 +49,7 @@ fun IssueCreditRequest.toDomain() = IssueCredit(
 
 fun RatingDto.toDomain() = Rating(
     clientId = clientId,
-    rating = rating,
+    rating = score,
     calculatedAt = calculatedAt
 )
 

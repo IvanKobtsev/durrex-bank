@@ -65,7 +65,7 @@ class AccountRepositoryImpl(
         return api.getTransactions(accountId).items.map { it.toDomain() }
     }
 
-    override fun getTransactionHubEvents(): Flow<Result<Unit>> {
-        return hub.getTransactionHubEvents()
+    override fun getTransactionHubEvents(accountId: Int): Flow<Result<Unit>> {
+        return hub.getTransactionHubEvents(accountId)
     }
 }

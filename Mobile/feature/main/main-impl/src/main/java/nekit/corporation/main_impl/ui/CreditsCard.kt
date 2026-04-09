@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -35,7 +36,8 @@ internal fun CreditsCard(
     ) {
         Spacer(Modifier.height(16.dp))
 
-        loans.forEach {
+        loans.forEachIndexed { index, it ->
+
             CreditRow(
                 it.id,
                 it.tariffName,
@@ -43,6 +45,12 @@ internal fun CreditsCard(
                 modifier = Modifier.fillMaxWidth()
             ) { credit ->
                 onRowClick(credit)
+            }
+            if (index != loans.lastIndex) {
+                HorizontalDivider(
+                    color = colors.fontPrimary,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
             }
         }
 

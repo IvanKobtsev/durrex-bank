@@ -4,5 +4,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface AccountHub {
 
-    fun getTransactionHubEvents(): Flow<Result<Unit>>
+    fun getTransactionHubEvents(accountId:Int): Flow<Result<Unit>>
 }

@@ -1,4 +1,4 @@
-package nekit.corporation.transaction.model
+package nekit.corporation.transaction_impl.model
 
 data class AccountUi(
     val id: Int,

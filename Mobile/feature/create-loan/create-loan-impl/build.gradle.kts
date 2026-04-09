@@ -28,4 +28,5 @@ dependencies {
     implementation(project(":components:tariff"))
 
     implementation(projects.feature.createLoan.createLoanApi)
+    implementation(projects.feature.shellMain.shellMainApi)
 }

@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.zacsweers.metro.AppScope
@@ -20,15 +21,14 @@ import nekit.corporation.ui.theme.DurexBankTheme
 @ContributesIntoMap(AppScope::class)
 @FragmentKey(TransactionDetailsFragment::class)
 @Inject
-internal class TransactionDetailsFragment(
+class TransactionDetailsFragment(
     private val viewModelFactory: ViewModelProvider.Factory
 ) : Fragment() {
 
     override val defaultViewModelProviderFactory: ViewModelProvider.Factory
         get() = viewModelFactory
 
-    @Inject
-    private lateinit var viewModel: TransactionDetailsViewModel
+    private val viewModel by viewModels<TransactionDetailsViewModel>()
 
     override fun onAttach(context: Context) {
         super.onAttach(context)

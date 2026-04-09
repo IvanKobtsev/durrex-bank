@@ -81,7 +81,7 @@ class AuthViewModel(
                         action = { getNetworkSettingsUseCase() },
                         onFailure = { onSignInOpen() }
                     )?.let {
-                        screenEvents.offerEvent(AuthEvent.ChangeTheme(it.theme == Scheme.Dark))
+                        screenEvents.offerEvent(AuthEvent.ChangeTheme(it.theme == Scheme.dark))
                     }
                 }
                 try {
@@ -116,10 +116,11 @@ class AuthViewModel(
     fun onAuthCodeReceived(accessToken: String, idToken: String?, refreshToken: String?) {
         viewModelScope.launch {
             try {
+
                 authRepository.saveToken(
                     TokenDto(
                         token = accessToken,
-                        expiresAt = ""
+                        expiresAt = java.time.Instant.now().toString()
                     )
                 )
                 if (!getSettingsUseCase.execute().isShowedOnboarding)

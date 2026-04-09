@@ -5,11 +5,13 @@
     <string name="description">Описание</string>
     <string name="description_enter">Введите описание</string>
     <string name="transfer_to">Кому хотите отправить деньги?</string>
+    <string name="description_sum">Введите сумму</string>
 
     <string name="first_name">Имя</string>
     <string name="second_name">Фамилия</string>
     <string name="phone">Номер телефона</string>
 
     <string name="strange_error">Что то пошло не так</string>
+    <string name="transaction_success">Транзакция прошла успешно</string>
 
 </resources>

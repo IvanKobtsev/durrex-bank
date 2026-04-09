@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.zacsweers.metro.AppScope
-import dev.zacsweers.metro.ClassKey
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.binding
@@ -22,9 +21,9 @@ import nekit.corporation.loan_shared.domain.model.Transfer
 import nekit.corporation.loan_shared.domain.usecase.CreateTransferUseCase
 import nekit.corporation.loan_shared.domain.usecase.GetAccountByIdUseCase
 import nekit.corporation.loan_shared.domain.usecase.GetAccountsUseCase
-import nekit.corporation.transaction.model.TransactionInteractions
+import nekit.corporation.transaction_impl.model.TransactionInteractions
 import nekit.corporation.transaction.model.TransactionState
-import nekit.corporation.transaction.model.toUi
+import nekit.corporation.transaction_impl.model.toUi
 import nekit.corporation.transaction_impl.model.TransactionEvents
 import nekit.corporation.user.domain.usecase.GetUserByIdUseCase
 import nekit.corporation.user.domain.usecase.GetUserUseCase
@@ -83,11 +82,11 @@ class TransactionViewModel(
                     if (it.currentState.accountTo == "")
                         return@collect
                     val account = getAccountByIdUseCase(it.currentState.accountTo.toInt())
-                    Log.d("RAG", "account " + account.toString())
                     val user = getUserByIdUseCase(account.ownerId)
                     updateState {
                         copy(
-                            recipient = user.toUi()
+                            recipient = user.toUi(),
+                            accountToError = null
                         )
                     }
                 } catch (_: NotFoundFailure) {
@@ -109,11 +108,12 @@ class TransactionViewModel(
                 val state = it.currentState
                 updateState {
                     copy(
-                        isButtonEnable = state.recipient != null && state.user != null && state.accountToError == null
+                        isButtonEnable = state.recipient != null && state.user != null && state.accountToError == null && state.accountTo != ""
                     )
                 }
             }
         }
+
     }
 
     override fun onAccountToChange(id: String) {
@@ -143,19 +143,20 @@ class TransactionViewModel(
     override fun onTransferClick() {
         viewModelScope.launch(Dispatchers.IO) {
             val state = currentScreenState
-            if (state.recipient != null && state.user != null) {
+            if (state.recipient != null && state.accountFrom != null) {
                 try {
                     updateState {
                         copy(isLoading = true, isButtonEnable = false)
                     }
                     createTransferUseCase(
                         transfer = Transfer(
-                            targetAccountId = state.recipient.id,
+                            targetAccountId = state.accountTo.toInt(),
                             amount = state.sum,
                             description = state.description
                         ),
-                        id = state.user.id
+                        id = state.accountFrom.id
                     )
+                    screenEvents.offerEvent(TransactionEvents.ShowToast(R.string.transaction_success))
                 } catch (_: Throwable) {
                     screenEvents.offerEvent(TransactionEvents.ShowToast(R.string.strange_error))
                     navigator.toMain()
@@ -168,10 +169,6 @@ class TransactionViewModel(
     }
 
     override fun descriptionChange(text: String) {
-        updateState {
-            copy(
-                description = text
-            )
-        }
+        updateState { copy(description = text) }
     }
 }

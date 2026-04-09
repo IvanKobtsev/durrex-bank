@@ -19,9 +19,7 @@ interface LoanApi {
     ): CreditResponse
 
     @GET("credit/credits")
-    suspend fun getCredits(
-        @Query("clientId") clientId: Int
-    ): List<CreditResponse>
+    suspend fun getCredits(): List<CreditResponse>
 
     @GET("credit/credits/{id}")
     suspend fun getCreditDetail(

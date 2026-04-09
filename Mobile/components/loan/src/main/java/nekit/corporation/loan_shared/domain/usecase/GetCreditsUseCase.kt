@@ -8,7 +8,5 @@ class GetCreditsUseCase(
     private val repository: CreditRepository
 ) {
 
-    suspend operator fun invoke(
-        clientId: Int = 2
-    ) = repository.getCredits(clientId)
+    suspend operator fun invoke() = repository.getCredits()
 }

@@ -15,13 +15,6 @@ abstract class SignalRHub<Input, Output> {
     }
     protected val scope: CoroutineScope = CoroutineScope(Dispatchers.IO + exceptionHandler)
 
-    init {
-        scope.launch {
-            delay(500)
-            connect()
-        }
-    }
-
     abstract val inputFlow: Flow<Input>
 
     abstract val outputFlow: Flow<Result<Output>>

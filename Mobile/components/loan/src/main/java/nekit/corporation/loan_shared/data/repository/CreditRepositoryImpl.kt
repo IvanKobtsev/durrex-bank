@@ -27,10 +27,8 @@ class CreditRepositoryImpl(
             IssueCreditRequest(accountId, tariffId, amount)
         ).toDomain()
 
-    override suspend fun getCredits(
-        clientId: Int
-    ): List<Credit> =
-        api.getCredits(clientId).map { it.toDomain() }
+    override suspend fun getCredits(): List<Credit> =
+        api.getCredits().map { it.toDomain() }
 
     override suspend fun getCreditDetail(
         creditId: Int

@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -16,24 +17,27 @@ import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
 import kotlinx.coroutines.launch
+import nekit.corporation.ThemeViewModel
 import nekit.corporation.auth_impl.AuthManager
 import nekit.corporation.auth_impl.presentation.model.AuthEvent
 import nekit.corporation.common.FragmentKey
 import nekit.corporation.ui.theme.DurexBankTheme
+import kotlin.getValue
 
 @ContributesIntoMap(AppScope::class)
 @FragmentKey(AuthFragment::class)
 @Inject
 class AuthFragment(
     private val viewModelFactory: ViewModelProvider.Factory,
-    private var authManager: AuthManager
+    private val authManager: AuthManager,
 ) : Fragment() {
 
     override val defaultViewModelProviderFactory: ViewModelProvider.Factory
         get() = viewModelFactory
 
 
-    val viewModel by viewModels<AuthViewModel>()
+    private val viewModel by viewModels<AuthViewModel>()
+    private val themeViewModel: ThemeViewModel by activityViewModels()
 
     private val loginLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -42,11 +46,9 @@ class AuthFragment(
             authManager.handleAuthResponse(
                 data,
                 onSuccess = { accessToken, idToken, refreshToken ->
-                    Log.d("Auth", "Access token: $accessToken")
                     viewModel.onAuthCodeReceived(accessToken, idToken, refreshToken)
                 },
                 onError = { error ->
-                    Log.e("Auth", "Login failed", error)
                     Toast.makeText(
                         requireContext(),
                         "Login failed: ${error.message}",
@@ -74,7 +76,11 @@ class AuthFragment(
             viewModel.screenEvents.collect {
                 if (it is AuthEvent) {
                     when (it) {
-                        is AuthEvent.ChangeTheme -> /*TODO()*/Unit
+                        is AuthEvent.ChangeTheme -> {
+                            Log.d("RAGGG", "THEME CHANGET ${it.isDark}")
+                            themeViewModel.setTheme(it.isDark)
+                        }
+
                         is AuthEvent.OpenLogin -> loginLauncher.launch(it.intent)
 
                         is AuthEvent.ShowToast -> Toast.makeText(

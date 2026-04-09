@@ -6,6 +6,6 @@ import kotlin.time.Instant
 @Serializable
 data class RatingDto(
     val clientId: Int,
-    val rating: Int,
+    val score: Int,
     val calculatedAt: Instant
 )

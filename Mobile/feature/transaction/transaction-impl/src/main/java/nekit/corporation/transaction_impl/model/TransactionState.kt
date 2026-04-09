@@ -4,7 +4,7 @@ import androidx.annotation.StringRes
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import nekit.corporation.architecture.presentation.ScreenState
-import nekit.corporation.user.domain.model.User
+import nekit.corporation.transaction_impl.model.AccountUi
 
 data class TransactionState(
     val accountTo: String,
@@ -31,7 +31,7 @@ data class TransactionState(
             user = null,
             recipient = null,
             description = "",
-            isButtonEnable = true
+            isButtonEnable = false
         )
     }
 }

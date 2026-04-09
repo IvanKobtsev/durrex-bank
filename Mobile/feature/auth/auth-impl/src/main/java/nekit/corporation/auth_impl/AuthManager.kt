@@ -4,28 +4,18 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
-import nekit.corporation.auth.domain.repository.AuthRepository
 import nekit.corporation.common.MainServerUrl
 import net.openid.appauth.AuthorizationService
 import net.openid.appauth.AuthorizationServiceConfiguration
-import androidx.core.net.toUri
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.SingleIn
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import nekit.corporation.auth.domain.model.TokenDto
 import net.openid.appauth.AuthorizationException
 import net.openid.appauth.AuthorizationRequest
 import net.openid.appauth.AuthorizationResponse
 import net.openid.appauth.ResponseTypeValues
-import java.time.Instant
 import net.openid.appauth.*
-import net.openid.appauth.connectivity.ConnectionBuilder
-import java.net.HttpURLConnection
-import java.net.URL
+import androidx.core.net.toUri
 
 @Inject
 @SingleIn(AppScope::class)
@@ -39,12 +29,15 @@ class AuthManager(
     private var authState: AuthState = AuthState()
 
     fun initialize(onReady: () -> Unit, onError: (Exception) -> Unit) {
-        val issuerUri = Uri.parse(mainServerUrl+"/auth")
+        val issuerUri = (mainServerUrl + "auth").toUri()
         Log.d("AuthManager", "Fetching discovery from $issuerUri")
         AuthorizationServiceConfiguration.fetchFromIssuer(issuerUri) { config, ex ->
             if (config != null) {
                 authState = AuthState(config)
-                authService = AuthorizationService(context,)
+                val appAuthConfig = AppAuthConfiguration.Builder()
+                    .setSkipIssuerHttpsCheck(true)
+                    .build()
+                authService = AuthorizationService(context, appAuthConfig)
                 Log.d("AuthManager", "Discovery successful")
                 onReady()
             } else {
@@ -57,7 +50,9 @@ class AuthManager(
     fun buildLoginIntent(): Intent? {
         val config = authState.authorizationServiceConfiguration ?: return null
         val service = authService ?: return null
-
+        val appAuthConfig = AppAuthConfiguration.Builder()
+            .setSkipIssuerHttpsCheck(true)
+            .build()
         val request = AuthorizationRequest.Builder(
             config,
             AuthConfig.CLIENT_ID,
@@ -65,7 +60,6 @@ class AuthManager(
             Uri.parse(AuthConfig.REDIRECT_URI)
         )
             .setScope(AuthConfig.SCOPE)
-            .setCodeVerifier(CodeVerifierUtil.generateRandomCodeVerifier())
             .build()
 
         return service.getAuthorizationRequestIntent(request)

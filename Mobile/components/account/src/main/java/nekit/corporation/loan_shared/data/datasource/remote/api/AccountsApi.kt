@@ -63,7 +63,7 @@ interface AccountsApi {
     @GET("core/api/accounts/{id}/transactions")
     suspend fun getTransactions(
         @Path("id") id: Int,
-        @Query("page") page: Int = 1,
-        @Query("pageSize") pageSize: Int = 20
+        @Query("page") page: Int = 0,
+        @Query("pageSize") pageSize: Int = 40
     ): PagedResponseOfTransactionResponse
 }

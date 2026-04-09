@@ -1,5 +1,6 @@
 package nekit.corporation.profile
 
+import android.util.Log
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,7 +11,6 @@ import dev.zacsweers.metro.binding
 import dev.zacsweers.metrox.viewmodel.ViewModelKey
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import nekit.corporation.architecture.presentation.StatefulViewModel
 import nekit.corporation.loan_shared.domain.usecase.GetRatingUseCase
@@ -65,22 +65,25 @@ class ProfileViewModel(
             action = { action() },
             onFailure = {
                 if (it is NoConnectionFailure) {
-                    uiFlow.emit(UiEvents.ShowToast(R.string.no_connection))
+                    screenEvents.offerEvent(UiEvents.ShowToast(R.string.no_connection))
                 } else {
-                    uiFlow.emit(UiEvents.ShowToast(R.string.something_went_wrong))
+                    screenEvents.offerEvent(UiEvents.ShowToast(R.string.something_went_wrong))
+                    Log.d(TAG, "error: $it")
                 }
             }
         )
     }
 
-    override val uiFlow: MutableSharedFlow<UiEvents> = MutableSharedFlow()
-
     override fun onSchemeClick() {
-        updateState { copy(isSchemeOpen = true) }
+        updateState { copy(isSchemeOpen = !isSchemeOpen) }
     }
 
     override fun onSchemeSwitch(scheme: Scheme) {
+        updateState {
+            copy(isLoading = true)
+        }
         updateSetting({ it.copy(scheme = scheme) }, R.string.change_scheme_error)
+
     }
 
     private fun updateSetting(
@@ -94,10 +97,20 @@ class ProfileViewModel(
                 onComplete = {
                     updateState { copy(settings = transform(settings!!)) }
                     settingsManager.update(transform(currentSettings).scheme)
-                    uiFlow.emit(UiEvents.ChangeTheme)
+                    screenEvents.offerEvent(UiEvents.ChangeTheme)
                 },
-                onFailure = { uiFlow.emit(UiEvents.ShowToast(errorMessageRes)) }
+                onFailure = {
+                    screenEvents.offerEvent(UiEvents.ShowToast(errorMessageRes))
+                    Log.d(TAG, "error: $it")
+                }
             )
+            updateState {
+                copy(isLoading = false)
+            }
         }
+    }
+
+    companion object {
+        private const val TAG = "ProfileViewModel"
     }
 }

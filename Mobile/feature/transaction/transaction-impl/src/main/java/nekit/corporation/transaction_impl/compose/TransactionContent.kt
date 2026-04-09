@@ -18,17 +18,20 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.persistentListOf
-import nekit.corporation.transaction.model.TransactionInteractions
+import nekit.corporation.transaction_impl.model.TransactionInteractions
 import nekit.corporation.transaction.model.TransactionState
 import nekit.corporation.transaction.compose.UserDetailsCard
-import nekit.corporation.transaction.model.AccountUi
+import nekit.corporation.transaction_impl.model.AccountUi
 import nekit.corporation.transaction_impl.R
 import nekit.corporation.ui.component.AccountDetailsCard
 import nekit.corporation.ui.component.PrimaryInputField
@@ -56,6 +59,9 @@ fun TransactionContent(state: TransactionState, interactions: TransactionInterac
 
             if (state.userAccounts.isNotEmpty()) {
                 val pagerState = rememberPagerState(0) { state.userAccounts.size }
+                LaunchedEffect(pagerState) {
+                    interactions.onAccountFromChoose(state.userAccounts[pagerState.currentPage].id)
+                }
                 HorizontalPager(pagerState) {
                     val account = state.userAccounts[it]
                     AccountDetailsCard(account.id, "${account.sum} ${account.currency}")
@@ -98,10 +104,23 @@ fun TransactionContent(state: TransactionState, interactions: TransactionInterac
                     .fillMaxWidth()
                     .padding(vertical = 8.dp)
             )
+            Spacer(Modifier.height(32.dp))
+            PrimaryInputField(
+                value = state.sum.toString(),
+                onValueChange = { interactions.onSumChange(it.toDoubleOrNull() ?: 0.0) },
+                label = stringResource(R.string.description_sum),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            )
+            Spacer(Modifier.height(32.dp))
+
             Spacer(Modifier.weight(1f))
             PrimaryButton(
                 text = stringResource(R.string.transfer),
                 onClick = interactions::onTransferClick,
+                isEnable = state.isButtonEnable,
                 modifier = Modifier
                     .fillMaxWidth()
             )

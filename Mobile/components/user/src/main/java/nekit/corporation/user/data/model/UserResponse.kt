@@ -12,5 +12,4 @@ data class UserResponse(
     val telephoneNumber: String,
     val role: UserRole,
     val isBlocked: Boolean,
-    val rating: Float
 )

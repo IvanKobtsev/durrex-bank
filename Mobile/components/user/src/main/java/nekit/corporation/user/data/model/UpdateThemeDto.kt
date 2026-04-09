@@ -1,7 +1,8 @@
 ﻿package nekit.corporation.user.data.model
 
-import nekit.corporation.user.domain.model.Scheme
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class UpdateThemeDto(
-    val theme: Scheme,
+    val theme: String,
 )

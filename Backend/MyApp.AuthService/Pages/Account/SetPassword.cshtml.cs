@@ -9,7 +9,9 @@ namespace MyApp.AuthService.Pages.Account;
 
 public class SetPasswordModel(
     UserManager<ApplicationUser> userManager,
-    AuthDbContext db) : PageModel
+    AuthDbContext db,
+    IConfiguration configuration
+) : PageModel
 {
     [BindProperty(SupportsGet = true)]
     public string Token { get; set; } = null!;
@@ -30,8 +32,9 @@ public class SetPasswordModel(
             return Page();
         }
 
-        var invite = await db.InviteTokens
-            .FirstOrDefaultAsync(t => t.Token == Token && !t.IsUsed && t.ExpiresAt > DateTimeOffset.UtcNow);
+        var invite = await db.InviteTokens.FirstOrDefaultAsync(t =>
+            t.Token == Token && !t.IsUsed && t.ExpiresAt > DateTimeOffset.UtcNow
+        );
 
         if (invite is null)
         {
@@ -58,6 +61,10 @@ public class SetPasswordModel(
         invite.IsUsed = true;
         await db.SaveChangesAsync();
 
-        return RedirectToPage("/Account/Login", new { returnUrl = "/" });
+        var loginUrl =
+            configuration["Frontend:LoginUrl"]
+            ?? throw new InvalidOperationException("Frontend:LoginUrl is not configured");
+
+        return Redirect(loginUrl);
     }
 }

@@ -7,203 +7,251 @@
 /* tslint:disable */
 /* eslint-disable */
 // ReSharper disable InconsistentNaming
-import * as Types from '../user-api-client.types';
-import type { AxiosRequestConfig, AxiosResponse, CancelToken } from 'axios';
+import * as Types from "../user-api-client.types";
+import type { AxiosRequestConfig, AxiosResponse, CancelToken } from "axios";
 
-import { throwException, isAxiosError } from '../user-api-client.types';
-import { getAxios, getBaseUrl } from './helpers';
+import { throwException, isAxiosError } from "../user-api-client.types";
+import { getAxios, getBaseUrl } from "./helpers";
 
 /**
  * @return OK
  */
-export function authProfile(id: number, config?: AxiosRequestConfig | undefined): Promise<void> {
-    let url_ = getBaseUrl() + "/internal/users/{id}/auth-profile";
-    if (id === undefined || id === null)
-      throw new Error("The parameter 'id' must be defined.");
-    url_ = url_.replace("{id}", encodeURIComponent("" + id));
-      url_ = url_.replace(/[?&]$/, "");
+export function authProfile(
+  id: number,
+  config?: AxiosRequestConfig | undefined,
+): Promise<void> {
+  let url_ = getBaseUrl() + "/internal/users/{id}/auth-profile";
+  if (id === undefined || id === null)
+    throw new Error("The parameter 'id' must be defined.");
+  url_ = url_.replace("{id}", encodeURIComponent("" + id));
+  url_ = url_.replace(/[?&]$/, "");
 
-    let options_: AxiosRequestConfig = {
-        ..._requestConfigAuthProfile,
-        ...config,
-        method: "GET",
-        url: url_,
-        headers: {
-            ..._requestConfigAuthProfile?.headers,
-            ...config?.headers,
-        }
-    };
+  let options_: AxiosRequestConfig = {
+    ..._requestConfigAuthProfile,
+    ...config,
+    method: "GET",
+    url: url_,
+    headers: {
+      ..._requestConfigAuthProfile?.headers,
+      ...config?.headers,
+    },
+  };
 
-    return getAxios().request(options_).catch((_error: any) => {
-        if (isAxiosError(_error) && _error.response) {
-            return _error.response;
-        } else {
-            throw _error;
-        }
-    }).then((_response: AxiosResponse) => {
-        return processAuthProfile(_response);
+  return getAxios()
+    .request(options_)
+    .catch((_error: any) => {
+      if (isAxiosError(_error) && _error.response) {
+        return _error.response;
+      } else {
+        throw _error;
+      }
+    })
+    .then((_response: AxiosResponse) => {
+      return processAuthProfile(_response);
     });
 }
 
 function processAuthProfile(response: AxiosResponse): Promise<void> {
-    const status = response.status;
-    let _headers: any = {};
-    if (response.headers && typeof response.headers === "object") {
-        for (let k in response.headers) {
-            if (response.headers.hasOwnProperty(k)) {
-                _headers[k] = response.headers[k];
-            }
-        }
+  const status = response.status;
+  let _headers: any = {};
+  if (response.headers && typeof response.headers === "object") {
+    for (let k in response.headers) {
+      if (response.headers.hasOwnProperty(k)) {
+        _headers[k] = response.headers[k];
+      }
     }
-    if (status === 200) {
-        const _responseText = response.data;
-        return Promise.resolve<void>(null as any);
-
-    } else if (status !== 200 && status !== 204) {
-        const _responseText = response.data;
-        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-    }
+  }
+  if (status === 200) {
+    const _responseText = response.data;
     return Promise.resolve<void>(null as any);
+  } else if (status !== 200 && status !== 204) {
+    const _responseText = response.data;
+    return throwException(
+      "An unexpected server error occurred.",
+      status,
+      _responseText,
+      _headers,
+    );
+  }
+  return Promise.resolve<void>(null as any);
 }
 
 /**
  * Get a list of all users (clients and employees)
  * @return List of users returned
  */
-export function usersAll(config?: AxiosRequestConfig | undefined): Promise<Types.UserResponse[]> {
-    let url_ = getBaseUrl() + "/users";
-      url_ = url_.replace(/[?&]$/, "");
+export function usersAll(
+  config?: AxiosRequestConfig | undefined,
+): Promise<Types.UserResponse[]> {
+  let url_ = getBaseUrl() + "/users";
+  url_ = url_.replace(/[?&]$/, "");
 
-    let options_: AxiosRequestConfig = {
-        ..._requestConfigUsersAll,
-        ...config,
-        method: "GET",
-        url: url_,
-        headers: {
-            ..._requestConfigUsersAll?.headers,
-            "Accept": "application/json",
-            ...config?.headers,
-        }
-    };
+  let options_: AxiosRequestConfig = {
+    ..._requestConfigUsersAll,
+    ...config,
+    method: "GET",
+    url: url_,
+    headers: {
+      ..._requestConfigUsersAll?.headers,
+      Accept: "application/json",
+      ...config?.headers,
+    },
+  };
 
-    return getAxios().request(options_).catch((_error: any) => {
-        if (isAxiosError(_error) && _error.response) {
-            return _error.response;
-        } else {
-            throw _error;
-        }
-    }).then((_response: AxiosResponse) => {
-        return processUsersAll(_response);
+  return getAxios()
+    .request(options_)
+    .catch((_error: any) => {
+      if (isAxiosError(_error) && _error.response) {
+        return _error.response;
+      } else {
+        throw _error;
+      }
+    })
+    .then((_response: AxiosResponse) => {
+      return processUsersAll(_response);
     });
 }
 
-function processUsersAll(response: AxiosResponse): Promise<Types.UserResponse[]> {
-    const status = response.status;
-    let _headers: any = {};
-    if (response.headers && typeof response.headers === "object") {
-        for (let k in response.headers) {
-            if (response.headers.hasOwnProperty(k)) {
-                _headers[k] = response.headers[k];
-            }
-        }
+function processUsersAll(
+  response: AxiosResponse,
+): Promise<Types.UserResponse[]> {
+  const status = response.status;
+  let _headers: any = {};
+  if (response.headers && typeof response.headers === "object") {
+    for (let k in response.headers) {
+      if (response.headers.hasOwnProperty(k)) {
+        _headers[k] = response.headers[k];
+      }
     }
-    if (status === 200) {
-        const _responseText = response.data;
-        let result200: any = null;
-        let resultData200  = _responseText;
-        if (Array.isArray(resultData200)) {
-              result200 = resultData200.map(item => 
-                Types.initUserResponse(item)
-              );
-            }
-        return Promise.resolve<Types.UserResponse[]>(result200);
-
-    } else if (status === 403) {
-        const _responseText = response.data;
-        let result403: any = null;
-        let resultData403  = _responseText;
-        result403 = Types.initProblemDetails(resultData403);
-        return throwException("Clients are not allowed to list all users", status, _responseText, _headers, result403);
-
-    } else if (status !== 200 && status !== 204) {
-        const _responseText = response.data;
-        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+  }
+  if (status === 200) {
+    const _responseText = response.data;
+    let result200: any = null;
+    let resultData200 = _responseText;
+    if (Array.isArray(resultData200)) {
+      result200 = resultData200.map((item) => Types.initUserResponse(item));
     }
-    return Promise.resolve<Types.UserResponse[]>(null as any);
+    return Promise.resolve<Types.UserResponse[]>(result200);
+  } else if (status === 403) {
+    const _responseText = response.data;
+    let result403: any = null;
+    let resultData403 = _responseText;
+    result403 = Types.initProblemDetails(resultData403);
+    return throwException(
+      "Clients are not allowed to list all users",
+      status,
+      _responseText,
+      _headers,
+      result403,
+    );
+  } else if (status !== 200 && status !== 204) {
+    const _responseText = response.data;
+    return throwException(
+      "An unexpected server error occurred.",
+      status,
+      _responseText,
+      _headers,
+    );
+  }
+  return Promise.resolve<Types.UserResponse[]>(null as any);
 }
 
 /**
  * Create a new client or employee
- * @param body (optional) 
+ * @param body (optional)
  * @return User created successfully
  */
-export function usersPOST(body?: Types.CreateUserRequest | undefined, config?: AxiosRequestConfig | undefined): Promise<void> {
-    let url_ = getBaseUrl() + "/users";
-      url_ = url_.replace(/[?&]$/, "");
+export function usersPOST(
+  body?: Types.CreateUserRequest | undefined,
+  config?: AxiosRequestConfig | undefined,
+): Promise<any> {
+  let url_ = getBaseUrl() + "/users";
+  url_ = url_.replace(/[?&]$/, "");
 
-    const content_ = Types.serializeCreateUserRequest(body);
+  const content_ = Types.serializeCreateUserRequest(body);
 
-    let options_: AxiosRequestConfig = {
-        ..._requestConfigUsersPOST,
-        ...config,
-        data: content_,
-        method: "POST",
-        url: url_,
-        headers: {
-            ..._requestConfigUsersPOST?.headers,
-            "Content-Type": "application/json",
-            ...config?.headers,
-        }
-    };
+  let options_: AxiosRequestConfig = {
+    ..._requestConfigUsersPOST,
+    ...config,
+    data: content_,
+    method: "POST",
+    url: url_,
+    headers: {
+      ..._requestConfigUsersPOST?.headers,
+      "Content-Type": "application/json",
+      ...config?.headers,
+    },
+  };
 
-    return getAxios().request(options_).catch((_error: any) => {
-        if (isAxiosError(_error) && _error.response) {
-            return _error.response;
-        } else {
-            throw _error;
-        }
-    }).then((_response: AxiosResponse) => {
-        return processUsersPOST(_response);
+  return getAxios()
+    .request(options_)
+    .catch((_error: any) => {
+      if (isAxiosError(_error) && _error.response) {
+        return _error.response;
+      } else {
+        throw _error;
+      }
+    })
+    .then((_response: AxiosResponse) => {
+      return processUsersPOST(_response);
     });
 }
 
-function processUsersPOST(response: AxiosResponse): Promise<void> {
-    const status = response.status;
-    let _headers: any = {};
-    if (response.headers && typeof response.headers === "object") {
-        for (let k in response.headers) {
-            if (response.headers.hasOwnProperty(k)) {
-                _headers[k] = response.headers[k];
-            }
-        }
+function processUsersPOST(response: AxiosResponse): Promise<any> {
+  const status = response.status;
+  let _headers: any = {};
+  if (response.headers && typeof response.headers === "object") {
+    for (let k in response.headers) {
+      if (response.headers.hasOwnProperty(k)) {
+        _headers[k] = response.headers[k];
+      }
     }
-    if (status === 201) {
-        const _responseText = response.data;
-        return Promise.resolve<void>(null as any);
-
-    } else if (status === 403) {
-        const _responseText = response.data;
-        let result403: any = null;
-        let resultData403  = _responseText;
-        result403 = Types.initProblemDetails(resultData403);
-        return throwException("Only employees may create users", status, _responseText, _headers, result403);
-
-    } else if (status === 409) {
-        const _responseText = response.data;
-        let result409: any = null;
-        let resultData409  = _responseText;
-        result409 = Types.initProblemDetails(resultData409);
-        return throwException("Username or email is already taken", status, _responseText, _headers, result409);
-
-    } else if (status === 503) {
-        const _responseText = response.data;
-        return throwException("Service Unavailable", status, _responseText, _headers);
-
-    } else if (status !== 200 && status !== 204) {
-        const _responseText = response.data;
-        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-    }
-    return Promise.resolve<void>(null as any);
+  }
+  if (status === 201) {
+    const _responseText = response.data;
+    return Promise.resolve<void>(_responseText as any);
+  } else if (status === 403) {
+    const _responseText = response.data;
+    let result403: any = null;
+    let resultData403 = _responseText;
+    result403 = Types.initProblemDetails(resultData403);
+    return throwException(
+      "Only employees may create users",
+      status,
+      _responseText,
+      _headers,
+      result403,
+    );
+  } else if (status === 409) {
+    const _responseText = response.data;
+    let result409: any = null;
+    let resultData409 = _responseText;
+    result409 = Types.initProblemDetails(resultData409);
+    return throwException(
+      "Username or email is already taken",
+      status,
+      _responseText,
+      _headers,
+      result409,
+    );
+  } else if (status === 503) {
+    const _responseText = response.data;
+    return throwException(
+      "Service Unavailable",
+      status,
+      _responseText,
+      _headers,
+    );
+  } else if (status !== 200 && status !== 204) {
+    const _responseText = response.data;
+    return throwException(
+      "An unexpected server error occurred.",
+      status,
+      _responseText,
+      _headers,
+    );
+  }
+  return Promise.resolve<void>(null as any);
 }
 
 /**
@@ -211,141 +259,180 @@ function processUsersPOST(response: AxiosResponse): Promise<void> {
  * @param id User ID
  * @return User profile returned
  */
-export function usersGET(id: number, config?: AxiosRequestConfig | undefined): Promise<Types.UserResponse> {
-    let url_ = getBaseUrl() + "/users/{id}";
-    if (id === undefined || id === null)
-      throw new Error("The parameter 'id' must be defined.");
-    url_ = url_.replace("{id}", encodeURIComponent("" + id));
-      url_ = url_.replace(/[?&]$/, "");
+export function usersGET(
+  id: number,
+  config?: AxiosRequestConfig | undefined,
+): Promise<Types.UserResponse> {
+  let url_ = getBaseUrl() + "/users/{id}";
+  if (id === undefined || id === null)
+    throw new Error("The parameter 'id' must be defined.");
+  url_ = url_.replace("{id}", encodeURIComponent("" + id));
+  url_ = url_.replace(/[?&]$/, "");
 
-    let options_: AxiosRequestConfig = {
-        ..._requestConfigUsersGET,
-        ...config,
-        method: "GET",
-        url: url_,
-        headers: {
-            ..._requestConfigUsersGET?.headers,
-            "Accept": "application/json",
-            ...config?.headers,
-        }
-    };
+  let options_: AxiosRequestConfig = {
+    ..._requestConfigUsersGET,
+    ...config,
+    method: "GET",
+    url: url_,
+    headers: {
+      ..._requestConfigUsersGET?.headers,
+      Accept: "application/json",
+      ...config?.headers,
+    },
+  };
 
-    return getAxios().request(options_).catch((_error: any) => {
-        if (isAxiosError(_error) && _error.response) {
-            return _error.response;
-        } else {
-            throw _error;
-        }
-    }).then((_response: AxiosResponse) => {
-        return processUsersGET(_response);
+  return getAxios()
+    .request(options_)
+    .catch((_error: any) => {
+      if (isAxiosError(_error) && _error.response) {
+        return _error.response;
+      } else {
+        throw _error;
+      }
+    })
+    .then((_response: AxiosResponse) => {
+      return processUsersGET(_response);
     });
 }
 
 function processUsersGET(response: AxiosResponse): Promise<Types.UserResponse> {
-    const status = response.status;
-    let _headers: any = {};
-    if (response.headers && typeof response.headers === "object") {
-        for (let k in response.headers) {
-            if (response.headers.hasOwnProperty(k)) {
-                _headers[k] = response.headers[k];
-            }
-        }
+  const status = response.status;
+  let _headers: any = {};
+  if (response.headers && typeof response.headers === "object") {
+    for (let k in response.headers) {
+      if (response.headers.hasOwnProperty(k)) {
+        _headers[k] = response.headers[k];
+      }
     }
-    if (status === 200) {
-        const _responseText = response.data;
-        let result200: any = null;
-        let resultData200  = _responseText;
-        result200 = Types.initUserResponse(resultData200);
-        return Promise.resolve<Types.UserResponse>(result200);
-
-    } else if (status === 403) {
-        const _responseText = response.data;
-        let result403: any = null;
-        let resultData403  = _responseText;
-        result403 = Types.initProblemDetails(resultData403);
-        return throwException("Client may only view their own profile", status, _responseText, _headers, result403);
-
-    } else if (status === 404) {
-        const _responseText = response.data;
-        let result404: any = null;
-        let resultData404  = _responseText;
-        result404 = Types.initProblemDetails(resultData404);
-        return throwException("User not found", status, _responseText, _headers, result404);
-
-    } else if (status !== 200 && status !== 204) {
-        const _responseText = response.data;
-        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-    }
-    return Promise.resolve<Types.UserResponse>(null as any);
+  }
+  if (status === 200) {
+    const _responseText = response.data;
+    let result200: any = null;
+    let resultData200 = _responseText;
+    result200 = Types.initUserResponse(resultData200);
+    return Promise.resolve<Types.UserResponse>(result200);
+  } else if (status === 403) {
+    const _responseText = response.data;
+    let result403: any = null;
+    let resultData403 = _responseText;
+    result403 = Types.initProblemDetails(resultData403);
+    return throwException(
+      "Client may only view their own profile",
+      status,
+      _responseText,
+      _headers,
+      result403,
+    );
+  } else if (status === 404) {
+    const _responseText = response.data;
+    let result404: any = null;
+    let resultData404 = _responseText;
+    result404 = Types.initProblemDetails(resultData404);
+    return throwException(
+      "User not found",
+      status,
+      _responseText,
+      _headers,
+      result404,
+    );
+  } else if (status !== 200 && status !== 204) {
+    const _responseText = response.data;
+    return throwException(
+      "An unexpected server error occurred.",
+      status,
+      _responseText,
+      _headers,
+    );
+  }
+  return Promise.resolve<Types.UserResponse>(null as any);
 }
 
 /**
  * Get current profile
  * @return User profile returned
  */
-export function me(config?: AxiosRequestConfig | undefined): Promise<Types.UserResponse> {
-    let url_ = getBaseUrl() + "/users/me";
-      url_ = url_.replace(/[?&]$/, "");
+export function me(
+  config?: AxiosRequestConfig | undefined,
+): Promise<Types.UserResponse> {
+  let url_ = getBaseUrl() + "/users/me";
+  url_ = url_.replace(/[?&]$/, "");
 
-    let options_: AxiosRequestConfig = {
-        ..._requestConfigMe,
-        ...config,
-        method: "GET",
-        url: url_,
-        headers: {
-            ..._requestConfigMe?.headers,
-            "Accept": "application/json",
-            ...config?.headers,
-        }
-    };
+  let options_: AxiosRequestConfig = {
+    ..._requestConfigMe,
+    ...config,
+    method: "GET",
+    url: url_,
+    headers: {
+      ..._requestConfigMe?.headers,
+      Accept: "application/json",
+      ...config?.headers,
+    },
+  };
 
-    return getAxios().request(options_).catch((_error: any) => {
-        if (isAxiosError(_error) && _error.response) {
-            return _error.response;
-        } else {
-            throw _error;
-        }
-    }).then((_response: AxiosResponse) => {
-        return processMe(_response);
+  return getAxios()
+    .request(options_)
+    .catch((_error: any) => {
+      if (isAxiosError(_error) && _error.response) {
+        return _error.response;
+      } else {
+        throw _error;
+      }
+    })
+    .then((_response: AxiosResponse) => {
+      return processMe(_response);
     });
 }
 
 function processMe(response: AxiosResponse): Promise<Types.UserResponse> {
-    const status = response.status;
-    let _headers: any = {};
-    if (response.headers && typeof response.headers === "object") {
-        for (let k in response.headers) {
-            if (response.headers.hasOwnProperty(k)) {
-                _headers[k] = response.headers[k];
-            }
-        }
+  const status = response.status;
+  let _headers: any = {};
+  if (response.headers && typeof response.headers === "object") {
+    for (let k in response.headers) {
+      if (response.headers.hasOwnProperty(k)) {
+        _headers[k] = response.headers[k];
+      }
     }
-    if (status === 200) {
-        const _responseText = response.data;
-        let result200: any = null;
-        let resultData200  = _responseText;
-        result200 = Types.initUserResponse(resultData200);
-        return Promise.resolve<Types.UserResponse>(result200);
-
-    } else if (status === 403) {
-        const _responseText = response.data;
-        let result403: any = null;
-        let resultData403  = _responseText;
-        result403 = Types.initProblemDetails(resultData403);
-        return throwException("Client may only view their own profile", status, _responseText, _headers, result403);
-
-    } else if (status === 404) {
-        const _responseText = response.data;
-        let result404: any = null;
-        let resultData404  = _responseText;
-        result404 = Types.initProblemDetails(resultData404);
-        return throwException("User not found", status, _responseText, _headers, result404);
-
-    } else if (status !== 200 && status !== 204) {
-        const _responseText = response.data;
-        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-    }
-    return Promise.resolve<Types.UserResponse>(null as any);
+  }
+  if (status === 200) {
+    const _responseText = response.data;
+    let result200: any = null;
+    let resultData200 = _responseText;
+    result200 = Types.initUserResponse(resultData200);
+    return Promise.resolve<Types.UserResponse>(result200);
+  } else if (status === 403) {
+    const _responseText = response.data;
+    let result403: any = null;
+    let resultData403 = _responseText;
+    result403 = Types.initProblemDetails(resultData403);
+    return throwException(
+      "Client may only view their own profile",
+      status,
+      _responseText,
+      _headers,
+      result403,
+    );
+  } else if (status === 404) {
+    const _responseText = response.data;
+    let result404: any = null;
+    let resultData404 = _responseText;
+    result404 = Types.initProblemDetails(resultData404);
+    return throwException(
+      "User not found",
+      status,
+      _responseText,
+      _headers,
+      result404,
+    );
+  } else if (status !== 200 && status !== 204) {
+    const _responseText = response.data;
+    return throwException(
+      "An unexpected server error occurred.",
+      status,
+      _responseText,
+      _headers,
+    );
+  }
+  return Promise.resolve<Types.UserResponse>(null as any);
 }
 
 /**
@@ -353,68 +440,88 @@ function processMe(response: AxiosResponse): Promise<Types.UserResponse> {
  * @param id User ID
  * @return User blocked successfully
  */
-export function block(id: number, config?: AxiosRequestConfig | undefined): Promise<void> {
-    let url_ = getBaseUrl() + "/users/{id}/block";
-    if (id === undefined || id === null)
-      throw new Error("The parameter 'id' must be defined.");
-    url_ = url_.replace("{id}", encodeURIComponent("" + id));
-      url_ = url_.replace(/[?&]$/, "");
+export function block(
+  id: number,
+  config?: AxiosRequestConfig | undefined,
+): Promise<void> {
+  let url_ = getBaseUrl() + "/users/{id}/block";
+  if (id === undefined || id === null)
+    throw new Error("The parameter 'id' must be defined.");
+  url_ = url_.replace("{id}", encodeURIComponent("" + id));
+  url_ = url_.replace(/[?&]$/, "");
 
-    let options_: AxiosRequestConfig = {
-        ..._requestConfigBlock,
-        ...config,
-        method: "PATCH",
-        url: url_,
-        headers: {
-            ..._requestConfigBlock?.headers,
-            ...config?.headers,
-        }
-    };
+  let options_: AxiosRequestConfig = {
+    ..._requestConfigBlock,
+    ...config,
+    method: "PATCH",
+    url: url_,
+    headers: {
+      ..._requestConfigBlock?.headers,
+      ...config?.headers,
+    },
+  };
 
-    return getAxios().request(options_).catch((_error: any) => {
-        if (isAxiosError(_error) && _error.response) {
-            return _error.response;
-        } else {
-            throw _error;
-        }
-    }).then((_response: AxiosResponse) => {
-        return processBlock(_response);
+  return getAxios()
+    .request(options_)
+    .catch((_error: any) => {
+      if (isAxiosError(_error) && _error.response) {
+        return _error.response;
+      } else {
+        throw _error;
+      }
+    })
+    .then((_response: AxiosResponse) => {
+      return processBlock(_response);
     });
 }
 
 function processBlock(response: AxiosResponse): Promise<void> {
-    const status = response.status;
-    let _headers: any = {};
-    if (response.headers && typeof response.headers === "object") {
-        for (let k in response.headers) {
-            if (response.headers.hasOwnProperty(k)) {
-                _headers[k] = response.headers[k];
-            }
-        }
+  const status = response.status;
+  let _headers: any = {};
+  if (response.headers && typeof response.headers === "object") {
+    for (let k in response.headers) {
+      if (response.headers.hasOwnProperty(k)) {
+        _headers[k] = response.headers[k];
+      }
     }
-    if (status === 204) {
-        const _responseText = response.data;
-        return Promise.resolve<void>(null as any);
-
-    } else if (status === 403) {
-        const _responseText = response.data;
-        let result403: any = null;
-        let resultData403  = _responseText;
-        result403 = Types.initProblemDetails(resultData403);
-        return throwException("Only employees may block users", status, _responseText, _headers, result403);
-
-    } else if (status === 404) {
-        const _responseText = response.data;
-        let result404: any = null;
-        let resultData404  = _responseText;
-        result404 = Types.initProblemDetails(resultData404);
-        return throwException("User not found", status, _responseText, _headers, result404);
-
-    } else if (status !== 200 && status !== 204) {
-        const _responseText = response.data;
-        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-    }
+  }
+  if (status === 204) {
+    const _responseText = response.data;
     return Promise.resolve<void>(null as any);
+  } else if (status === 403) {
+    const _responseText = response.data;
+    let result403: any = null;
+    let resultData403 = _responseText;
+    result403 = Types.initProblemDetails(resultData403);
+    return throwException(
+      "Only employees may block users",
+      status,
+      _responseText,
+      _headers,
+      result403,
+    );
+  } else if (status === 404) {
+    const _responseText = response.data;
+    let result404: any = null;
+    let resultData404 = _responseText;
+    result404 = Types.initProblemDetails(resultData404);
+    return throwException(
+      "User not found",
+      status,
+      _responseText,
+      _headers,
+      result404,
+    );
+  } else if (status !== 200 && status !== 204) {
+    const _responseText = response.data;
+    return throwException(
+      "An unexpected server error occurred.",
+      status,
+      _responseText,
+      _headers,
+    );
+  }
+  return Promise.resolve<void>(null as any);
 }
 
 /**
@@ -422,77 +529,101 @@ function processBlock(response: AxiosResponse): Promise<void> {
  * @param id User ID
  * @return User unblocked successfully
  */
-export function unblock(id: number, config?: AxiosRequestConfig | undefined): Promise<void> {
-    let url_ = getBaseUrl() + "/users/{id}/unblock";
-    if (id === undefined || id === null)
-      throw new Error("The parameter 'id' must be defined.");
-    url_ = url_.replace("{id}", encodeURIComponent("" + id));
-      url_ = url_.replace(/[?&]$/, "");
+export function unblock(
+  id: number,
+  config?: AxiosRequestConfig | undefined,
+): Promise<void> {
+  let url_ = getBaseUrl() + "/users/{id}/unblock";
+  if (id === undefined || id === null)
+    throw new Error("The parameter 'id' must be defined.");
+  url_ = url_.replace("{id}", encodeURIComponent("" + id));
+  url_ = url_.replace(/[?&]$/, "");
 
-    let options_: AxiosRequestConfig = {
-        ..._requestConfigUnblock,
-        ...config,
-        method: "PATCH",
-        url: url_,
-        headers: {
-            ..._requestConfigUnblock?.headers,
-            ...config?.headers,
-        }
-    };
+  let options_: AxiosRequestConfig = {
+    ..._requestConfigUnblock,
+    ...config,
+    method: "PATCH",
+    url: url_,
+    headers: {
+      ..._requestConfigUnblock?.headers,
+      ...config?.headers,
+    },
+  };
 
-    return getAxios().request(options_).catch((_error: any) => {
-        if (isAxiosError(_error) && _error.response) {
-            return _error.response;
-        } else {
-            throw _error;
-        }
-    }).then((_response: AxiosResponse) => {
-        return processUnblock(_response);
+  return getAxios()
+    .request(options_)
+    .catch((_error: any) => {
+      if (isAxiosError(_error) && _error.response) {
+        return _error.response;
+      } else {
+        throw _error;
+      }
+    })
+    .then((_response: AxiosResponse) => {
+      return processUnblock(_response);
     });
 }
 
 function processUnblock(response: AxiosResponse): Promise<void> {
-    const status = response.status;
-    let _headers: any = {};
-    if (response.headers && typeof response.headers === "object") {
-        for (let k in response.headers) {
-            if (response.headers.hasOwnProperty(k)) {
-                _headers[k] = response.headers[k];
-            }
-        }
+  const status = response.status;
+  let _headers: any = {};
+  if (response.headers && typeof response.headers === "object") {
+    for (let k in response.headers) {
+      if (response.headers.hasOwnProperty(k)) {
+        _headers[k] = response.headers[k];
+      }
     }
-    if (status === 204) {
-        const _responseText = response.data;
-        return Promise.resolve<void>(null as any);
-
-    } else if (status === 403) {
-        const _responseText = response.data;
-        let result403: any = null;
-        let resultData403  = _responseText;
-        result403 = Types.initProblemDetails(resultData403);
-        return throwException("Only employees may unblock users", status, _responseText, _headers, result403);
-
-    } else if (status === 404) {
-        const _responseText = response.data;
-        let result404: any = null;
-        let resultData404  = _responseText;
-        result404 = Types.initProblemDetails(resultData404);
-        return throwException("User not found", status, _responseText, _headers, result404);
-
-    } else if (status !== 200 && status !== 204) {
-        const _responseText = response.data;
-        return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-    }
+  }
+  if (status === 204) {
+    const _responseText = response.data;
     return Promise.resolve<void>(null as any);
+  } else if (status === 403) {
+    const _responseText = response.data;
+    let result403: any = null;
+    let resultData403 = _responseText;
+    result403 = Types.initProblemDetails(resultData403);
+    return throwException(
+      "Only employees may unblock users",
+      status,
+      _responseText,
+      _headers,
+      result403,
+    );
+  } else if (status === 404) {
+    const _responseText = response.data;
+    let result404: any = null;
+    let resultData404 = _responseText;
+    result404 = Types.initProblemDetails(resultData404);
+    return throwException(
+      "User not found",
+      status,
+      _responseText,
+      _headers,
+      result404,
+    );
+  } else if (status !== 200 && status !== 204) {
+    const _responseText = response.data;
+    return throwException(
+      "An unexpected server error occurred.",
+      status,
+      _responseText,
+      _headers,
+    );
+  }
+  return Promise.resolve<void>(null as any);
 }
 let _requestConfigAuthProfile: Partial<AxiosRequestConfig> | null;
 export function getAuthProfileRequestConfig() {
   return _requestConfigAuthProfile;
 }
-export function setAuthProfileRequestConfig(value: Partial<AxiosRequestConfig>) {
+export function setAuthProfileRequestConfig(
+  value: Partial<AxiosRequestConfig>,
+) {
   _requestConfigAuthProfile = value;
 }
-export function patchAuthProfileRequestConfig(patch: (value: Partial<AxiosRequestConfig>) => Partial<AxiosRequestConfig>) {
+export function patchAuthProfileRequestConfig(
+  patch: (value: Partial<AxiosRequestConfig>) => Partial<AxiosRequestConfig>,
+) {
   _requestConfigAuthProfile = patch(_requestConfigAuthProfile ?? {});
 }
 
@@ -503,7 +634,9 @@ export function getUsersAllRequestConfig() {
 export function setUsersAllRequestConfig(value: Partial<AxiosRequestConfig>) {
   _requestConfigUsersAll = value;
 }
-export function patchUsersAllRequestConfig(patch: (value: Partial<AxiosRequestConfig>) => Partial<AxiosRequestConfig>) {
+export function patchUsersAllRequestConfig(
+  patch: (value: Partial<AxiosRequestConfig>) => Partial<AxiosRequestConfig>,
+) {
   _requestConfigUsersAll = patch(_requestConfigUsersAll ?? {});
 }
 
@@ -514,7 +647,9 @@ export function getUsersPOSTRequestConfig() {
 export function setUsersPOSTRequestConfig(value: Partial<AxiosRequestConfig>) {
   _requestConfigUsersPOST = value;
 }
-export function patchUsersPOSTRequestConfig(patch: (value: Partial<AxiosRequestConfig>) => Partial<AxiosRequestConfig>) {
+export function patchUsersPOSTRequestConfig(
+  patch: (value: Partial<AxiosRequestConfig>) => Partial<AxiosRequestConfig>,
+) {
   _requestConfigUsersPOST = patch(_requestConfigUsersPOST ?? {});
 }
 
@@ -525,7 +660,9 @@ export function getUsersGETRequestConfig() {
 export function setUsersGETRequestConfig(value: Partial<AxiosRequestConfig>) {
   _requestConfigUsersGET = value;
 }
-export function patchUsersGETRequestConfig(patch: (value: Partial<AxiosRequestConfig>) => Partial<AxiosRequestConfig>) {
+export function patchUsersGETRequestConfig(
+  patch: (value: Partial<AxiosRequestConfig>) => Partial<AxiosRequestConfig>,
+) {
   _requestConfigUsersGET = patch(_requestConfigUsersGET ?? {});
 }
 
@@ -536,7 +673,9 @@ export function getMeRequestConfig() {
 export function setMeRequestConfig(value: Partial<AxiosRequestConfig>) {
   _requestConfigMe = value;
 }
-export function patchMeRequestConfig(patch: (value: Partial<AxiosRequestConfig>) => Partial<AxiosRequestConfig>) {
+export function patchMeRequestConfig(
+  patch: (value: Partial<AxiosRequestConfig>) => Partial<AxiosRequestConfig>,
+) {
   _requestConfigMe = patch(_requestConfigMe ?? {});
 }
 
@@ -547,7 +686,9 @@ export function getBlockRequestConfig() {
 export function setBlockRequestConfig(value: Partial<AxiosRequestConfig>) {
   _requestConfigBlock = value;
 }
-export function patchBlockRequestConfig(patch: (value: Partial<AxiosRequestConfig>) => Partial<AxiosRequestConfig>) {
+export function patchBlockRequestConfig(
+  patch: (value: Partial<AxiosRequestConfig>) => Partial<AxiosRequestConfig>,
+) {
   _requestConfigBlock = patch(_requestConfigBlock ?? {});
 }
 
@@ -558,6 +699,8 @@ export function getUnblockRequestConfig() {
 export function setUnblockRequestConfig(value: Partial<AxiosRequestConfig>) {
   _requestConfigUnblock = value;
 }
-export function patchUnblockRequestConfig(patch: (value: Partial<AxiosRequestConfig>) => Partial<AxiosRequestConfig>) {
+export function patchUnblockRequestConfig(
+  patch: (value: Partial<AxiosRequestConfig>) => Partial<AxiosRequestConfig>,
+) {
   _requestConfigUnblock = patch(_requestConfigUnblock ?? {});
 }

@@ -15,7 +15,10 @@ public class JwtForwardingMiddleware(RequestDelegate next)
         var p = path.ToString();
         return PublicPrefixes.Any(prefix =>
                 p.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)
-            ) || p.EndsWith(".json", StringComparison.OrdinalIgnoreCase);
+            )
+            || p.EndsWith(".json", StringComparison.OrdinalIgnoreCase)
+            || p.EndsWith(".css", StringComparison.OrdinalIgnoreCase)
+            || p.EndsWith(".ico", StringComparison.OrdinalIgnoreCase);
     }
 
     public async Task InvokeAsync(HttpContext context)

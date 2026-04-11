@@ -1,5 +1,5 @@
+import { appEnv, userData } from "application/configs";
 import axios, { AxiosError } from "axios";
-import { appEnv, userData } from "../../main.tsx";
 import { traceId } from "services/axios/interceptors.ts";
 
 const toMonitoringUserId = (value: number | undefined): string | undefined => {

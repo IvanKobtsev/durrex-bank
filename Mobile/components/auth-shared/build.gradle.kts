@@ -15,7 +15,7 @@ dependencies {
 
     api(stack.retrofit)
     implementation(stack.kotlinx.serialization.json)
-    implementation(project(":core:common"))
-    implementation(project(":core:util"))
-    implementation(project(":core:ui"))
+    implementation(projects.core.common)
+    implementation(projects.core.util)
+    implementation(projects.core.ui)
 }

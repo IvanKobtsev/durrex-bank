@@ -11,7 +11,7 @@ import androidx.lifecycle.ViewModelProvider
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
-import nekit.corporation.common.FragmentKey
+import nekit.corporation.common.di.FragmentKey
 import nekit.corporation.history_impl.ui.AllLoansScreen
 import nekit.corporation.ui.theme.DurexBankTheme
 

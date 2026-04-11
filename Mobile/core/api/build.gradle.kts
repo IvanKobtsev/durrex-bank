@@ -17,6 +17,7 @@ dependencies {
 
     implementation(project(":components:account"))
     implementation(project(":components:auth-shared"))
+    implementation(projects.components.crash)
     implementation(project(":components:loan"))
     implementation(project(":components:tariff"))
     implementation(project(":components:user"))

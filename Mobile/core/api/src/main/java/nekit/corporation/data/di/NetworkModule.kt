@@ -6,10 +6,12 @@ import dev.zacsweers.metro.Provides
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import nekit.corporation.auth.data.datasource.remote.AuthApi
-import nekit.corporation.common.MainServerUrl
+import nekit.corporation.common.di.MainServerUrl
+import nekit.corporation.crash.data.remote.MonitoringApi
 import nekit.corporation.data.remote.Network
 import nekit.corporation.data.remote.Network.getHttpClient
 import nekit.corporation.data.remote.interseptors.AuthInterceptor
+import nekit.corporation.data.remote.interseptors.CircuitBreakerInterceptor
 import nekit.corporation.data.remote.interseptors.NetworkConnectionInterceptor
 import nekit.corporation.data.remote.interseptors.StatusCodeInterceptor
 import nekit.corporation.data.remote.interseptors.TokenAuthenticator
@@ -50,12 +52,18 @@ interface NetworkModule {
     fun provideOkHttpClient(
         okHttpCache: Cache,
         networkInterceptor: NetworkConnectionInterceptor,
+        circuitBreakerInterceptor: CircuitBreakerInterceptor,
         authenticator: TokenAuthenticator,
         authInterceptor: AuthInterceptor,
         statusCodeInterceptor: StatusCodeInterceptor
     ): OkHttpClient = getHttpClient(
         cache = okHttpCache,
-        interceptors = listOf(statusCodeInterceptor, authInterceptor, networkInterceptor),
+        interceptors = listOf(
+            statusCodeInterceptor,
+            authInterceptor,
+            networkInterceptor,
+            circuitBreakerInterceptor
+        ),
         authenticator = authenticator,
     )
 
@@ -64,10 +72,11 @@ interface NetworkModule {
     fun provideClientWithoutInterceptors(
         networkInterceptor: NetworkConnectionInterceptor,
         statusCodeInterceptor: StatusCodeInterceptor,
+        circuitBreakerInterceptor: CircuitBreakerInterceptor,
         okHttpCache: Cache
     ): OkHttpClient = getHttpClient(
         cache = okHttpCache,
-        interceptors = listOf(networkInterceptor, statusCodeInterceptor),
+        interceptors = listOf(networkInterceptor, statusCodeInterceptor, circuitBreakerInterceptor),
     )
 
     @DefaultRetrofit
@@ -120,8 +129,12 @@ interface NetworkModule {
         retrofit.create<SettingsApi>()
 
     @Provides
+    fun provideMonitoringApi(@DefaultRetrofit retrofit: Retrofit): MonitoringApi =
+        retrofit.create<MonitoringApi>()
+
+    @Provides
     @MainServerUrl
-    fun provideMainServerUrl(): String = "https://df3e-84-17-62-53.ngrok-free.app/"
+    fun provideMainServerUrl(): String = "https://swagor-time.ru/services/"
 
     companion object {
         private val contentType = "application/json".toMediaType()

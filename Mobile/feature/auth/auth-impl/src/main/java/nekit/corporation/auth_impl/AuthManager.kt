@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
-import nekit.corporation.common.MainServerUrl
+import nekit.corporation.common.di.MainServerUrl
 import net.openid.appauth.AuthorizationService
 import net.openid.appauth.AuthorizationServiceConfiguration
 import dev.zacsweers.metro.AppScope

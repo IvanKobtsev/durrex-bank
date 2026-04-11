@@ -1,4 +1,4 @@
-package nekit.corporation.common
+package nekit.corporation.common.di
 
 import android.util.Log
 import androidx.fragment.app.Fragment

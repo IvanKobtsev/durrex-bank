@@ -14,13 +14,11 @@ import com.github.terrakok.cicerone.Screen
 import com.github.terrakok.cicerone.androidx.AppNavigator
 import com.github.terrakok.cicerone.androidx.FragmentScreen
 import dev.zacsweers.metro.AppScope
-import dev.zacsweers.metro.ClassKey
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.SingleIn
 import dev.zacsweers.metro.binding
-import nekit.corporation.common.FragmentKey
-import nekit.corporation.common.MainBottomNav
+import nekit.corporation.common.di.FragmentKey
 import nekit.corporation.shell_main_api.MainShellApi
 import nekit.corporation.shell_main_api.model.Tab
 import nekit.corporation.shell_main_impl.R

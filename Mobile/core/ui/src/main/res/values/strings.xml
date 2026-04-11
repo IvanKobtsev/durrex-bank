@@ -13,4 +13,6 @@
     <string name="account_number">Номер счета</string>
     <string name="balance">Баланс</string>
 
+    <string name="technic_break">Фиксики ушли на технический перерыв</string>
+
 </resources>

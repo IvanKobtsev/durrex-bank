@@ -1,4 +1,4 @@
-package nekit.corporation.common
+package nekit.corporation.common.di
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

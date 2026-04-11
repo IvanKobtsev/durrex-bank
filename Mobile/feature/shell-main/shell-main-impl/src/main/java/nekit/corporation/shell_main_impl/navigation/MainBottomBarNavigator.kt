@@ -3,7 +3,6 @@ package nekit.corporation.shell_main_impl.navigation
 import com.github.terrakok.cicerone.Screen
 import dev.zacsweers.metro.Inject
 import nekit.corporation.ProfileApi
-import nekit.corporation.common.MainBottomNav
 import nekit.corporation.history_api.HistoryApi
 import nekit.corporation.main_api.MainApi
 import nekit.corporation.shell_main_api.model.Tab

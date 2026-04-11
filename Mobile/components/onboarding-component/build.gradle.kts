@@ -10,7 +10,7 @@ android {
 }
 
 dependencies {
-    implementation(project(":core:common"))
+    implementation(projects.core.common)
     api(stack.data.store)
     implementation(stack.kotlinx.serialization.json)
 }

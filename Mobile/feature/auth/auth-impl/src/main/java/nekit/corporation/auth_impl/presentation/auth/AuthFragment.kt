@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 import nekit.corporation.ThemeViewModel
 import nekit.corporation.auth_impl.AuthManager
 import nekit.corporation.auth_impl.presentation.model.AuthEvent
-import nekit.corporation.common.FragmentKey
+import nekit.corporation.common.di.FragmentKey
 import nekit.corporation.ui.theme.DurexBankTheme
 import kotlin.getValue
 

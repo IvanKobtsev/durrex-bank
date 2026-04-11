@@ -16,7 +16,7 @@ import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
 import kotlinx.coroutines.launch
-import nekit.corporation.common.FragmentKey
+import nekit.corporation.common.di.FragmentKey
 import nekit.corporation.transaction_impl.compose.TransactionContent
 import nekit.corporation.transaction_impl.model.TransactionEvents
 import nekit.corporation.ui.theme.DurexBankTheme

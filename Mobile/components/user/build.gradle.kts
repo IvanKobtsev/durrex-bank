@@ -13,6 +13,6 @@ dependencies {
     api(stack.retrofit)
     implementation(stack.kotlinx.serialization.json)
     implementation(stack.kotlinx.coroutine)
-    implementation(project(":core:common"))
-    implementation(project(":core:util"))
+    implementation(projects.core.common)
+    implementation(projects.core.util)
 }

@@ -19,12 +19,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx3.rxSingle
 import nekit.corporation.architecture.api.SignalRHub
 import nekit.corporation.auth.domain.usecase.GetCredentialsUseCase
-import nekit.corporation.common.MainServerUrl
+import nekit.corporation.common.di.MainServerUrl
 import nekit.corporation.loan_shared.data.datasource.remote.api.AccountHub
-import nekit.corporation.loan_shared.data.datasource.remote.model.TransactionResponse
 import nekit.corporation.util.domain.common.ForbiddenFailure
-import java.util.logging.Level
-import java.util.logging.Logger
 
 @Inject
 @SingleIn(AppScope::class)

@@ -1,4 +1,4 @@
-package nekit.corporation.common
+package nekit.corporation.common.di
 
 import androidx.fragment.app.Fragment
 import dev.zacsweers.metro.MapKey

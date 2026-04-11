@@ -5,6 +5,7 @@ import { AppLinks } from "application/constants/appLinks.ts";
 import { Loading } from "../../components/uikit/suspense/Loading.tsx";
 import { useAuth } from "react-oidc-context";
 import { useEffect } from "react";
+import { recordRequestOutcome } from "../../services/axios/circuit-breaker.ts";
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -13,6 +14,12 @@ export function LoginPage() {
   useEffect(() => {
     if (auth.isAuthenticated) navigate(AppLinks.Dashboard.link());
   }, [auth.isAuthenticated]);
+
+  useEffect(() => {
+    if (auth.error && auth.error.message === "Failed to fetch") {
+      recordRequestOutcome(true);
+    }
+  }, [auth.error]);
 
   return (
     <div className={styles.wrapper}>

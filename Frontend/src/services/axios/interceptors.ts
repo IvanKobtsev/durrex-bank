@@ -1,11 +1,46 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
 import { sendAxiosErrorToMonitoring } from "services/monitoring/monitoring-service.ts";
 import { generateTraceparent } from "helpers/traceparent.ts";
+import {
+  CircuitBreakerOpenError,
+  getCircuitBreakerRemainingMs,
+  isCircuitBreakerOpen,
+  recordRequestOutcome,
+} from "services/axios/circuit-breaker.ts";
 
 export const traceId = generateTraceparent();
 
+const isRefusedConnectionError = (error: AxiosError<any>): boolean => {
+  if (error.response?.status === 503) {
+    return true;
+  }
+
+  if (error.response) {
+    return false;
+  }
+
+  const code = error.code?.toLowerCase();
+  const message = error.message?.toLowerCase() ?? "";
+  return (
+    code === "err_network" ||
+    code === "econnrefused" ||
+    code === "err_connection_refused" ||
+    message.includes("connection refused") ||
+    message.includes("refused connection")
+  );
+};
+
 axios.interceptors.request.use(
   (config) => {
+    if (isCircuitBreakerOpen()) {
+      const remainingMs = getCircuitBreakerRemainingMs();
+      return Promise.reject(
+        new CircuitBreakerOpenError(
+          `Circuit breaker is open for ${remainingMs}ms`,
+        ),
+      );
+    }
+
     const token = localStorage.getItem("access_token");
 
     config.headers = config.headers ?? {};
@@ -24,9 +59,18 @@ axios.interceptors.request.use(
 
 axios.interceptors.response.use(
   (response: AxiosResponse) => {
+    recordRequestOutcome(false);
     return response;
   },
   (error: AxiosError<any>) => {
+    if (error instanceof CircuitBreakerOpenError) {
+      return Promise.reject(error);
+    }
+
+    if (error.code !== "ERR_CANCELED") {
+      recordRequestOutcome(isRefusedConnectionError(error));
+    }
+
     void sendAxiosErrorToMonitoring(error);
 
     if (

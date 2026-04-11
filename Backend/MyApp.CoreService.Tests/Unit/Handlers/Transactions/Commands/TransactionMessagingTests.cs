@@ -12,6 +12,7 @@ using MyApp.CoreService.Hubs;
 using MyApp.CoreService.Messaging.Consumers;
 using MyApp.CoreService.Messaging.Messages;
 using MyApp.CoreService.Models;
+using MyApp.CoreService.Services;
 using Xunit;
 
 namespace MyApp.CoreService.Tests.Unit.Handlers.Transactions.Commands;
@@ -27,6 +28,7 @@ public class TransactionMessagingTests
         var hubMock = new Mock<IHubContext<TransactionHub>>(MockBehavior.Loose);
         var clients = new Mock<IHubClients>(MockBehavior.Loose);
         var clientProxy = new Mock<IClientProxy>(MockBehavior.Loose);
+        var firebaseMock = new Mock<IFirebaseNotificationService>(MockBehavior.Loose);
         clients.Setup(c => c.Group(It.IsAny<string>())).Returns(clientProxy.Object);
         hubMock.Setup(h => h.Clients).Returns(clients.Object);
 
@@ -36,6 +38,7 @@ public class TransactionMessagingTests
                 services.AddDbContext<CoreDbContext>(o => o.UseInMemoryDatabase(databaseName));
                 services.AddSingleton(hubMock.Object);
                 services.AddSingleton<IExchangeRateService, NoOpExchangeRateService>();
+                services.AddSingleton(firebaseMock.Object);
                 services.AddMassTransit(x =>
                 {
                     x.AddConsumer<TransactionRequestedConsumer>();

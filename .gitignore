@@ -7,3 +7,7 @@ nginx/ssl/
 /Backend/MyApp.MonitoringService/SourceMaps/**
 !/Backend/MyApp.MonitoringService/SourceMaps/
 !/Backend/MyApp.MonitoringService/SourceMaps/README.md
+/Backend/artifacts
+/Backend/MyApp.MonitoringService/artifacts
+/Backend/.idea
+/node_modules

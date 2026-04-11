@@ -7,10 +7,12 @@ namespace MyApp.CoreService.Data;
 
 public class CoreDbContext : DbContext
 {
-    public CoreDbContext(DbContextOptions<CoreDbContext> options) : base(options) { }
+    public CoreDbContext(DbContextOptions<CoreDbContext> options)
+        : base(options) { }
 
     public DbSet<Account> Accounts => Set<Account>();
     public DbSet<Transaction> Transactions => Set<Transaction>();
+    public DbSet<FirebaseToken> FirebaseTokens => Set<FirebaseToken>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

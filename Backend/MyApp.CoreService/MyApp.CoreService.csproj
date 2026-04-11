@@ -19,4 +19,10 @@
     <PackageReference Include="MassTransit.EntityFrameworkCore" Version="8.*" />
     <PackageReference Include="Scalar.AspNetCore" Version="2.1.5" />
   </ItemGroup>
+  <ItemGroup>
+    <None Update="firebase-credentials.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </None>
+  </ItemGroup>
 </Project>

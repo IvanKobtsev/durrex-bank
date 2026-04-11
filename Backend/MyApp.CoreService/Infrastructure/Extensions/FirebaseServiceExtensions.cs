@@ -108,7 +108,9 @@ public static class FirebaseServiceExtensions
 
             var appOptions = new AppOptions
             {
-                Credential = CredentialFactory.FromFile(credentialsPath, null),
+                Credential = CredentialFactory
+                    .FromFile<ServiceAccountCredential>(credentialsPath)
+                    .ToGoogleCredential(),
             };
 
             if (!string.IsNullOrWhiteSpace(options.ProjectId))

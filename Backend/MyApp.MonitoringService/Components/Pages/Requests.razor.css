@@ -143,6 +143,11 @@
 	gap: 0.5rem;
 }
 
+.trace-filter {
+	flex: 1 1 16rem;
+	max-width: 24rem;
+}
+
 @media (max-width: 992px) {
 	.dashboard-header,
 	.event-card__header {
@@ -153,4 +158,3 @@
 		min-width: 0;
 	}
 }
-

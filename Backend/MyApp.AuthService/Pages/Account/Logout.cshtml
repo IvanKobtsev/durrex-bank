@@ -1,0 +1,8 @@
+@page
+@model MyApp.AuthService.Pages.Account.LogoutModel
+<h1>Sign out</h1>
+<p>Do you want to sign out?</p>
+<form method="post" asp-page="Logout">
+    <input asp-for="LogoutId" type="hidden" />
+    <button type="submit">Yes, sign out</button>
+</form>

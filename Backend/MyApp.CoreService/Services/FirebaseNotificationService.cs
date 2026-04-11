@@ -90,14 +90,20 @@ public sealed class FirebaseNotificationService(
             using var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
             timeoutCts.CancelAfter(TimeSpan.FromSeconds(_options.SendTimeout));
 
+            var payloadData = BuildPayloadData(title, body, data);
+            var clickLink = ResolveClickLink(payloadData, _options.FrontendBaseUrl);
+
             var message = new MulticastMessage
             {
                 Tokens = batch,
                 Notification = new Notification { Title = title, Body = body },
+                Data = payloadData,
+                Webpush = new WebpushConfig
+                {
+                    Notification = new WebpushNotification { Title = title, Body = body },
+                    FcmOptions = clickLink is null ? null : new WebpushFcmOptions { Link = clickLink },
+                },
             };
-
-            if (data is { Count: > 0 })
-                message.Data = new Dictionary<string, string>(data);
 
             try
             {
@@ -161,6 +167,95 @@ public sealed class FirebaseNotificationService(
         }
 
         return invalidTokens;
+    }
+
+    private static Dictionary<string, string> BuildPayloadData(
+        string title,
+        string body,
+        Dictionary<string, string>? data
+    )
+    {
+        var payloadData = data is null
+            ? new Dictionary<string, string>(StringComparer.Ordinal)
+            : new Dictionary<string, string>(data, StringComparer.Ordinal);
+
+        payloadData.TryAdd("title", title);
+        payloadData.TryAdd("body", body);
+
+        return payloadData;
+    }
+
+    private static string? ResolveClickLink(
+        IReadOnlyDictionary<string, string> data,
+        string? frontendBaseUrl
+    )
+    {
+        if (TryGetFirstNonEmptyValue(
+                data,
+                out var directLink,
+                "actionUrl",
+                "click_action",
+                "url",
+                "link",
+                "route",
+                "pathname"
+            ))
+        {
+            return BuildWebPushLink(directLink, frontendBaseUrl);
+        }
+
+        if (TryGetFirstNonEmptyValue(data, out var accountId, "accountId"))
+            return BuildWebPushLink($"/account/{accountId}", frontendBaseUrl);
+
+        if (TryGetFirstNonEmptyValue(data, out var userId, "userId"))
+            return BuildWebPushLink($"/users/{userId}", frontendBaseUrl);
+
+        if (TryGetFirstNonEmptyValue(data, out var creditId, "creditId"))
+            return BuildWebPushLink($"/credits/{creditId}", frontendBaseUrl);
+
+        if (TryGetFirstNonEmptyValue(data, out var screen, "screen"))
+        {
+            return screen switch
+            {
+                "users" => BuildWebPushLink("/users", frontendBaseUrl),
+                "transactions" or "dashboard" => BuildWebPushLink("/", frontendBaseUrl),
+                _ => null,
+            };
+        }
+
+        return null;
+    }
+
+    private static bool TryGetFirstNonEmptyValue(
+        IReadOnlyDictionary<string, string> data,
+        out string value,
+        params string[] keys
+    )
+    {
+        foreach (var key in keys)
+        {
+            if (data.TryGetValue(key, out var candidate) && !string.IsNullOrWhiteSpace(candidate))
+            {
+                value = candidate;
+                return true;
+            }
+        }
+
+        value = string.Empty;
+        return false;
+    }
+
+    private static string BuildWebPushLink(string value, string? frontendBaseUrl)
+    {
+        if (Uri.TryCreate(value, UriKind.Absolute, out _))
+            return value;
+
+        var normalizedPath = value.StartsWith('/') ? value : $"/{value}";
+        if (string.IsNullOrWhiteSpace(frontendBaseUrl))
+            return normalizedPath;
+
+        var baseUri = new Uri(frontendBaseUrl.TrimEnd('/') + "/", UriKind.Absolute);
+        return new Uri(baseUri, normalizedPath.TrimStart('/')).ToString();
     }
 
     private async Task RemoveInvalidTokensAsync(

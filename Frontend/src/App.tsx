@@ -7,6 +7,7 @@ import { SignalRConnectionsProvider } from "./services/signal-r-client/SignalRCo
 import { useAuth } from "react-oidc-context";
 import { useCircuitBreaker } from "services/axios/useCircuitBreaker.ts";
 import { CircuitBreakerWarning } from "components/CircuitBreakerWarning/CircuitBreakerWarning.tsx";
+import { FirebaseNotificationsBridge } from "services/FirebaseNotificationsBridge.tsx";
 
 function App() {
   const auth = useAuth();
@@ -23,6 +24,7 @@ function App() {
   return (
     <SignalRConnectionsProvider>
       <QueryClientProvider client={queryClient}>
+        <FirebaseNotificationsBridge />
         <RouterProvider router={AppRoutes()} />
         <Toast />
       </QueryClientProvider>

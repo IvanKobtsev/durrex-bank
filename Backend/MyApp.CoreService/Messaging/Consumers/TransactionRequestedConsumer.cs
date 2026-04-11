@@ -67,9 +67,22 @@ public class TransactionRequestedConsumer(
         var body =
             $"Сумма: {transaction.Amount} {account.Currency}. Доступно: {transaction.BalanceAfter} {account.Currency}";
 
-        await firebaseNotificationService.SendToUserAsync(account.OwnerId, title, body, ct: ct);
+        var sourceNotificationData = CreateTransactionNotificationData(transaction, account.Id, account.Currency);
 
-        await firebaseNotificationService.SendToAllEmployeesAsync(title, body, ct: ct);
+        await firebaseNotificationService.SendToUserAsync(
+            account.OwnerId,
+            title,
+            body,
+            sourceNotificationData,
+            ct
+        );
+
+        await firebaseNotificationService.SendToAllEmployeesAsync(
+            title,
+            body,
+            sourceNotificationData,
+            ct
+        );
 
         if (transaction.RelatedAccountId.HasValue)
         {
@@ -79,14 +92,46 @@ public class TransactionRequestedConsumer(
             );
             if (relatedAccount is not null)
             {
+                var relatedNotificationData = CreateTransactionNotificationData(
+                    transaction,
+                    relatedAccount.Id,
+                    relatedAccount.Currency
+                );
+
                 await firebaseNotificationService.SendToUserAsync(
                     relatedAccount.OwnerId,
                     title,
                     body,
-                    ct: ct
+                    relatedNotificationData,
+                    ct
                 );
             }
         }
+    }
+
+    private static Dictionary<string, string> CreateTransactionNotificationData(
+        TransactionResponse transaction,
+        int accountId,
+        string currency
+    )
+    {
+        var data = new Dictionary<string, string>
+        {
+            ["transactionType"] = transaction.Type.ToString(),
+            ["accountId"] = accountId.ToString(),
+            ["amount"] = transaction.Amount.ToString("F2"),
+            ["currency"] = currency,
+            ["balanceAfter"] = transaction.BalanceAfter.ToString("F2"),
+            ["screen"] = "transactions",
+            ["route"] = $"/account/{accountId}",
+        };
+
+        if (transaction.RelatedAccountId.HasValue)
+        {
+            data["relatedAccountId"] = transaction.RelatedAccountId.Value.ToString();
+        }
+
+        return data;
     }
 
     private async Task<TransactionResponse> HandleDeposit(

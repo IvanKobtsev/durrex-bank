@@ -22,6 +22,12 @@ public class FirebaseOptions
     public string? ProjectId { get; set; }
 
     /// <summary>
+    /// Public base URL of the web frontend used for Firebase Web Push click targets.
+    /// Example: https://swagor-time.ru or http://localhost:5173
+    /// </summary>
+    public string? FrontendBaseUrl { get; set; }
+
+    /// <summary>
     /// Batch size for multicast Firebase Cloud Messaging operations.
     /// Firebase limits multicast messages to 500 tokens per request.
     /// Default: 500

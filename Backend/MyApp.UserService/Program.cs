@@ -8,6 +8,7 @@ using MyApp.UserService.Infrastructure;
 using MyApp.UserService.Repositories;
 using MyApp.UserService.Services;
 using MyApp.UserService.Swagger;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -89,6 +90,11 @@ builder.Services.AddHttpClient<AuthServiceClient>(client =>
         "X-Internal-Api-Key",
         builder.Configuration["InternalApiKey"]!);
 });
+
+builder.Services.AddSingleton<IConnectionMultiplexer>(
+    ConnectionMultiplexer.Connect(
+        builder.Configuration.GetConnectionString("Redis")
+        ?? throw new InvalidOperationException("ConnectionStrings:Redis is not configured.")));
 
 builder.Services.AddScoped<DataSeeder>();
 builder.Services.AddScoped<UserRegistrationService>();

@@ -10,6 +10,7 @@ using MyApp.CoreService.Messaging.Consumers;
 using MyApp.CoreService.Messaging.Messages;
 using MyApp.CoreService.Middleware;
 using Scalar.AspNetCore;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,6 +50,11 @@ builder.Services.AddScoped<ICurrentUserContext>(sp =>
 });
 
 builder.Services.AddMemoryCache();
+
+builder.Services.AddSingleton<IConnectionMultiplexer>(
+    ConnectionMultiplexer.Connect(
+        builder.Configuration.GetConnectionString("Redis")
+        ?? throw new InvalidOperationException("ConnectionStrings:Redis is not configured.")));
 
 if (isTesting)
     builder.Services.AddSingleton<IExchangeRateService, NoOpExchangeRateService>();

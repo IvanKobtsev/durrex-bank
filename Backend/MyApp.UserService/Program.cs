@@ -1,10 +1,14 @@
 using System.Reflection;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Http.Resilience;
 using Microsoft.OpenApi;
 using MyApp.UserService.Auth;
 using MyApp.UserService.Data;
+using MyApp.UserService.DTOs;
 using MyApp.UserService.Infrastructure;
+using MyApp.UserService.Middleware;
 using MyApp.UserService.Repositories;
 using MyApp.UserService.Services;
 using MyApp.UserService.Swagger;
@@ -89,6 +93,15 @@ builder.Services.AddHttpClient<AuthServiceClient>(client =>
     client.DefaultRequestHeaders.Add(
         "X-Internal-Api-Key",
         builder.Configuration["InternalApiKey"]!);
+})
+.AddStandardResilienceHandler(options =>
+{
+    options.Retry.MaxRetryAttempts = 3;
+    options.Retry.Delay = TimeSpan.FromMilliseconds(500);
+    options.CircuitBreaker.FailureRatio = 0.7;
+    options.CircuitBreaker.SamplingDuration = TimeSpan.FromSeconds(30);
+    options.CircuitBreaker.MinimumThroughput = 5;
+    options.CircuitBreaker.BreakDuration = TimeSpan.FromSeconds(30);
 });
 
 builder.Services.AddSingleton<IConnectionMultiplexer>(
@@ -118,6 +131,48 @@ using (var scope = app.Services.CreateScope())
     await seeder.SeedAsync();
 }
 
+app.UseExceptionHandler(errApp =>
+{
+    errApp.Run(async context =>
+    {
+        var ex = context.Features.Get<IExceptionHandlerFeature>()?.Error;
+        if (ex is null) return;
+
+        var (status, message) = ex switch
+        {
+            KeyNotFoundException => (StatusCodes.Status404NotFound, ex.Message),
+            InvalidOperationException => (StatusCodes.Status400BadRequest, ex.Message),
+            UnauthorizedAccessException => (StatusCodes.Status403Forbidden, ex.Message),
+            _ => (StatusCodes.Status500InternalServerError, "An unexpected error occurred.")
+        };
+
+        context.Response.StatusCode = status;
+        context.Response.ContentType = "application/json";
+        await context.Response.WriteAsJsonAsync(new { error = message });
+
+        if (status >= 500)
+        {
+            try
+            {
+                var monitoring = context.RequestServices.GetService<MonitoringClient>();
+                if (monitoring is not null)
+                    await monitoring.CaptureErrorAsync(new CaptureErrorEventDto
+                    {
+                        Service = "UserService",
+                        Level = "Error",
+                        Message = ex.Message,
+                        ExceptionType = ex.GetType().FullName,
+                        StackTrace = ex.StackTrace,
+                        RequestMethod = context.Request.Method,
+                        RequestPath = context.Request.Path,
+                        OccurredAtUtc = DateTimeOffset.UtcNow,
+                    });
+            }
+            catch { }
+        }
+    });
+});
+
 app.UseSwagger();
 app.UseSwaggerUI(options =>
 {
@@ -125,6 +180,8 @@ app.UseSwaggerUI(options =>
     options.RoutePrefix = "swagger";
 });
 
+app.UseMiddleware<RandomFailureMiddleware>();
+app.UseMiddleware<IdempotencyMiddleware>();
 app.UseMiddleware<InternalApiKeyMiddleware>();
 
 app.MapControllers();

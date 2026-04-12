@@ -1,4 +1,4 @@
-@use 'src/styles/variables' as *;
+@use "src/styles/variables" as *;
 
 .toastContent {
   font-size: 14px !important;
@@ -34,6 +34,10 @@
   &.warning {
     color: yellow !important;
     background: orange !important;
+  }
+
+  &.info {
+    background: #c1670b !important;
   }
 }
 

@@ -96,6 +96,12 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(
         builder.Configuration.GetConnectionString("Redis")
         ?? throw new InvalidOperationException("ConnectionStrings:Redis is not configured.")));
 
+builder.Services.AddHttpClient<MonitoringClient>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["Services:MonitoringService"]!);
+    client.DefaultRequestHeaders.Add("X-Internal-Api-Key", builder.Configuration["InternalApiKey"]!);
+});
+
 builder.Services.AddScoped<DataSeeder>();
 builder.Services.AddScoped<UserRegistrationService>();
 builder.Services.AddScoped<IUserService, UserService>();

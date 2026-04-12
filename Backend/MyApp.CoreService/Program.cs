@@ -8,6 +8,7 @@ using MyApp.CoreService.ExchangeRates;
 using MyApp.CoreService.Hubs;
 using MyApp.CoreService.Messaging.Consumers;
 using MyApp.CoreService.Messaging.Messages;
+using MyApp.CoreService.Infrastructure;
 using MyApp.CoreService.Middleware;
 using Scalar.AspNetCore;
 using StackExchange.Redis;
@@ -55,6 +56,12 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(
     ConnectionMultiplexer.Connect(
         builder.Configuration.GetConnectionString("Redis")
         ?? throw new InvalidOperationException("ConnectionStrings:Redis is not configured.")));
+
+builder.Services.AddHttpClient<MonitoringClient>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["Services:MonitoringService"]!);
+    client.DefaultRequestHeaders.Add("X-Internal-Api-Key", builder.Configuration["InternalApiKey"]!);
+});
 
 if (isTesting)
     builder.Services.AddSingleton<IExchangeRateService, NoOpExchangeRateService>();

@@ -46,6 +46,7 @@ services:
       Services__AuthService: "http://auth-service:8080"
       RabbitMQ__Password: ${RABBITMQ_DEFAULT_PASS}
       Services__MonitoringService: "http://monitoring-service:8080/"
+      RandomFailureEnabled: ${RANDOM_FAILURE_ENABLED:-false}
     ports:
       - "5004:8080"
     depends_on:
@@ -93,6 +94,7 @@ services:
       RabbitMQ__Password: ${RABBITMQ_DEFAULT_PASS}
       Services__MonitoringService: "http://monitoring-service:8080/"
       Firebase__CredentialsPath: "/run/secrets/firebase-credentials.json"
+      RandomFailureEnabled: ${RANDOM_FAILURE_ENABLED:-false}
     volumes:
       - ${FIREBASE_CREDENTIALS_PATH:-./firebase-credentials.json}:/run/secrets/firebase-credentials.json:ro
     ports:
@@ -116,6 +118,7 @@ services:
       ConnectionStrings__Redis: "redis:6379"
       RabbitMQ__Host: rabbitmq
       RabbitMQ__Password: ${RABBITMQ_DEFAULT_PASS}
+      RandomFailureEnabled: ${RANDOM_FAILURE_ENABLED:-false}
     ports:
       - "5209:8080"
     depends_on:

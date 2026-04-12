@@ -217,7 +217,9 @@ app.MapScalarApiReference();
 
 app.UseHttpsRedirection();
 
-app.UseMiddleware<RandomFailureMiddleware>();
+if ((builder.Configuration["RandomFailureEnabled"]?.ToLower() ?? "false") == "true")
+    app.UseMiddleware<RandomFailureMiddleware>();
+
 app.UseMiddleware<IdempotencyMiddleware>();
 app.UseMiddleware<InternalApiKeyMiddleware>();
 

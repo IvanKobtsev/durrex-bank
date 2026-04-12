@@ -50,6 +50,11 @@ axios.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
 
+    const mutatingMethods = ["POST", "PUT", "PATCH", "DELETE"];
+    if (mutatingMethods.includes((config.method ?? "").toUpperCase())) {
+      config.headers["Idempotency-Key"] = crypto.randomUUID();
+    }
+
     return config;
   },
   (error) => {

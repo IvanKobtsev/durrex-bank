@@ -56,6 +56,9 @@ services:
       InternalApiKey: "dev-internal-api-key-12345"
       RabbitMQ__Password: ${RABBITMQ_DEFAULT_PASS}
       AdminPassword: ${AUTH_ADMIN_PASSWORD}
+    volumes:
+      - auth-dp-keys:/app/dp-keys
+      - auth-signing-keys:/app/keys
     ports:
       - "5005:8080"
     depends_on:
@@ -198,4 +201,6 @@ services:
 
 volumes:
   postgres-data:
+  auth-dp-keys:
+  auth-signing-keys:
 

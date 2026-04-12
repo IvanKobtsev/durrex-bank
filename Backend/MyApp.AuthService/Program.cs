@@ -1,4 +1,5 @@
 using Duende.IdentityServer.Models;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -17,6 +18,12 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
     options.KnownNetworks.Clear();
     options.KnownProxies.Clear();
 });
+
+builder.Services.AddDataProtection()
+    .PersistKeysToFileSystem(
+        new DirectoryInfo(Path.Combine(builder.Environment.ContentRootPath, "dp-keys"))
+    )
+    .SetApplicationName("MyApp.AuthService");
 
 builder.Services.AddRazorPages();
 builder.Services.AddControllers();
@@ -69,8 +76,7 @@ builder
     .AddInMemoryApiResources(apiResources)
     .AddInMemoryClients(clients)
     .AddAspNetIdentity<ApplicationUser>()
-    .AddProfileService<HierarchicalProfileService>()
-    .AddDeveloperSigningCredential();
+    .AddProfileService<HierarchicalProfileService>();
 
 builder.Services.AddScoped<AuthSeeder>();
 

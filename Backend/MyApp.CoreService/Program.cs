@@ -77,7 +77,7 @@ builder.Services.AddSignalR();
 builder.Services.AddSingleton<IUserIdProvider, HeaderUserIdProvider>();
 
 // Add Firebase services with modern configuration
-if (!isTesting)
+if (!isTesting && builder.Configuration.GetValue<bool>("Firebase:Enabled"))
     builder.Services.AddFirebaseServices(builder.Configuration);
 
 builder.Services.AddMassTransit(x =>

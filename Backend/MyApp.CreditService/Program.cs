@@ -4,10 +4,13 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using MyApp.CreditService.Auth;
+using MyApp.CreditService.DTOs;
+using MyApp.CreditService.Infrastructure;
 using MyApp.CreditService.Middleware;
 using MyApp.CreditService.Services;
 using MyApp.CreditService.Swagger;
 using Npgsql;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -56,9 +59,29 @@ builder.Services.AddMassTransit(x =>
                 }
             );
 
+            // retry for transient messaging failures
+            cfg.UseMessageRetry(r => r.Intervals(
+                TimeSpan.FromSeconds(1),
+                TimeSpan.FromSeconds(5),
+                TimeSpan.FromSeconds(15)
+            ));
+
             cfg.ConfigureEndpoints(ctx);
         }
     );
+});
+
+// Redis for distributed idempotency
+builder.Services.AddSingleton<IConnectionMultiplexer>(
+    ConnectionMultiplexer.Connect(
+        builder.Configuration.GetConnectionString("Redis")
+        ?? throw new InvalidOperationException("ConnectionStrings:Redis is not configured.")));
+
+// MonitoringClient
+builder.Services.AddHttpClient<MonitoringClient>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["Services:MonitoringService"]!);
+    client.DefaultRequestHeaders.Add("X-Internal-Api-Key", builder.Configuration["InternalApiKey"]!);
 });
 
 builder.Services.AddHostedService<PaymentSchedulerService>();
@@ -159,6 +182,28 @@ app.UseExceptionHandler(exceptionApp =>
         context.Response.StatusCode = status;
         context.Response.ContentType = "application/json";
         await context.Response.WriteAsJsonAsync(new { error = message });
+
+        // log 5xx to monitoring
+        if (status >= 500 && ex is not null)
+        {
+            try
+            {
+                var monitoring = context.RequestServices.GetService<MonitoringClient>();
+                if (monitoring is not null)
+                    await monitoring.CaptureErrorAsync(new CaptureErrorEventDto
+                    {
+                        Service = "CreditService",
+                        Level = "Error",
+                        Message = ex.Message,
+                        ExceptionType = ex.GetType().FullName,
+                        StackTrace = ex.StackTrace,
+                        RequestMethod = context.Request.Method,
+                        RequestPath = context.Request.Path,
+                        OccurredAtUtc = DateTimeOffset.UtcNow,
+                    });
+            }
+            catch { }
+        }
     })
 );
 
@@ -169,6 +214,8 @@ app.UseSwaggerUI(options =>
     options.RoutePrefix = "swagger";
 });
 
+app.UseMiddleware<RandomFailureMiddleware>();
+app.UseMiddleware<IdempotencyMiddleware>();
 app.UseMiddleware<InternalApiKeyMiddleware>();
 
 app.MapControllers();

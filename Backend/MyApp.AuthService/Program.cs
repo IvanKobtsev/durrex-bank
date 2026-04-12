@@ -1,13 +1,17 @@
 using Duende.IdentityServer.Models;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Http.Resilience;
 using MyApp.AuthService.Data;
+using MyApp.AuthService.DTOs;
 using MyApp.AuthService.Infrastructure;
 using MyApp.AuthService.Middleware;
 using MyApp.AuthService.Models;
 using MyApp.AuthService.Services;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")!;
@@ -48,6 +52,28 @@ builder.Services.AddHttpClient<UserServiceClient>(client =>
         "X-Internal-Api-Key",
         builder.Configuration["InternalApiKey"]!
     );
+})
+.AddStandardResilienceHandler(options =>
+{
+    options.Retry.MaxRetryAttempts = 3;
+    options.Retry.Delay = TimeSpan.FromMilliseconds(500);
+    options.CircuitBreaker.FailureRatio = 0.7;
+    options.CircuitBreaker.SamplingDuration = TimeSpan.FromSeconds(30);
+    options.CircuitBreaker.MinimumThroughput = 5;
+    options.CircuitBreaker.BreakDuration = TimeSpan.FromSeconds(30);
+});
+
+// Redis for distributed idempotency
+builder.Services.AddSingleton<IConnectionMultiplexer>(
+    ConnectionMultiplexer.Connect(
+        builder.Configuration.GetConnectionString("Redis")
+        ?? throw new InvalidOperationException("ConnectionStrings:Redis is not configured.")));
+
+// MonitoringClient
+builder.Services.AddHttpClient<MonitoringClient>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["Services:MonitoringService"]!);
+    client.DefaultRequestHeaders.Add("X-Internal-Api-Key", builder.Configuration["InternalApiKey"]!);
 });
 
 var identityResources =
@@ -123,7 +149,43 @@ if (!app.Environment.IsDevelopment())
         }
     );
 
+app.UseExceptionHandler(errApp =>
+{
+    errApp.Run(async context =>
+    {
+        var ex = context.Features.Get<IExceptionHandlerFeature>()?.Error;
+        if (ex is null) return;
+
+        // Only return JSON for /internal API paths
+        if (!context.Request.Path.StartsWithSegments("/internal"))
+            return;
+
+        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+        context.Response.ContentType = "application/json";
+        await context.Response.WriteAsJsonAsync(new { error = "An unexpected error occurred." });
+
+        try
+        {
+            var monitoring = context.RequestServices.GetService<MonitoringClient>();
+            if (monitoring is not null)
+                await monitoring.CaptureErrorAsync(new CaptureErrorEventDto
+                {
+                    Service = "AuthService",
+                    Level = "Error",
+                    Message = ex.Message,
+                    ExceptionType = ex.GetType().FullName,
+                    StackTrace = ex.StackTrace,
+                    RequestMethod = context.Request.Method,
+                    RequestPath = context.Request.Path,
+                    OccurredAtUtc = DateTimeOffset.UtcNow,
+                });
+        }
+        catch { }
+    });
+});
+
 app.UseMiddleware<InternalApiKeyMiddleware>();
+app.UseMiddleware<IdempotencyMiddleware>();
 app.UseStaticFiles();
 app.UseRouting();
 app.UseIdentityServer();

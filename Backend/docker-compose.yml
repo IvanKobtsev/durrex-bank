@@ -17,6 +17,12 @@ services:
       - postgres-data:/var/lib/postgresql/data
       - ./init-databases.sh:/docker-entrypoint-initdb.d/init-databases.sh:ro
 
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+
   rabbitmq:
     image: rabbitmq:3.13-management-alpine
     restart: unless-stopped
@@ -62,6 +68,8 @@ services:
       ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=durrex_auth;Username=postgres;Password=${POSTGRES_PASSWORD}"
       IdentityServer__IssuerUri: "https://swagor-time.ru/services/auth"
       Services__UserService: "http://user-service:8080"
+      Services__MonitoringService: "http://monitoring-service:8080/"
+      ConnectionStrings__Redis: "redis:6379"
       InternalApiKey: "dev-internal-api-key-12345"
       RabbitMQ__Password: ${RABBITMQ_DEFAULT_PASS}
       AdminPassword: ${AUTH_ADMIN_PASSWORD}
@@ -72,6 +80,7 @@ services:
       - "5005:8080"
     depends_on:
       - postgres
+      - redis
       - user-service
 
   core-service:
@@ -109,6 +118,8 @@ services:
       ConnectionStrings__Default: "Host=postgres;Port=5432;Database=durrex_credit;Username=postgres;Password=${POSTGRES_PASSWORD}"
       InternalApiKey: "dev-internal-api-key-12345"
       Bank__MasterAccountId: "1"
+      Services__MonitoringService: "http://monitoring-service:8080/"
+      ConnectionStrings__Redis: "redis:6379"
       RabbitMQ__Host: rabbitmq
       RabbitMQ__Password: ${RABBITMQ_DEFAULT_PASS}
     ports:
@@ -117,6 +128,8 @@ services:
       postgres:
         condition: service_healthy
       rabbitmq:
+        condition: service_started
+      redis:
         condition: service_started
 
   web-app-settings-service:

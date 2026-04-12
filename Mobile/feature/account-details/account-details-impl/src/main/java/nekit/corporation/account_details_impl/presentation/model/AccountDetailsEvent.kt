@@ -1,4 +1,4 @@
-package nekit.corporation.presentation.model
+package nekit.corporation.account_details_impl.presentation.model
 
 import androidx.annotation.StringRes
 import nekit.corporation.architecture.presentation.Event

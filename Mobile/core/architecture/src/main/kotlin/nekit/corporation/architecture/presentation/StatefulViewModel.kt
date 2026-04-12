@@ -29,6 +29,7 @@ abstract class StatefulViewModel<State : ScreenState> : ViewModel() {
 
     val screenEvents: EventQueue = EventQueue()
 
+    @Synchronized
     fun updateState(transform: suspend State.() -> State) {
         viewModelScope.launch {
             val current = currentScreenState
@@ -63,54 +64,6 @@ abstract class StatefulViewModel<State : ScreenState> : ViewModel() {
             ValidationError.InvalidEmail -> R.string.email_constraint
             ValidationError.InvalidSurname -> R.string.surname_constraint
         }
-    }
-
-    protected suspend fun <T> fallback(
-        action: suspend () -> T,
-        onFailure: suspend (Throwable) -> Unit = {},
-        onComplete: suspend (T) -> Unit,
-        maxTries: Int = 4,
-        dispatcher: CoroutineDispatcher = Dispatchers.IO
-    ) = withContext(dispatcher) {
-        var retryTime = 500L
-        var completed = false
-        var currentTry = 1
-        while (!completed) {
-            runCatching { action() }
-                .onFailure {
-                    onFailure(it)
-                }
-                .onSuccess {
-                    onComplete(it)
-                    completed = true
-                }
-            delay(retryTime)
-            retryTime = (retryTime * 2).coerceAtMost(10000)
-            if (currentTry < maxTries) {
-                currentTry++
-            } else {
-                completed = true
-            }
-        }
-    }
-
-    protected suspend fun <T> fallback(
-        action: suspend () -> T,
-        onFailure: suspend (Throwable) -> Unit = {},
-        maxTries: Int = 4,
-    ): T? {
-        var retryTime = 500L
-        repeat(maxTries) { attempt ->
-            try {
-                return action()
-            } catch (e: Exception) {
-                onFailure(e)
-                if (attempt == maxTries - 1) return null
-                delay(retryTime)
-                retryTime = (retryTime * 2).coerceAtMost(10000)
-            }
-        }
-        return null
     }
 
     abstract fun createInitialState(): State

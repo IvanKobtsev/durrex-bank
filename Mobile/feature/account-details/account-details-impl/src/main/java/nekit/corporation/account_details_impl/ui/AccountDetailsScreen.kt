@@ -39,7 +39,7 @@ import nekit.corporation.loan_shared.data.datasource.remote.model.AccountStatus
 import nekit.corporation.loan_shared.domain.model.Account
 import nekit.corporation.loan_shared.domain.model.Transaction
 import nekit.corporation.loan_shared.domain.model.TransactionTypeDomain
-import nekit.corporation.presentation.model.AccountDetailsEvent
+import nekit.corporation.account_details_impl.presentation.model.AccountDetailsEvent
 import nekit.corporation.account_details_impl.presentation.model.AccountDetailsInteractions
 import nekit.corporation.account_details_impl.presentation.model.AccountDetailsState
 import nekit.corporation.ui.component.AccountDetailsCard
@@ -63,19 +63,7 @@ internal fun AccountDetailsScreen(
     interactions: AccountDetailsInteractions
 ) {
     val colors = LocalAppColors.current
-    val context = LocalContext.current
 
-    screenEvents.CollectEvent {
-        if (it is AccountDetailsEvent) {
-            when (it) {
-                is AccountDetailsEvent.ShowToast -> Toast.makeText(
-                    context,
-                    it.textRes,
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        }
-    }
 
     when (state) {
         AccountDetailsState.Loading -> LoadingScreen(modifier = Modifier.fillMaxSize())
@@ -104,7 +92,7 @@ internal fun AccountDetailsScreen(
                         )
                         Spacer(Modifier.width(16.dp))
                         Headline2(
-                            stringResource(R.string.number) + " ${state.account.id}",
+                            stringResource(R.string.number) + " ${state.account?.id}",
                             color = colors.fontPrimary
                         )
                         Spacer(Modifier.weight(1f))
@@ -132,37 +120,43 @@ internal fun AccountDetailsScreen(
                             .fillMaxWidth()
                     ) {
                         item {
-                            Spacer(Modifier.height(16.dp))
-                            AccountDetailsCard(
-                                accountId = state.account.id,
-                                balance = "${state.account.balance} ${state.account.currency}",
-                            )
+                            state.account?.let {
+                                Spacer(Modifier.height(16.dp))
+                                AccountDetailsCard(
+                                    accountId = state.account.id,
+                                    balance = "${state.account.balance} ${state.account.currency}",
+                                )
+                            }
+
                         }
                         item {
-                            Spacer(Modifier.height(16.dp))
-                            Box(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(16.dp))
-                                    .background(colors.bgPrimary)
-                                    .padding(16.dp)
-                            ) {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically
+                            state.account?.let {
+
+                                Spacer(Modifier.height(16.dp))
+                                Box(
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(16.dp))
+                                        .background(colors.bgPrimary)
+                                        .padding(16.dp)
                                 ) {
-                                    Caption(
-                                        string = stringResource(R.string.state),
-                                        color = colors.fontSecondary
-                                    )
-                                    Spacer(Modifier.weight(1f))
-                                    Body2Text(
-                                        text = state.account.status.name,
-                                        modifier = Modifier.padding(vertical = 4.dp),
-                                        color = colors.fontPrimary
-                                    )
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Caption(
+                                            string = stringResource(R.string.state),
+                                            color = colors.fontSecondary
+                                        )
+                                        Spacer(Modifier.weight(1f))
+                                        Body2Text(
+                                            text = state.account.status.name,
+                                            modifier = Modifier.padding(vertical = 4.dp),
+                                            color = colors.fontPrimary
+                                        )
+                                    }
                                 }
+                                Spacer(Modifier.height(24.dp))
                             }
-                            Spacer(Modifier.height(24.dp))
                         }
                         item {
                             BodyText(
@@ -256,7 +250,7 @@ private fun PreviewLoanDetailsScreen() {
     DurexBankTheme {
         AccountDetailsScreen(
             screenEvents = EventQueue(),
-            state = AccountDetailsState.Content(
+            state = AccountDetailsState./*Loading*/Content(
                 account = Account(
                     id = 12,
                     ownerId = 123,

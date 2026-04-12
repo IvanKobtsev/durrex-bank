@@ -20,8 +20,8 @@ dependencies {
     implementation(projects.core.util)
     implementation(projects.core.ui)
 
+    implementation(projects.feature.auth.authApi)
     implementation(projects.feature.profile.profileApi)
-    implementation(projects.feature.shellMain.shellMainApi)
 
     implementation(projects.components.user)
     implementation(projects.components.languageComponent)

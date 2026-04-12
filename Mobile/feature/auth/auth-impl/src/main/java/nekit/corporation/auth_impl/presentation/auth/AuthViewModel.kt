@@ -14,19 +14,14 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
 import nekit.corporation.architecture.presentation.StatefulViewModel
-import nekit.corporation.auth.domain.Validator
 import nekit.corporation.auth.domain.model.TokenDto
 import nekit.corporation.auth.domain.repository.AuthRepository
 import nekit.corporation.auth.domain.usecase.GetCredentialsUseCase
-import nekit.corporation.auth.domain.usecase.LoginUseCase
-import nekit.corporation.auth.domain.usecase.RegisterUseCase
 import nekit.corporation.auth_impl.AuthManager
 import nekit.corporation.auth_impl.R
 import nekit.corporation.auth_impl.navigation.AuthNavigator
@@ -39,7 +34,6 @@ import nekit.corporation.auth_impl.presentation.sign.`in`.SignInInteract
 import nekit.corporation.auth_impl.presentation.sign.up.SignUpInteract
 import nekit.corporation.loan_shared.domain.repository.AccountRepository
 import nekit.corporation.onboarding_shared.domain.usecase.GetSettingsUseCase
-import nekit.corporation.user.domain.model.Scheme
 import nekit.corporation.util.domain.common.BadRequestFailure
 import nekit.corporation.util.domain.common.CommonBackendFailure
 import nekit.corporation.util.domain.common.CredentialsError
@@ -54,34 +48,24 @@ import nekit.corporation.util.domain.common.UnknownFailure
 @ViewModelKey(AuthViewModel::class)
 @ContributesIntoMap(AppScope::class, binding<ViewModel>())
 class AuthViewModel(
-    private val registerUseCase: RegisterUseCase,
     private val oidcAuthManager: AuthManager,
-    private val loginUseCase: LoginUseCase,
     private val getSettingsUseCase: GetSettingsUseCase,
     private val getCredentialsUseCase: GetCredentialsUseCase,
     private val accountRepository: AccountRepository,
     private val navigator: AuthNavigator,
     private val authRepository: AuthRepository,
-    private val getNetworkSettingsUseCase: nekit.corporation.user.domain.usecase.GetSettingsUseCase
 ) : StatefulViewModel<AuthState>(), SignUpInteract, SignInInteract {
     init {
         observeSignUpState()
         observeSignInState()
 
         viewModelScope.launch(Dispatchers.IO) {
-            reduceError {
+            reduceError({
                 val credentials = async {
-                    fallback(
-                        action = { getCredentialsUseCase() },
-                        onFailure = { onSignInOpen() }
-                    )
-                }
-                launch {
-                    fallback(
-                        action = { getNetworkSettingsUseCase() },
-                        onFailure = { onSignInOpen() }
-                    )?.let {
-                        screenEvents.offerEvent(AuthEvent.ChangeTheme(it.theme == Scheme.dark))
+                    try {
+                        getCredentialsUseCase()
+                    } catch (_: Throwable) {
+                        onSignInOpen()
                     }
                 }
                 try {
@@ -96,7 +80,7 @@ class AuthViewModel(
                     onSignInOpen()
                 }
 
-            }
+            })
         }
     }
 
@@ -127,7 +111,7 @@ class AuthViewModel(
                     navigator.onOnboardingOpen()
                 else
                     navigator.onMainOpen()
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 offerEvent(ShowToast(R.string.strange_error))
             }
         }
@@ -234,129 +218,6 @@ class AuthViewModel(
         }
     }
 
-    private fun observeSignUpPassword() = with(viewModelScope) {
-        launch(Dispatchers.Default + SupervisorJob()) {
-            screenState.map { it.currentState }
-                .filterIsInstance<AuthState.SignUpState>()
-                .distinctUntilChanged { lastValue, newValue ->
-                    lastValue.password.password == newValue.password.password
-                }
-                .debounce(DELAY_BETWEEN_CHECKING)
-                .mapLatest {
-                    Validator.validateEmptyField(it.password.password)
-                }
-                .collect {
-                    updateStateOf<AuthState.SignUpState> {
-                        copy(
-                            password = password.copy(error = reduceValidationError(it))
-                        )
-                    }
-                    if (currentScreenState is AuthState.SignInState) {
-                        cancel()
-                    }
-                }
-        }
-    }
-
-    private fun observeSignUpEmail() = with(viewModelScope) {
-        launch(Dispatchers.Default + SupervisorJob()) {
-            screenState.map { it.currentState }
-                .filterIsInstance<AuthState.SignUpState>()
-                .distinctUntilChanged { lastValue, newValue ->
-                    lastValue.email.text == newValue.email.text
-                }
-                .debounce(DELAY_BETWEEN_CHECKING)
-                .mapLatest {
-                    Validator.emailValidator(it.email.text)
-                }
-                .collect {
-                    updateStateOf<AuthState.SignUpState> {
-                        copy(
-                            email = email.copy(error = reduceValidationError(it))
-                        )
-                    }
-                    if (currentScreenState is AuthState.SignInState) {
-                        cancel()
-                    }
-                }
-        }
-    }
-
-    private fun observeSignUpFirstName() = with(viewModelScope) {
-        launch(Dispatchers.Default + SupervisorJob()) {
-            screenState.map { it.currentState }
-                .filterIsInstance<AuthState.SignUpState>()
-                .distinctUntilChanged { lastValue, newValue ->
-                    lastValue.firstName.text == newValue.firstName.text
-                }
-                .debounce(DELAY_BETWEEN_CHECKING)
-                .mapLatest {
-                    Validator.firstNameValidator(it.firstName.text)
-                }
-                .collect {
-                    updateStateOf<AuthState.SignUpState> {
-                        copy(
-                            firstName = firstName.copy(error = reduceValidationError(it))
-                        )
-                    }
-                    if (currentScreenState is AuthState.SignInState) {
-                        cancel()
-                    }
-                }
-        }
-    }
-
-    private fun observeSignUpLastName() = with(viewModelScope) {
-        launch(Dispatchers.Default + SupervisorJob()) {
-            screenState.map { it.currentState }
-                .filterIsInstance<AuthState.SignUpState>()
-                .distinctUntilChanged { lastValue, newValue ->
-                    lastValue.lastName.text == newValue.lastName.text
-                }
-                .debounce(DELAY_BETWEEN_CHECKING)
-                .mapLatest {
-                    Validator.lastNameValidator(it.lastName.text)
-                }
-                .collect {
-                    updateStateOf<AuthState.SignUpState> {
-                        copy(
-                            lastName = lastName.copy(error = reduceValidationError(it))
-                        )
-                    }
-                    if (currentScreenState is AuthState.SignInState) {
-                        cancel()
-                    }
-                }
-        }
-    }
-
-    private fun observeSignUpRepeatPassword() = with(viewModelScope) {
-        launch(Dispatchers.Default + SupervisorJob()) {
-            screenState.map { it.currentState }
-                .filterIsInstance<AuthState.SignUpState>()
-                .distinctUntilChanged { lastValue, newValue ->
-                    lastValue.repeatPassword.password == newValue.repeatPassword.password
-                }
-                .debounce(DELAY_BETWEEN_CHECKING)
-                .mapLatest {
-                    Validator.validateEmptyField(it.repeatPassword.password)
-                        ?: Validator.validateRepeatPassword(
-                            it.password.password,
-                            it.repeatPassword.password
-                        )
-                }
-                .collect {
-                    updateStateOf<AuthState.SignUpState> {
-                        copy(
-                            repeatPassword = repeatPassword.copy(error = reduceValidationError(it))
-                        )
-                    }
-                    if (currentScreenState is AuthState.SignInState) {
-                        cancel()
-                    }
-                }
-        }
-    }
 
     private fun observeSignUpState() = with(viewModelScope) {
         launch(Dispatchers.Default + SupervisorJob()) {
@@ -407,6 +268,5 @@ class AuthViewModel(
     private companion object {
 
         const val TAG = "AuthViewModel"
-        const val DELAY_BETWEEN_CHECKING = 1000L
     }
 }

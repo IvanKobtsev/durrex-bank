@@ -8,11 +8,12 @@ import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.binding
 import dev.zacsweers.metrox.viewmodel.ViewModelKey
-import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.supervisorScope
 import nekit.corporation.architecture.presentation.StatefulViewModel
 import nekit.corporation.create_loan_impl.R
 import nekit.corporation.create_loan_impl.model.AccountUi
@@ -36,44 +37,35 @@ class CreateLoanViewModel(
     private val getTariffsUseCase: GetTariffsUseCase,
     private val accountRepository: AccountRepository,
 ) : StatefulViewModel<CreateLoanState>(), CreateLoanInteractions {
+    private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
+        handleUnknownError()
+        Log.d(TAG, throwable.message.toString())
+    }
+
     init {
-        viewModelScope.launch(Dispatchers.IO) {
-            val accounts = async {
-                fallback(
-                    action = { accountRepository.getAllAccounts() },
-                    onFailure = {
-                        screenEvents.offerEvent(CreateLoanEvents.ShowToast(R.string.error))
-                        Log.d(TAG, "accounts error: ${it.message}")
+        viewModelScope.launch(Dispatchers.IO + exceptionHandler) {
+            supervisorScope {
+                val accounts = async { accountRepository.getAllAccounts() }
+                val tariffs = async { getTariffsUseCase() }
+                runCatching { accounts.await() to tariffs.await() }.onSuccess { (accounts, tariffs) ->
+                    updateState {
+                        copy(
+                            selectedAccount = accounts.firstOrNull()?.toUi(),
+                            selectedTariff = tariffs.firstOrNull(),
+                            accounts = accounts.map { it.toUi() }.toImmutableList(),
+                            tariffs = tariffs.toImmutableList(),
+                            isLoading = false
+                        )
                     }
-                )
-            }
-            val tariffs = async {
-                fallback(
-                    action = { getTariffsUseCase() },
-                    onFailure = {
-                        screenEvents.offerEvent(CreateLoanEvents.ShowToast(R.string.error))
-                        Log.d(TAG, "tariffs error: ${it.message}")
+                }.onFailure {
+                    updateState {
+                        copy(
+                            isFatalError = true,
+                            isLoading = false
+                        )
                     }
-                )
+                }
             }
-            if (accounts.await() == null || tariffs.await() == null)
-                updateState {
-                    copy(
-                        isFatalError = true,
-                        isLoading = false
-                    )
-                }
-            else
-                updateState {
-                    copy(
-                        selectedAccount = accounts.await()?.firstOrNull()?.toUi(),
-                        selectedTariff = tariffs.await()?.firstOrNull(),
-                        accounts = accounts.await()?.map { it.toUi() }?.toImmutableList()
-                            ?: persistentListOf(),
-                        tariffs = tariffs.await()?.toImmutableList() ?: persistentListOf(),
-                        isLoading = false
-                    )
-                }
         }
     }
 
@@ -135,6 +127,10 @@ class CreateLoanViewModel(
         updateState {
             copy(amount = amount.toDouble())
         }
+    }
+
+    private fun handleUnknownError() {
+        offerEvent(CreateLoanEvents.ShowToast(R.string.error))
     }
 
     companion object {

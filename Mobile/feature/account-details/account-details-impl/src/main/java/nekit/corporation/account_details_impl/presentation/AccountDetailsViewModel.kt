@@ -8,33 +8,31 @@ import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.binding
 import dev.zacsweers.metrox.viewmodel.ViewModelKey
-import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.supervisorScope
 import nekit.corporation.account_details_impl.R
 import nekit.corporation.account_details_impl.navigation.AccountDetailsNavigator
+import nekit.corporation.account_details_impl.presentation.model.AccountDetailsEvent
+import nekit.corporation.account_details_impl.presentation.model.AccountDetailsInteractions
+import nekit.corporation.account_details_impl.presentation.model.AccountDetailsState
 import nekit.corporation.architecture.presentation.StatefulViewModel
 import nekit.corporation.loan_shared.domain.model.Debit
 import nekit.corporation.loan_shared.domain.model.Deposit
 import nekit.corporation.loan_shared.domain.model.Transaction
 import nekit.corporation.loan_shared.domain.model.TransactionTypeDomain
 import nekit.corporation.loan_shared.domain.repository.AccountRepository
-import nekit.corporation.presentation.model.AccountDetailsEvent.*
-import nekit.corporation.account_details_impl.presentation.model.AccountDetailsInteractions
-import nekit.corporation.account_details_impl.presentation.model.AccountDetailsState
-import nekit.corporation.user.data.model.UpdateHiddenAccountsDto
+import nekit.corporation.account_details_impl.presentation.model.AccountDetailsEvent.ShowToast
 import nekit.corporation.user.domain.usecase.GetSettingsUseCase
 import nekit.corporation.user.domain.usecase.UpdateHiddenIdsUseCase
-import nekit.corporation.util.domain.common.BadRequestFailure
 import nekit.corporation.util.domain.common.CommonBackendFailure
 import nekit.corporation.util.domain.common.ForbiddenFailure
 import nekit.corporation.util.domain.common.NoConnectionFailure
 import nekit.corporation.util.domain.common.NotFoundFailure
-import nekit.corporation.util.domain.common.ServerFailure
-import nekit.corporation.util.domain.common.UnknownFailure
 
 @Inject
 @ViewModelKey(AccountDetailsViewModel::class)
@@ -52,56 +50,74 @@ class AccountDetailsViewModel(
         return AccountDetailsState.Loading
     }
 
-    fun init(id: Int) {
-        viewModelScope.launch(Dispatchers.IO) {
+    private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
+        if (throwable is CommonBackendFailure) {
+            handleError(throwable)
+        } else {
+            handleUnknownError(throwable)
+        }
+        Log.d(TAG, throwable.message.toString())
+    }
 
-            val accounts = async {
-                fallback(
-                    { accountRepository.getAllAccounts() },
-                    { reduceError { throw it } })
+    fun init(id: Int) {
+        viewModelScope.launch(Dispatchers.IO + exceptionHandler) {
+            try {
+                loadAccountDetails(id)
+            } finally {
+                updateStateOf<AccountDetailsState.Content> {
+                    copy(isLoading = false)
+                }
             }
-            val transactions = async {
-                fallback(
-                    { accountRepository.getTransactions(id) },
-                    { reduceError { throw it } })
-            }
-            val account = accounts.await()?.first { it.id == id }
-            val settings = async {
-                fallback(
-                    { getSettingsUseCase() },
-                    { reduceError { throw it } }
-                )
-            }.await()
-            if (account != null && settings != null)
-                updateState {
-                    AccountDetailsState.Content(
+            observeTransactionUpdates(id)
+        }
+    }
+
+    private suspend fun loadAccountDetails(id: Int) = supervisorScope {
+        updateState { AccountDetailsState.Content.default }
+        val accountDeferred = async { accountRepository.getAccount(id) }
+        val transactionsDeferred = async { accountRepository.getTransactions(id) }
+        val settingsDeferred = async { getSettingsUseCase() }
+
+        listOf(
+            launch {
+                val account = accountDeferred.await()
+                updateStateOf<AccountDetailsState.Content> {
+                    copy(
                         account = account,
-                        isApplyButtonEnable = false,
-                        sum = "",
-                        selectedOperation = TransactionTypeDomain.Debit,
-                        isOperationTypeOpen = false,
-                        isLoading = false,
-                        transactions = transactions.await()?.toImmutableList()
-                            ?: persistentListOf(),
-                        isDeleteCan = account.balance == 0.0,
+                        isDeleteCan = account.balance == 0.0
+                    )
+                }
+            },
+            launch {
+                val transactions = transactionsDeferred.await()
+                updateStateOf<AccountDetailsState.Content> {
+                    copy(
+                        transactions = transactions.toImmutableList()
+                    )
+                }
+            },
+            launch {
+                val settings = settingsDeferred.await()
+                val account = accountDeferred.await()
+                updateStateOf<AccountDetailsState.Content> {
+                    copy(
                         isHidden = settings.hiddenAccountIds.contains(account.id)
                     )
                 }
-        }
-        viewModelScope.launch {
-            accountRepository.getTransactionHubEvents(accountId = id).collect {
-                Log.d(TAG, "updated")
-                async {
-                    fallback(
-                        { accountRepository.getTransactions(id) },
-                        { reduceError { throw it } })
-                }.await()?.let {
-                    updateStateOf<AccountDetailsState.Content> {
-                        copy(
-                            transactions = it.toImmutableList()
-                        )
-                    }
-                }
+            }
+        ).joinAll()
+
+
+    }
+
+    private suspend fun observeTransactionUpdates(id: Int) {
+        accountRepository.getTransactionHubEvents(accountId = id).collect {
+            Log.d(TAG, "updated")
+            val transactions = accountRepository.getTransactions(id)
+            updateStateOf<AccountDetailsState.Content> {
+                copy(
+                    transactions = transactions.toImmutableList()
+                )
             }
         }
     }
@@ -109,30 +125,32 @@ class AccountDetailsViewModel(
     override fun onBack() = navigator.back()
 
     override fun onApplyClick() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(Dispatchers.IO + exceptionHandler) {
             val currentState =
                 currentScreenState as? AccountDetailsState.Content ?: return@launch
 
             updateStateOf<AccountDetailsState.Content> { copy(isLoading = true) }
 
-            safeCall {
-                when (currentState.selectedOperation) {
-                    TransactionTypeDomain.Deposit -> {
+            when (currentState.selectedOperation) {
+                TransactionTypeDomain.Deposit -> {
+                    currentState.account?.id?.let {
                         accountRepository.deposit(
-                            currentState.account.id,
+                            it,
                             Deposit(amount = currentState.sum.toDouble(), description = null)
                         )
                     }
+                }
 
-                    TransactionTypeDomain.Debit -> {
+                TransactionTypeDomain.Debit -> {
+                    currentState.account?.id?.let {
                         accountRepository.debit(
-                            currentState.account.id,
+                            it,
                             Debit(amount = currentState.sum.toDouble(), description = null)
                         )
                     }
-
-                    else -> Unit
                 }
+
+                else -> Unit
             }
 
             updateStateOf<AccountDetailsState.Content> { copy(isLoading = false) }
@@ -143,7 +161,7 @@ class AccountDetailsViewModel(
         updateStateOf<AccountDetailsState.Content> {
             val isApplyEnabled =
                 sum.isNotEmpty() && (
-                        (sum.toDouble() <= account.balance && selectedOperation == TransactionTypeDomain.Debit) ||
+                        (account?.balance != null && sum.toDouble() <= account.balance && selectedOperation == TransactionTypeDomain.Debit) ||
                                 selectedOperation != TransactionTypeDomain.Debit
                         )
             copy(sum = sum, isApplyButtonEnable = isApplyEnabled)
@@ -151,16 +169,11 @@ class AccountDetailsViewModel(
     }
 
     override fun onDeleteClick() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(Dispatchers.IO + exceptionHandler) {
             updateStateOf<AccountDetailsState.Content> { copy(isLoading = true) }
-
-            val result = safeCall {
-                accountRepository.closeAccount(
-                    (currentScreenState as? AccountDetailsState.Content)?.account?.id
-                        ?: return@safeCall
-                )
+            val result = (currentScreenState as? AccountDetailsState.Content)?.account?.id?.let {
+                accountRepository.closeAccount(it)
             }
-
             if (result != null) {
                 navigator.back()
             } else {
@@ -170,39 +183,42 @@ class AccountDetailsViewModel(
     }
 
     override fun onHide() {
-        viewModelScope.launch {
-            updateStateOf<AccountDetailsState.Content> {
-                copy(isLoading = true)
-            }
-            val state = currentScreenState
-
-            fallback(
-                {
-                    if (state is AccountDetailsState.Content && state.isHidden) {
-                        updateHiddenIdsUseCase(
-                            added = listOf(),
-                            removed = listOf(state.account.id)
-                        )
-                    } else if (state is AccountDetailsState.Content) {
-                        updateHiddenIdsUseCase(
-                            added = listOf(state.account.id),
-                            removed = listOf()
-                        )
-                    } else
-                        updateHiddenIdsUseCase(
-                            added = listOf(),
-                            removed = listOf()
-                        )
-                }, {
-                    handleUnknownError(it)
-                }
-            )?.let {
+        viewModelScope.launch(exceptionHandler) {
+            try {
                 updateStateOf<AccountDetailsState.Content> {
-                    copy(isHidden = it.hiddenAccountIds.contains(account.id))
+                    copy(isLoading = true)
                 }
-            }
-            updateStateOf<AccountDetailsState.Content> {
-                copy(isLoading = false)
+                when (val state = currentScreenState) {
+                    is AccountDetailsState.Content if state.isHidden -> {
+                        Log.d(TAG, "state.account: ${state.account}")
+                        updateHiddenIdsUseCase(
+                            added = listOf(),
+                            removed = state.account?.id?.let { listOf(it) } ?: listOf()
+                        )
+                    }
+
+                    is AccountDetailsState.Content -> {
+                        Log.d(TAG, "state.account1: ${state.account}")
+                        updateHiddenIdsUseCase(
+                            added = state.account?.id?.let { listOf(it) } ?: listOf(),
+                            removed = listOf()
+                        )
+                    }
+
+                    else -> updateHiddenIdsUseCase(
+                        added = listOf(),
+                        removed = listOf()
+                    )
+                }.let {
+                    updateStateOf<AccountDetailsState.Content> {
+                        copy(isHidden = it.hiddenAccountIds.contains(account?.id))
+                    }
+                }
+            } finally {
+                updateStateOf<AccountDetailsState.Content> {
+                    copy(isLoading = false)
+                }
+
             }
         }
     }
@@ -210,7 +226,7 @@ class AccountDetailsViewModel(
     override fun onSelectOperation(operation: TransactionTypeDomain) {
         updateStateOf<AccountDetailsState.Content> {
             val isApplyEnabled = sum.isNotEmpty() && (
-                    (sum.toDouble() <= account.balance && operation == TransactionTypeDomain.Debit) ||
+                    (account?.balance != null && sum.toDouble() <= account.balance && operation == TransactionTypeDomain.Debit) ||
                             operation != TransactionTypeDomain.Debit
                     )
 
@@ -235,44 +251,6 @@ class AccountDetailsViewModel(
 
     override fun onTransactionOpen(transaction: Transaction) {
         navigator.toTransaction(transaction.accountId, transaction.id)
-    }
-
-
-    private suspend fun reduceError(block: suspend () -> Unit) {
-        try {
-            block()
-        } catch (e: CommonBackendFailure) {
-            when (e) {
-                is NoConnectionFailure -> {
-                    offerEvent(ShowToast(R.string.no_connections_error))
-                }
-
-                is NotFoundFailure -> {
-                    offerEvent(ShowToast(R.string.not_found_error))
-                }
-
-                is ServerFailure, is UnknownFailure, is BadRequestFailure ->
-                    offerEvent(ShowToast(R.string.strange_error))
-
-                is ForbiddenFailure -> navigator.toAuth()
-            }
-            Log.d(TAG, "error: ${e.message}")
-        } catch (e: Throwable) {
-            offerEvent(ShowToast(R.string.strange_error))
-            Log.d(TAG, e.message.toString())
-        }
-    }
-
-    private suspend fun <T> safeCall(block: suspend () -> T): T? {
-        return try {
-            block()
-        } catch (e: CommonBackendFailure) {
-            handleError(e)
-            null
-        } catch (e: Throwable) {
-            handleUnknownError(e)
-            null
-        }
     }
 
     private fun handleError(e: CommonBackendFailure) {

@@ -3,6 +3,7 @@ package nekit.corporation.auth.data.datasource.local
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.google.crypto.tink.Aead
@@ -18,7 +19,7 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 @Inject
 @SingleIn(AppScope::class)
 class AuthDataStore(
-    context: Context,
+    private val context: Context,
     private val aead: Aead
 ) : DataStore<TokenLocal> {
     private val Context.authDataStore: DataStore<Preferences> by preferencesDataStore(
@@ -35,6 +36,7 @@ class AuthDataStore(
                 val decrypted = aead.decrypt(ciphertext, null)
                 String(decrypted, Charsets.UTF_8)
             } catch (_: Exception) {
+                clearDataStore()
                 ""
             }
         } ?: ""
@@ -45,6 +47,7 @@ class AuthDataStore(
                 val decrypted = aead.decrypt(ciphertext, null)
                 String(decrypted, Charsets.UTF_8)
             } catch (_: Exception) {
+                clearDataStore()
                 ""
             }
         } ?: ""
@@ -52,14 +55,17 @@ class AuthDataStore(
         TokenLocal(token.ifEmpty { null }, date.ifEmpty { null })
     }
 
+    private suspend fun clearDataStore() {
+        dataStore.edit { it.clear() }
+    }
+
     @OptIn(ExperimentalEncodingApi::class)
     override suspend fun updateData(transform: suspend (TokenLocal) -> TokenLocal): TokenLocal {
         var newTokenLocal: TokenLocal? = null
         return dataStore.updateData { preferences ->
-            // Чтение текущих значений
             val currentToken = try {
                 preferences[tokenKey]?.let { encoded ->
-                    String(aead.decrypt(Base64.decode(encoded, android.util.Base64.NO_WRAP), null), Charsets.UTF_8)
+                    String(aead.decrypt(android.util.Base64.decode(encoded, android.util.Base64.NO_WRAP), null), Charsets.UTF_8)
                 }
             } catch (_: Exception) {
                 null
@@ -67,7 +73,7 @@ class AuthDataStore(
 
             val currentDate = try {
                 preferences[dateKey]?.let { encoded ->
-                    String(aead.decrypt(Base64.decode(encoded, android.util.Base64.NO_WRAP), null), Charsets.UTF_8)
+                    String(aead.decrypt(android.util.Base64.decode(encoded, android.util.Base64.NO_WRAP), null), Charsets.UTF_8)
                 }
             } catch (_: Exception) {
                 null

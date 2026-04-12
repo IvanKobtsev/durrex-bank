@@ -58,16 +58,6 @@ class MainActivity(
         super.attachBaseContext(LocaleManager.getLocalizedContext(newBase))
     }
 
-    override fun applyOverrideConfiguration(overrideConfiguration: Configuration?) {
-        super.applyOverrideConfiguration(
-            overrideConfiguration?.let {
-                val config = Configuration(it)
-                config.setLocale(Locale(LocaleManager.getPersistedLanguage(this)))
-                config
-            }
-        )
-    }
-
     private val ciceroneNavigator by lazy {
         AppNavigator(this, R.id.main_container, supportFragmentManager)
     }
@@ -93,9 +83,8 @@ class MainActivity(
                 }
             }
 
-        if (savedInstanceState == null) {
-            router.newRootScreen(authApi.auth())
-        }
+        router.newRootScreen(authApi.auth())
+
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 themeViewModel.darkTheme.collect { dark ->

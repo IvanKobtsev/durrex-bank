@@ -14,4 +14,5 @@
     <string name="credit_rating">Кредитный рейтинг</string>
     <string name="selected_language">Выбранный язык:</string>
     <string name="selected_theme">Выбранная тема:</string>
+    <string name="profile">Профиль</string>
 </resources>

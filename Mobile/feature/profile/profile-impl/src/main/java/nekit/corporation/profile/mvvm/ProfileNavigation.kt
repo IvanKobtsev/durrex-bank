@@ -1,13 +1,14 @@
 package nekit.corporation.profile.mvvm
 
+import com.github.terrakok.cicerone.Router
 import dev.zacsweers.metro.Inject
-import nekit.corporation.shell_main_api.MainShellApi
-import nekit.corporation.shell_main_api.model.Tab
+import nekit.corporation.auth_api.AuthApi
 
 @Inject
-internal class ProfileNavigation(
-    private val mainShellApi: MainShellApi
+class ProfileNavigation(
+    private val authApi: AuthApi,
+    private val router: Router
 ) {
 
-    fun toMain() = mainShellApi.onTab(Tab.Main)
+    fun toAuth() = router.newRootScreen(authApi.auth())
 }

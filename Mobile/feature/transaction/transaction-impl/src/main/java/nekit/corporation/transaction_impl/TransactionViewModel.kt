@@ -10,6 +10,7 @@ import dev.zacsweers.metro.binding
 import dev.zacsweers.metrox.viewmodel.ViewModelKey
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.async
@@ -42,34 +43,25 @@ class TransactionViewModel(
     private val navigator: TransactionNavigator
 ) : StatefulViewModel<TransactionState>(), TransactionInteractions {
 
+    private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
+        handleUnknownError()
+        Log.d(TAG, throwable.message.toString())
+    }
+
     override fun createInitialState(): TransactionState {
         return TransactionState.DEFAULT
     }
 
     init {
-        viewModelScope.launch(Dispatchers.IO) {
-            val accounts = async {
-                fallback(
-                    action = { getAccountsUseCase() },
-                    onFailure = {
-                        getAccountsUseCase()
-                    }
-                )
-            }
-            val user = async {
-                fallback(
-                    action = { getUserUseCase() },
-                    onFailure = {
-                        screenEvents.offerEvent(TransactionEvents.ShowToast(R.string.strange_error))
-                    }
-                )
-            }
+        viewModelScope.launch(Dispatchers.IO + exceptionHandler) {
+            val accounts = async { getAccountsUseCase() }
+            val user = async { getUserUseCase() }
             updateState {
                 copy(
-                    userAccounts = accounts.await()?.map { it.toUi() }?.toImmutableList()
+                    userAccounts = accounts.await().map { it.toUi() }?.toImmutableList()
                         ?: persistentListOf(),
-                    accountFrom = accounts.await()?.firstOrNull()?.toUi(),
-                    user = user.await()?.toUi()
+                    accountFrom = accounts.await().firstOrNull()?.toUi(),
+                    user = user.await().toUi()
                 )
             }
         }
@@ -170,5 +162,13 @@ class TransactionViewModel(
 
     override fun descriptionChange(text: String) {
         updateState { copy(description = text) }
+    }
+
+    private fun handleUnknownError() {
+        offerEvent(TransactionEvents.ShowToast(R.string.strange_error))
+    }
+
+    private companion object {
+        const val TAG = "TransactionViewModel"
     }
 }

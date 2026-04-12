@@ -16,6 +16,8 @@ import net.openid.appauth.AuthorizationResponse
 import net.openid.appauth.ResponseTypeValues
 import net.openid.appauth.*
 import androidx.core.net.toUri
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
 
 @Inject
 @SingleIn(AppScope::class)
@@ -27,10 +29,9 @@ class AuthManager(
 
     private var authService: AuthorizationService? = null
     private var authState: AuthState = AuthState()
-
+    private var logoutRequest: EndSessionRequest? = null
     fun initialize(onReady: () -> Unit, onError: (Exception) -> Unit) {
         val issuerUri = (mainServerUrl + "auth").toUri()
-        Log.d("AuthManager", "Fetching discovery from $issuerUri")
         AuthorizationServiceConfiguration.fetchFromIssuer(issuerUri) { config, ex ->
             if (config != null) {
                 authState = AuthState(config)
@@ -38,26 +39,38 @@ class AuthManager(
                     .setSkipIssuerHttpsCheck(true)
                     .build()
                 authService = AuthorizationService(context, appAuthConfig)
-                Log.d("AuthManager", "Discovery successful")
                 onReady()
+
             } else {
-                Log.e("AuthManager", "Discovery failed", ex)
                 onError(ex ?: Exception("Discovery failed"))
             }
+        }
+    }
+
+    @Synchronized
+    fun logoutIntent(): Intent? {
+        val config = authState.authorizationServiceConfiguration ?: return null
+        if (logoutRequest == null) {
+            logoutRequest = EndSessionRequest.Builder(config)
+                .setIdTokenHint(authState.idToken)
+                .setPostLogoutRedirectUri(AuthConfig.REDIRECT_URI.toUri())
+                .build()
+        }
+        Log.d(TAG, "logoutRequest: ${logoutRequest?.toUri()}")
+        return logoutRequest?.let {
+            authService?.getEndSessionRequestIntent(it)
         }
     }
 
     fun buildLoginIntent(): Intent? {
         val config = authState.authorizationServiceConfiguration ?: return null
         val service = authService ?: return null
-        val appAuthConfig = AppAuthConfiguration.Builder()
-            .setSkipIssuerHttpsCheck(true)
-            .build()
+
         val request = AuthorizationRequest.Builder(
             config,
             AuthConfig.CLIENT_ID,
             ResponseTypeValues.CODE,
-            Uri.parse(AuthConfig.REDIRECT_URI)
+            AuthConfig.REDIRECT_URI.toUri()
         )
             .setScope(AuthConfig.SCOPE)
             .build()
@@ -77,7 +90,6 @@ class AuthManager(
 
         val service = authService
         if (response != null && service != null) {
-            // Exchange authorization code for tokens
             service.performTokenRequest(response.createTokenExchangeRequest()) { tokenResponse, tokenEx ->
                 authState.update(tokenResponse, tokenEx)
 
@@ -96,19 +108,7 @@ class AuthManager(
         }
     }
 
-
-    fun getFreshToken(onToken: (String) -> Unit, onError: (Exception) -> Unit) {
-        val service = authService
-        if (service == null) {
-            onError(Exception("Auth service not initialized"))
-            return
-        }
-        authState.performActionWithFreshTokens(service) { accessToken, _, ex ->
-            if (accessToken != null) {
-                onToken(accessToken)
-            } else {
-                onError(ex ?: Exception("Could not refresh token"))
-            }
-        }
+    private companion object {
+        private const val TAG = "AuthManager"
     }
 }

@@ -8,7 +8,5 @@ sealed interface AuthEvent : Event {
 
     data class ShowToast(@param:StringRes val stringResId: Int) : AuthEvent
 
-    class ChangeTheme(val isDark: Boolean) : AuthEvent
-
     data class OpenLogin(val intent: Intent) : AuthEvent
 }

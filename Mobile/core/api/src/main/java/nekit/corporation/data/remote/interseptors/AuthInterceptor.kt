@@ -25,11 +25,11 @@ class AuthInterceptor @Inject constructor(
 
         runBlocking(Dispatchers.IO) {
             val token = repository.getToken()?.token
-            Log.d("AuthInterceptor", "Token: $token")
+            Log.d(TAG, "Token: $token")
             if (token != null) {
                 requestBuilder.addHeader("Authorization", "Bearer $token")
             } else {
-                Log.d("AuthInterceptor", "Token is null, header not added")
+                Log.d(TAG, "Token is null, header not added")
             }
         }
 
@@ -42,4 +42,8 @@ class AuthInterceptor @Inject constructor(
         requestWithHeaders: Request
     ): Response =
         chain.proceed(requestWithHeaders)
+
+    companion object{
+        private const val TAG = "AuthInterceptor"
+    }
 }

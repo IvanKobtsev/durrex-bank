@@ -9,16 +9,18 @@ data class ProfileState(
     val account: AccountModel?,
     val settings: SettingsUi?,
     val isSchemeOpen: Boolean,
-    val isLanguageOpen: Boolean
-) : ScreenState{
+    val isLanguageOpen: Boolean,
+    val isTechnicBreak: Boolean,
+) : ScreenState {
 
-    companion object{
+    companion object {
         val DEFAULT = ProfileState(
             isLoading = true,
             account = null,
             settings = null,
             isSchemeOpen = false,
-            isLanguageOpen = false
+            isLanguageOpen = false,
+            isTechnicBreak = false
         )
     }
 }

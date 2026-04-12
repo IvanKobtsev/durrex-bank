@@ -37,7 +37,6 @@ class AuthFragment(
 
 
     private val viewModel by viewModels<AuthViewModel>()
-    private val themeViewModel: ThemeViewModel by activityViewModels()
 
     private val loginLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -70,17 +69,12 @@ class AuthFragment(
 
                 },
                 onError = { error ->
-                    Log.e("Auth", "Discovery failed", error)
+                    Log.e(TAG, "Discovery failed", error)
                 }
             )
             viewModel.screenEvents.collect {
                 if (it is AuthEvent) {
                     when (it) {
-                        is AuthEvent.ChangeTheme -> {
-                            Log.d("RAGGG", "THEME CHANGET ${it.isDark}")
-                            themeViewModel.setTheme(it.isDark)
-                        }
-
                         is AuthEvent.OpenLogin -> loginLauncher.launch(it.intent)
 
                         is AuthEvent.ShowToast -> Toast.makeText(
@@ -92,6 +86,7 @@ class AuthFragment(
                 }
             }
         }
+
         return ComposeView(requireContext()).apply {
             setContent {
 
@@ -100,5 +95,9 @@ class AuthFragment(
                 }
             }
         }
+    }
+
+    private companion object{
+        private const val TAG = "AuthFragment"
     }
 }

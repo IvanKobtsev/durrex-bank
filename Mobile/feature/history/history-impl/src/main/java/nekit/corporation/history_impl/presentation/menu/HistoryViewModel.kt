@@ -10,6 +10,7 @@ import dev.zacsweers.metro.binding
 import dev.zacsweers.metrox.viewmodel.ViewModelKey
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -31,33 +32,26 @@ class HistoryViewModel(
     private val accountRepository: AccountRepository
 ) : StatefulViewModel<MenuState>() {
 
-    init {
-        viewModelScope.launch(Dispatchers.IO) {
+    private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
+        handleUnknownError()
+        Log.d(TAG, throwable.message.toString())
+    }
 
-            fallback(
-                action = {
-                    accountRepository.getAllAccounts()
-                        .map { account ->
-                            async {
-                                runCatching { accountRepository.getTransactions(account.id) }
-                                    .getOrDefault(emptyList())
-                            }
-                        }.awaitAll()
-                        .flatten()
-                        .sortedBy { it.id }
-                },
-                onFailure = { error ->
-                    when (error) {
-                        is NoConnectionFailure -> offerEvent(HistoryEvent.ShowToast(R.string.network_error))
-                        else -> offerEvent(HistoryEvent.ShowToast(R.string.strange_error))
+    init {
+        viewModelScope.launch(Dispatchers.IO + exceptionHandler) {
+            accountRepository.getAllAccounts()
+                .map { account ->
+                    async {
+                        runCatching { accountRepository.getTransactions(account.id) }
+                            .getOrDefault(emptyList())
                     }
-                    Log.d(TAG, "error: ${error.message}")
                 }
-            )?.let {
-                updateState {
-                    copy(transactions = it.toImmutableList())
+                .awaitAll()
+                .flatten()
+                .sortedBy { it.id }
+                .let {
+                    updateState { copy(transactions = it.toImmutableList()) }
                 }
-            }
         }
     }
 
@@ -67,6 +61,11 @@ class HistoryViewModel(
             transactionId
         )
     }
+
+    private fun handleUnknownError() {
+        offerEvent(HistoryEvent.ShowToast(R.string.strange_error))
+    }
+
 
     override fun createInitialState(): MenuState {
         return MenuState(

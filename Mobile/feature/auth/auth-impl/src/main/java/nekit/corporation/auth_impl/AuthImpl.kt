@@ -1,5 +1,6 @@
 package nekit.corporation.auth_impl
 
+import android.content.Intent
 import androidx.lifecycle.ViewModelProvider
 import com.github.terrakok.cicerone.androidx.FragmentScreen
 import dev.zacsweers.metro.AppScope
@@ -12,11 +13,15 @@ import nekit.corporation.auth_impl.presentation.auth.AuthFragment
 @Inject
 @ContributesBinding(AppScope::class)
 class AuthImpl(
-    val viewModelFactory: ViewModelProvider.Factory,
-    private var authManager: AuthManager
+    private val viewModelFactory: ViewModelProvider.Factory,
+    private val authManager: AuthManager
 ) : AuthApi {
 
     override fun auth() = FragmentScreen {
-        AuthFragment(viewModelFactory,authManager)
+        AuthFragment(viewModelFactory, authManager)
+    }
+
+    override fun getLogoutIntent(): Intent? {
+        return authManager.logoutIntent()
     }
 }

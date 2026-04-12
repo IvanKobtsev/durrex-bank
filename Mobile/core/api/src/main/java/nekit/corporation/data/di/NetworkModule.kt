@@ -13,8 +13,10 @@ import nekit.corporation.data.remote.Network.getHttpClient
 import nekit.corporation.data.remote.interseptors.AuthInterceptor
 import nekit.corporation.data.remote.interseptors.CircuitBreakerInterceptor
 import nekit.corporation.data.remote.interseptors.NetworkConnectionInterceptor
+import nekit.corporation.data.remote.interseptors.RetryInterceptor
 import nekit.corporation.data.remote.interseptors.StatusCodeInterceptor
 import nekit.corporation.data.remote.interseptors.TokenAuthenticator
+import nekit.corporation.data.remote.interseptors.TraceIdInterceptor
 import nekit.corporation.data.remote.serializer.InstantSerializer
 import nekit.corporation.data.remote.serializer.OffsetDateTimeSerializer
 import nekit.corporation.loan_shared.data.datasource.remote.api.AccountsApi
@@ -55,10 +57,14 @@ interface NetworkModule {
         circuitBreakerInterceptor: CircuitBreakerInterceptor,
         authenticator: TokenAuthenticator,
         authInterceptor: AuthInterceptor,
+        retryInterceptor: RetryInterceptor,
+        traceIdInterceptor: TraceIdInterceptor,
         statusCodeInterceptor: StatusCodeInterceptor
     ): OkHttpClient = getHttpClient(
         cache = okHttpCache,
         interceptors = listOf(
+            retryInterceptor,
+            traceIdInterceptor,
             statusCodeInterceptor,
             authInterceptor,
             networkInterceptor,
@@ -72,11 +78,19 @@ interface NetworkModule {
     fun provideClientWithoutInterceptors(
         networkInterceptor: NetworkConnectionInterceptor,
         statusCodeInterceptor: StatusCodeInterceptor,
+        retryInterceptor: RetryInterceptor,
+        traceIdInterceptor: TraceIdInterceptor,
         circuitBreakerInterceptor: CircuitBreakerInterceptor,
         okHttpCache: Cache
     ): OkHttpClient = getHttpClient(
         cache = okHttpCache,
-        interceptors = listOf(networkInterceptor, statusCodeInterceptor, circuitBreakerInterceptor),
+        interceptors = listOf(
+            retryInterceptor,
+            traceIdInterceptor,
+            networkInterceptor,
+            statusCodeInterceptor,
+            circuitBreakerInterceptor
+        ),
     )
 
     @DefaultRetrofit

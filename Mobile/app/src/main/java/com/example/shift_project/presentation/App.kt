@@ -36,14 +36,15 @@ class App : Application(), MetroApplication, Configuration.Provider {
 
     @Inject
     lateinit var getUserUseCase: GetUserUseCase
-
+    init {
+        AeadConfig.register()
+    }
     @Inject
     lateinit var addCrashLogUseCase: AddCrashLogUseCase
 
     override fun onCreate() {
         super.onCreate()
         appGraph.inject(this)
-        AeadConfig.register()
         createNotificationChannels(this)
         INSTANCE = this
         val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()

@@ -1,10 +1,12 @@
 package nekit.corporation.profile
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
@@ -20,6 +22,7 @@ import kotlinx.coroutines.launch
 import nekit.corporation.ThemeViewModel
 import nekit.corporation.common.di.FragmentKey
 import nekit.corporation.profile.compose.ProfileContent
+import nekit.corporation.profile.mvvm.ProfileNavigation
 import nekit.corporation.profile.mvvm.UiEvents
 import nekit.corporation.ui.theme.DurexBankTheme
 
@@ -27,12 +30,21 @@ import nekit.corporation.ui.theme.DurexBankTheme
 @FragmentKey(ProfileFragment::class)
 @Inject
 class ProfileFragment(
-    private val viewModelFactory: ViewModelProvider.Factory
+    private val viewModelFactory: ViewModelProvider.Factory,
+    private val navigation: ProfileNavigation
 ) : Fragment() {
 
     override val defaultViewModelProviderFactory: ViewModelProvider.Factory
         get() = viewModelFactory
 
+    private val logoutLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        result.data?.let { data ->
+            Log.d(TAG, "date: $data")
+            navigation.toAuth()
+        }
+    }
     val viewModel by viewModels<ProfileViewModel>()
     private val themeViewModel: ThemeViewModel by activityViewModels()
     override fun onCreateView(
@@ -40,6 +52,7 @@ class ProfileFragment(
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+
         lifecycleScope.launch {
             viewModel.screenEvents.collect {
                 if (it is UiEvents) {
@@ -53,18 +66,27 @@ class ProfileFragment(
                         }
 
                         UiEvents.ChangeTheme -> themeViewModel.toggleTheme()
+                        is UiEvents.OnLogout -> logoutLauncher.launch(it.intent)
                     }
                 }
             }
         }
         return ComposeView(requireContext()).apply {
             setContent {
-                DurexBankTheme() {
+                DurexBankTheme {
                     val state by viewModel.screenState.collectAsStateWithLifecycle()
                     ProfileContent(state.currentState, viewModel)
                 }
             }
         }
+    }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.init()
+    }
+
+    companion object {
+        private const val TAG = "ProfileFragment"
     }
 }

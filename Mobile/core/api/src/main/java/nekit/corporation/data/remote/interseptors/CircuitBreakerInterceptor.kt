@@ -3,6 +3,7 @@
 package nekit.corporation.data.remote.interseptors
 
 import dev.zacsweers.metro.Inject
+import nekit.corporation.data.remote.model.CircuitBreakerState
 import okhttp3.Interceptor
 import okhttp3.Response
 import java.io.IOException

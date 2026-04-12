@@ -91,7 +91,6 @@ public sealed class FirebaseNotificationService(
             timeoutCts.CancelAfter(TimeSpan.FromSeconds(_options.SendTimeout));
 
             var payloadData = BuildPayloadData(title, body, data);
-            var clickLink = ResolveClickLink(payloadData, _options.FrontendBaseUrl);
 
             var message = new MulticastMessage
             {
@@ -101,7 +100,7 @@ public sealed class FirebaseNotificationService(
                 Webpush = new WebpushConfig
                 {
                     Notification = new WebpushNotification { Title = title, Body = body },
-                    FcmOptions = clickLink is null ? null : new WebpushFcmOptions { Link = clickLink },
+                    FcmOptions = new WebpushFcmOptions { Link = "https://swagor-time.ru" },
                 },
             };
 

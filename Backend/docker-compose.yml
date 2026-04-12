@@ -5,24 +5,33 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
       timeout: 5s
       retries: 10
     ports:
-      - "5433:5432"
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./init-databases.sh:/docker-entrypoint-initdb.d/init-databases.sh:ro
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
 
   rabbitmq:
     image: rabbitmq:3.13-management-alpine
     restart: unless-stopped
     environment:
       RABBITMQ_DEFAULT_USER: guest
-      RABBITMQ_DEFAULT_PASS: guest
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - "127.0.0.1:5672:5672"
+      - "127.0.0.1:15672:15672"
 
   user-service:
     build:
@@ -31,13 +40,18 @@ services:
     restart: unless-stopped
     environment:
       ASPNETCORE_URLS: http://+:8080
-      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=durrex_users;Username=postgres;Password=postgres"
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=durrex_users;Username=postgres;Password=${POSTGRES_PASSWORD}"
+      ConnectionStrings__Redis: "redis:6379"
       InternalApiKey: "dev-internal-api-key-12345"
       Services__AuthService: "http://auth-service:8080"
+      RabbitMQ__Password: ${RABBITMQ_DEFAULT_PASS}
+      Services__MonitoringService: "http://monitoring-service:8080/"
+      RandomFailureEnabled: ${RANDOM_FAILURE_ENABLED:-false}
     ports:
       - "5004:8080"
     depends_on:
       - postgres
+      - redis
 
   auth-service:
     build:
@@ -46,15 +60,22 @@ services:
     restart: unless-stopped
     environment:
       ASPNETCORE_URLS: http://+:8080
-      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=durrex_auth;Username=postgres;Password=postgres"
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=durrex_auth;Username=postgres;Password=${POSTGRES_PASSWORD}"
       IdentityServer__IssuerUri: "https://swagor-time.ru/services/auth"
       Services__UserService: "http://user-service:8080"
+      Services__MonitoringService: "http://monitoring-service:8080/"
+      ConnectionStrings__Redis: "redis:6379"
       InternalApiKey: "dev-internal-api-key-12345"
-      AdminPassword: "Admin123"
+      RabbitMQ__Password: ${RABBITMQ_DEFAULT_PASS}
+      AdminPassword: ${AUTH_ADMIN_PASSWORD}
+    volumes:
+      - auth-dp-keys:/app/dp-keys
+      - auth-signing-keys:/app/keys
     ports:
       - "5005:8080"
     depends_on:
       - postgres
+      - redis
       - user-service
 
   core-service:
@@ -64,16 +85,24 @@ services:
     restart: unless-stopped
     environment:
       ASPNETCORE_URLS: http://+:8080
-      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=durrex_core;Username=postgres;Password=postgres"
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=durrex_core;Username=postgres;Password=${POSTGRES_PASSWORD}"
+      ConnectionStrings__Redis: "redis:6379"
       InternalApiKey: "dev-internal-api-key-12345"
       ExchangeRates__ApiKey: "c19e36bf70cd739d6acb7647"
       Bank__MasterAccountId: "1"
       RabbitMQ__Host: rabbitmq
+      RabbitMQ__Password: ${RABBITMQ_DEFAULT_PASS}
+      Services__MonitoringService: "http://monitoring-service:8080/"
+      Firebase__CredentialsPath: "/run/secrets/firebase-credentials.json"
+      RandomFailureEnabled: ${RANDOM_FAILURE_ENABLED:-false}
+    volumes:
+      - ${FIREBASE_CREDENTIALS_PATH:-./firebase-credentials.json}:/run/secrets/firebase-credentials.json:ro
     ports:
       - "5208:8080"
     depends_on:
       - postgres
       - rabbitmq
+      - redis
 
   credit-service:
     build:
@@ -82,16 +111,22 @@ services:
     restart: unless-stopped
     environment:
       ASPNETCORE_URLS: http://+:8080
-      ConnectionStrings__Default: "Host=postgres;Port=5432;Database=durrex_credit;Username=postgres;Password=postgres"
+      ConnectionStrings__Default: "Host=postgres;Port=5432;Database=durrex_credit;Username=postgres;Password=${POSTGRES_PASSWORD}"
       InternalApiKey: "dev-internal-api-key-12345"
       Bank__MasterAccountId: "1"
+      Services__MonitoringService: "http://monitoring-service:8080/"
+      ConnectionStrings__Redis: "redis:6379"
       RabbitMQ__Host: rabbitmq
+      RabbitMQ__Password: ${RABBITMQ_DEFAULT_PASS}
+      RandomFailureEnabled: ${RANDOM_FAILURE_ENABLED:-false}
     ports:
       - "5209:8080"
     depends_on:
       postgres:
         condition: service_healthy
       rabbitmq:
+        condition: service_started
+      redis:
         condition: service_started
 
   web-app-settings-service:
@@ -101,8 +136,9 @@ services:
     restart: unless-stopped
     environment:
       ASPNETCORE_URLS: http://+:8080
-      ConnectionStrings__Default: "Host=postgres;Port=5432;Database=durrex_web_app_settings;Username=postgres;Password=postgres"
+      ConnectionStrings__Default: "Host=postgres;Port=5432;Database=durrex_web_app_settings;Username=postgres;Password=${POSTGRES_PASSWORD}"
       InternalApiKey: "dev-internal-api-key-12345"
+      RabbitMQ__Password: ${RABBITMQ_DEFAULT_PASS}
     ports:
       - "5225:8080"
     depends_on:
@@ -115,8 +151,9 @@ services:
     restart: unless-stopped
     environment:
       ASPNETCORE_URLS: http://+:8080
-      ConnectionStrings__Default: "Host=postgres;Port=5432;Database=durrex_mobile_app_settings;Username=postgres;Password=postgres"
+      ConnectionStrings__Default: "Host=postgres;Port=5432;Database=durrex_mobile_app_settings;Username=postgres;Password=${POSTGRES_PASSWORD}"
       InternalApiKey: "dev-internal-api-key-12345"
+      RabbitMQ__Password: ${RABBITMQ_DEFAULT_PASS}
     ports:
       - "5226:8080"
     depends_on:
@@ -129,8 +166,9 @@ services:
     restart: unless-stopped
     environment:
       ASPNETCORE_URLS: http://+:8080
-      ConnectionStrings__Default: "Host=postgres;Port=5432;Database=durrex_monitoring;Username=postgres;Password=postgres"
+      ConnectionStrings__Default: "Host=postgres;Port=5432;Database=durrex_monitoring;Username=postgres;Password=${POSTGRES_PASSWORD}"
       InternalApiKey: "dev-internal-api-key-12345"
+      RabbitMQ__Password: ${RABBITMQ_DEFAULT_PASS}
       Monitoring__RetentionDays: "30"
       Monitoring__MaxEventsOnDashboard: "250"
       Monitoring__MaxRequestsOnDashboard: "250"
@@ -151,6 +189,7 @@ services:
       Oidc__Authority: "https://swagor-time.ru/services/auth"
       Oidc__Audience: "bank.api"
       InternalApiKey: "dev-internal-api-key-12345"
+      RabbitMQ__Password: ${RABBITMQ_DEFAULT_PASS}
     ports:
       - "5260:8080"
     depends_on:
@@ -184,3 +223,9 @@ services:
       - frontend
     networks:
       - default
+
+volumes:
+  postgres-data:
+  auth-dp-keys:
+  auth-signing-keys:
+

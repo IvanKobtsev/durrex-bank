@@ -10,4 +10,6 @@ nginx/ssl/
 /Backend/artifacts
 /Backend/MyApp.MonitoringService/artifacts
 /Backend/.idea
+/Backend/.env
 /node_modules
+**/firebase-credentials.json

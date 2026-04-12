@@ -27,7 +27,7 @@ export function UserCreationPage() {
 
       const inviteUrl = (result as any).inviteUrl;
       if (!!inviteUrl) {
-        alert("Ссылка для активации аккаунта: " + inviteUrl);
+        toast.success("Ссылка для активации аккаунта: " + inviteUrl, { autoClose: false });
       }
 
       navigate(AppLinks.Users.link());

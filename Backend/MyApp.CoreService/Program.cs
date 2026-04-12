@@ -9,8 +9,11 @@ using MyApp.CoreService.Hubs;
 using MyApp.CoreService.Infrastructure.Extensions;
 using MyApp.CoreService.Messaging.Consumers;
 using MyApp.CoreService.Messaging.Messages;
+using MyApp.CoreService.Infrastructure;
+using MyApp.CoreService.DTOs;
 using MyApp.CoreService.Middleware;
 using Scalar.AspNetCore;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,6 +53,17 @@ builder.Services.AddScoped<ICurrentUserContext>(sp =>
 });
 
 builder.Services.AddMemoryCache();
+
+builder.Services.AddSingleton<IConnectionMultiplexer>(
+    ConnectionMultiplexer.Connect(
+        builder.Configuration.GetConnectionString("Redis")
+        ?? throw new InvalidOperationException("ConnectionStrings:Redis is not configured.")));
+
+builder.Services.AddHttpClient<MonitoringClient>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["Services:MonitoringService"]!);
+    client.DefaultRequestHeaders.Add("X-Internal-Api-Key", builder.Configuration["InternalApiKey"]!);
+});
 
 if (isTesting)
     builder.Services.AddSingleton<IExchangeRateService, NoOpExchangeRateService>();
@@ -151,6 +165,27 @@ app.UseExceptionHandler(errApp =>
         context.Response.StatusCode = status;
         context.Response.ContentType = "application/json";
         await context.Response.WriteAsJsonAsync(new { error = message });
+
+        if (status >= 500 && ex is not null)
+        {
+            try
+            {
+                var monitoring = context.RequestServices.GetService<MonitoringClient>();
+                if (monitoring is not null)
+                    await monitoring.CaptureErrorAsync(new CaptureErrorEventDto
+                    {
+                        Service = "CoreService",
+                        Level = "Error",
+                        Message = ex.Message,
+                        ExceptionType = ex.GetType().FullName,
+                        StackTrace = ex.StackTrace,
+                        RequestMethod = context.Request.Method,
+                        RequestPath = context.Request.Path,
+                        OccurredAtUtc = DateTimeOffset.UtcNow,
+                    });
+            }
+            catch { /* monitoring errors must not affect the response */ }
+        }
     });
 });
 
@@ -182,6 +217,8 @@ app.MapScalarApiReference();
 
 app.UseHttpsRedirection();
 
+app.UseMiddleware<RandomFailureMiddleware>();
+app.UseMiddleware<IdempotencyMiddleware>();
 app.UseMiddleware<InternalApiKeyMiddleware>();
 
 app.MapHub<TransactionHub>("/hubs/transactions");

@@ -27,6 +27,12 @@ services:
       - "127.0.0.1:5672:5672"
       - "127.0.0.1:15672:15672"
 
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+
   user-service:
     build:
       context: .
@@ -35,13 +41,16 @@ services:
     environment:
       ASPNETCORE_URLS: http://+:8080
       ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=durrex_users;Username=postgres;Password=${POSTGRES_PASSWORD}"
+      ConnectionStrings__Redis: "redis:6379"
       InternalApiKey: "dev-internal-api-key-12345"
       Services__AuthService: "http://auth-service:8080"
       RabbitMQ__Password: ${RABBITMQ_DEFAULT_PASS}
+      Services__MonitoringService: "http://monitoring-service:8080/"
     ports:
       - "5004:8080"
     depends_on:
       - postgres
+      - redis
 
   auth-service:
     build:
@@ -73,16 +82,22 @@ services:
     environment:
       ASPNETCORE_URLS: http://+:8080
       ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=durrex_core;Username=postgres;Password=${POSTGRES_PASSWORD}"
+      ConnectionStrings__Redis: "redis:6379"
       InternalApiKey: "dev-internal-api-key-12345"
       ExchangeRates__ApiKey: "c19e36bf70cd739d6acb7647"
       Bank__MasterAccountId: "1"
       RabbitMQ__Host: rabbitmq
       RabbitMQ__Password: ${RABBITMQ_DEFAULT_PASS}
+      Services__MonitoringService: "http://monitoring-service:8080/"
+      Firebase__CredentialsPath: "/run/secrets/firebase-credentials.json"
+    volumes:
+      - ${FIREBASE_CREDENTIALS_PATH:-./firebase-credentials.json}:/run/secrets/firebase-credentials.json:ro
     ports:
       - "5208:8080"
     depends_on:
       - postgres
       - rabbitmq
+      - redis
 
   credit-service:
     build:

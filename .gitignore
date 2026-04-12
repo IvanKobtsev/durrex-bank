@@ -12,3 +12,4 @@ nginx/ssl/
 /Backend/.idea
 /Backend/.env
 /node_modules
+**/firebase-credentials.json

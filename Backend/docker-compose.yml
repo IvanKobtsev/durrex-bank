@@ -89,6 +89,9 @@ services:
       RabbitMQ__Host: rabbitmq
       RabbitMQ__Password: ${RABBITMQ_DEFAULT_PASS}
       Services__MonitoringService: "http://monitoring-service:8080/"
+      Firebase__CredentialsPath: "/run/secrets/firebase-credentials.json"
+    volumes:
+      - ${FIREBASE_CREDENTIALS_PATH:-./firebase-credentials.json}:/run/secrets/firebase-credentials.json:ro
     ports:
       - "5208:8080"
     depends_on:

@@ -1,6 +1,7 @@
 import { QueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import equal from "fast-deep-equal";
+import { isCircuitBreakerOpen } from "services/axios/circuit-breaker.ts";
 
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -10,10 +11,18 @@ export const queryClient = new QueryClient({
       refetchOnWindowFocus: false,
       throwOnError: true,
       retry(failureCount, error) {
-        if (failureCount >= 3) return false;
-        if (axios.isAxiosError(error) && error.response?.status === 401) {
+        if (isCircuitBreakerOpen()) {
           return false;
         }
+
+        if (failureCount >= 3) return false;
+
+        if (axios.isAxiosError(error)) {
+          if (error.response?.status === 401) {
+            return false;
+          }
+        }
+
         return true;
       },
     },

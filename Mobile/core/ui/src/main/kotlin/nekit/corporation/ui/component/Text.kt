@@ -1,7 +1,10 @@
 package nekit.corporation.ui.component
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
@@ -15,7 +18,7 @@ import kotlinx.collections.immutable.ImmutableList
 import nekit.corporation.ui.theme.LocalAppColors
 import nekit.corporation.ui.theme.Typography
 import nekit.corporation.ui.theme.firaSansFontFamily
-
+import androidx.compose.ui.text.font.Font
 
 @Composable
 fun Caption(
@@ -69,16 +72,21 @@ fun LogoText(text: String, color: Color = LocalAppColors.current.fontPrimary) {
     )
 }
 
+@RequiresApi(Build.VERSION_CODES.Q)
 @Composable
 fun Headline(
     text: String,
     color: Color = LocalAppColors.current.fontPrimary,
     modifier: Modifier = Modifier,
+    font: FontFamily? = null,
+    textAlign: TextAlign = TextAlign.Start,
 ) {
     Text(
         text = text,
         style = Typography.headlineMedium,
+        fontFamily = font,
         color = color,
+        textAlign = textAlign,
         modifier = modifier,
     )
 }

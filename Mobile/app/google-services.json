@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "226907763658",
+    "project_id": "durexbank",
+    "storage_bucket": "durexbank.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:226907763658:android:4075a946bfdb7cf9721533",
+        "android_client_info": {
+          "package_name": "com.example.shift_project"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDXxm13uiPN5hM4qrVxe1zAZi-5bveqkhg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

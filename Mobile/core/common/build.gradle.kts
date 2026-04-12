@@ -15,4 +15,6 @@ dependencies {
     api(stack.metro.viewmodel)
     api(stack.metro.viewmodel.compose)
     api(stack.androidx.fragment.ktx)
+    api(stack.androidx.work)
+    implementation(stack.cicerone)
 }

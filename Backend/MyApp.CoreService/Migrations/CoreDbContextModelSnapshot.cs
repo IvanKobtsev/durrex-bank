@@ -240,6 +240,22 @@ namespace MyApp.CoreService.Migrations
                     b.ToTable("accounts", (string)null);
                 });
 
+            modelBuilder.Entity("MyApp.CoreService.Models.FirebaseToken", b =>
+                {
+                    b.Property<string>("Token")
+                        .HasColumnType("text");
+
+                    b.Property<int>("Role")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Token");
+
+                    b.ToTable("FirebaseTokens");
+                });
+
             modelBuilder.Entity("MyApp.CoreService.Models.Transaction", b =>
                 {
                     b.Property<long>("Id")

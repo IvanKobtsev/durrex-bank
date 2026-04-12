@@ -5,17 +5,17 @@ import {
   ToastContainerProps,
   ToastPosition,
   TypeOptions,
-} from 'react-toastify';
-import styles from './Toast.module.scss';
-import 'react-toastify/dist/ReactToastify.css';
-import React from 'react';
-import clsx from 'clsx';
+} from "react-toastify";
+import styles from "./Toast.module.scss";
+import "react-toastify/dist/ReactToastify.css";
+import React from "react";
+import clsx from "clsx";
 
 export const Toast: React.FC<ToastContainerProps> = (props) => {
   return (
     <ToastContainer
       {...props}
-      position={'top-center'}
+      position={"top-center"}
       autoClose={5000}
       limit={2}
       closeButton={CloseButton}
@@ -78,12 +78,13 @@ export function getToastClassNameFunc(
 }) => string {
   return (context) =>
     clsx(
-      'Toastify__toast',
+      "Toastify__toast",
       styles.toast,
       {
-        [styles.success]: context?.type === 'success',
-        [styles.error]: context?.type === 'error',
-        [styles.warning]: context?.type === 'warning',
+        [styles.success]: context?.type === "success",
+        [styles.error]: context?.type === "error",
+        [styles.warning]: context?.type === "warning",
+        [styles.info]: context?.type === "info",
       },
       {
         [styles.wideToast]: toastStyle === ToastStyle.Wide,

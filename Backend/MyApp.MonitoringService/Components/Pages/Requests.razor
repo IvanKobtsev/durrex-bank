@@ -77,18 +77,26 @@
                 Server Error
                 <span class="badge text-bg-light ms-1">@CountByLabel("Server Error")</span>
             </button>
+
+            <div class="trace-filter input-group input-group-sm">
+                <span class="input-group-text">Trace ID</span>
+                <input class="form-control"
+                       placeholder="Search Trace ID"
+                       @bind="_traceIdFilter"
+                       @bind:event="oninput" />
+                @if (HasTraceIdFilter)
+                {
+                    <button class="btn btn-outline-secondary" type="button" @onclick="ClearTraceIdFilter">Clear</button>
+                }
+            </div>
         </div>
 
         @if (!FilteredRequests.Any())
         {
             <div class="empty-state card shadow-sm border-0">
                 <div class="card-body">
-                    <h2>@(_filter is null ? "No request traces yet" : $"No \"{_filter}\" traces")</h2>
-                    <p class="text-muted mb-0">
-                        @(_filter is null
-                            ? "As soon as traffic reaches this service, request traces will appear here."
-                            : "Try a different filter or wait for new requests to arrive.")
-                    </p>
+                    <h2>@GetEmptyStateTitle()</h2>
+                    <p class="text-muted mb-0">@GetEmptyStateDescription()</p>
                 </div>
             </div>
         }
@@ -113,9 +121,9 @@
                                     }
                                 </div>
                                 <div class="event-meta text-muted">
+                                    <div><strong>ID:</strong> @item.TraceEntryId</div>
                                     <div><strong>Time:</strong> @item.TimestampUtc.ToLocalTime().ToString("g")</div>
                                     <div><strong>Duration:</strong> @item.DurationMs.ToString("0.##") ms</div>
-                                    <div><strong>Trace:</strong> <code>@(item.TraceId ?? "—")</code></div>
                                 </div>
                             </div>
 
@@ -125,8 +133,8 @@
                                     <div>@(item.UserId ?? "—")</div>
                                 </div>
                                 <div>
-                                    <span class="detail-label">Trace entry id</span>
-                                    <div><code>@item.TraceEntryId</code></div>
+                                    <span class="detail-label">Trace ID</span>
+                                    <div><code>@item.TraceId</code></div>
                                 </div>
                                 <div>
                                     <span class="detail-label">User Agent</span>
@@ -154,17 +162,54 @@
     private MonitoringRequestSnapshot? _snapshot;
     private string? _loadError;
     private string? _filter;
+    private string? _traceIdFilter;
     private HubConnection? _hubConnection;
 
-    private IEnumerable<MonitoringRequestListItem> FilteredRequests =>
-        _filter is null
-            ? _snapshot!.Requests
-            : _snapshot!.Requests.Where(r => r.StatusLabel == _filter);
+    private bool HasTraceIdFilter => !string.IsNullOrWhiteSpace(_traceIdFilter);
+
+    private IEnumerable<MonitoringRequestListItem> FilteredRequests
+    {
+        get
+        {
+            var requests = _snapshot?.Requests.AsEnumerable() ?? Enumerable.Empty<MonitoringRequestListItem>();
+
+            if (!string.IsNullOrWhiteSpace(_filter))
+                requests = requests.Where(r => r.StatusLabel == _filter);
+
+            if (HasTraceIdFilter)
+            {
+                var traceFilter = _traceIdFilter!.Trim();
+                requests = requests.Where(r =>
+                    !string.IsNullOrWhiteSpace(r.TraceId)
+                    && r.TraceId.Contains(traceFilter, StringComparison.OrdinalIgnoreCase));
+            }
+
+            return requests;
+        }
+    }
 
     private int CountByLabel(string label) =>
         _snapshot?.Requests.Count(r => r.StatusLabel == label) ?? 0;
 
     private void SetFilter(string? filter) => _filter = filter;
+
+    private void ClearTraceIdFilter() => _traceIdFilter = null;
+
+    private string GetEmptyStateTitle()
+    {
+        if (_filter is null && !HasTraceIdFilter)
+            return "No request traces yet";
+
+        return "No matching request traces";
+    }
+
+    private string GetEmptyStateDescription()
+    {
+        if (_filter is null && !HasTraceIdFilter)
+            return "As soon as traffic reaches this service, request traces will appear here.";
+
+        return "Try a different status or Trace ID filter, or wait for new requests to arrive.";
+    }
 
     protected override async Task OnInitializedAsync()
     {

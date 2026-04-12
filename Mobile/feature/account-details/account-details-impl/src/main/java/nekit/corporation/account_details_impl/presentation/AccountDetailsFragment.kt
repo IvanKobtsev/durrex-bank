@@ -14,7 +14,7 @@ import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
 import nekit.corporation.account_details_impl.ui.AccountDetailsScreen
-import nekit.corporation.common.FragmentKey
+import nekit.corporation.common.di.FragmentKey
 import nekit.corporation.ui.theme.DurexBankTheme
 import kotlin.getValue
 

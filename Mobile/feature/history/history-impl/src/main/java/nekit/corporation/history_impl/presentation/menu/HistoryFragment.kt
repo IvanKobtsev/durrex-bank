@@ -14,7 +14,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
-import nekit.corporation.common.FragmentKey
+import nekit.corporation.common.di.FragmentKey
 import nekit.corporation.history_impl.presentation.menu.mvvm.HistoryEvent
 import nekit.corporation.history_impl.ui.HistoryScreen
 import nekit.corporation.ui.theme.DurexBankTheme

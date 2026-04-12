@@ -6,7 +6,6 @@ import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesTo
 import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
-import nekit.corporation.common.MainBottomNav
 import nekit.corporation.shell_main_api.MainShellApi
 import nekit.corporation.shell_main_impl.navigation.MainBottomBarRouter
 import nekit.corporation.shell_main_impl.presentation.ShellMainHostFragment

@@ -3,10 +3,7 @@ import {
   CreateUserRequest,
   CreateUserRequestRole,
 } from "services/user-api/user-api-client.types.ts";
-import {
-  registerPassword,
-  registerString,
-} from "helpers/form/register-helpers.ts";
+import { registerString } from "helpers/form/register-helpers.ts";
 import { toast } from "react-toastify";
 import { useUsersPOSTMutation } from "services/user-api/user-api-client/Query.ts";
 import { Input } from "components/uikit/inputs/Input";
@@ -25,8 +22,14 @@ export function UserCreationPage() {
     onError: () => {
       toast.error("Не удалось создать пользователя.");
     },
-    onSuccess: () => {
+    onSuccess: (result) => {
       toast.success("Пользователь успешно создан.");
+
+      const inviteUrl = (result as any).inviteUrl;
+      if (!!inviteUrl) {
+        toast.success("Ссылка для активации аккаунта: " + inviteUrl, { autoClose: false });
+      }
+
       navigate(AppLinks.Users.link());
     },
   });

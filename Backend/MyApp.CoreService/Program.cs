@@ -6,6 +6,7 @@ using MyApp.CoreService.Auth;
 using MyApp.CoreService.Data;
 using MyApp.CoreService.ExchangeRates;
 using MyApp.CoreService.Hubs;
+using MyApp.CoreService.Infrastructure.Extensions;
 using MyApp.CoreService.Messaging.Consumers;
 using MyApp.CoreService.Messaging.Messages;
 using MyApp.CoreService.Infrastructure;
@@ -22,10 +23,10 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 builder.Services.AddDbContext<CoreDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
+);
 
-builder.Services.AddMediatR(cfg =>
-    cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUserContext>(sp =>
@@ -47,7 +48,7 @@ builder.Services.AddScoped<ICurrentUserContext>(sp =>
     return new CurrentUserContext
     {
         UserId = int.TryParse(userIdHeader, out var id) ? id : null,
-        Role = role
+        Role = role,
     };
 });
 
@@ -75,6 +76,10 @@ if (!isTesting)
 builder.Services.AddSignalR();
 builder.Services.AddSingleton<IUserIdProvider, HeaderUserIdProvider>();
 
+// Add Firebase services with modern configuration
+if (!isTesting)
+    builder.Services.AddFirebaseServices(builder.Configuration);
+
 builder.Services.AddMassTransit(x =>
 {
     if (!isTesting)
@@ -92,34 +97,44 @@ builder.Services.AddMassTransit(x =>
 
     if (isTesting)
     {
-        x.UsingInMemory((context, cfg) =>
-        {
-            cfg.ConfigureEndpoints(context);
-        });
+        x.UsingInMemory(
+            (context, cfg) =>
+            {
+                cfg.ConfigureEndpoints(context);
+            }
+        );
     }
     else
     {
-        x.UsingRabbitMq((ctx, cfg) =>
-        {
-            var host = builder.Configuration["RabbitMQ:Host"] ?? "localhost";
-            var vhost = builder.Configuration["RabbitMQ:VirtualHost"] ?? "/";
-            var user = builder.Configuration["RabbitMQ:Username"] ?? "guest";
-            var pass = builder.Configuration["RabbitMQ:Password"] ?? "guest";
-
-            cfg.Host(host, vhost, h =>
+        x.UsingRabbitMq(
+            (ctx, cfg) =>
             {
-                h.Username(user);
-                h.Password(pass);
-            });
+                var host = builder.Configuration["RabbitMQ:Host"] ?? "localhost";
+                var vhost = builder.Configuration["RabbitMQ:VirtualHost"] ?? "/";
+                var user = builder.Configuration["RabbitMQ:Username"] ?? "guest";
+                var pass = builder.Configuration["RabbitMQ:Password"] ?? "guest";
 
-            cfg.UseMessageRetry(r => r.Intervals(
-                TimeSpan.FromSeconds(1),
-                TimeSpan.FromSeconds(5),
-                TimeSpan.FromSeconds(15)
-            ));
+                cfg.Host(
+                    host,
+                    vhost,
+                    h =>
+                    {
+                        h.Username(user);
+                        h.Password(pass);
+                    }
+                );
 
-            cfg.ConfigureEndpoints(ctx);
-        });
+                cfg.UseMessageRetry(r =>
+                    r.Intervals(
+                        TimeSpan.FromSeconds(1),
+                        TimeSpan.FromSeconds(5),
+                        TimeSpan.FromSeconds(15)
+                    )
+                );
+
+                cfg.ConfigureEndpoints(ctx);
+            }
+        );
     }
 });
 
@@ -145,7 +160,7 @@ app.UseExceptionHandler(errApp =>
             InvalidOperationException => (StatusCodes.Status400BadRequest, ex.Message),
             ArgumentException => (StatusCodes.Status400BadRequest, ex.Message),
             RequestFaultException rex => MapRequestFault(rex),
-            _ => (StatusCodes.Status500InternalServerError, "An unexpected error occurred.")
+            _ => (StatusCodes.Status500InternalServerError, "An unexpected error occurred."),
         };
         context.Response.StatusCode = status;
         context.Response.ContentType = "application/json";
@@ -197,11 +212,8 @@ static (int status, string message) MapRequestFault(RequestFaultException rex)
     return (StatusCodes.Status400BadRequest, rex.Message);
 }
 
-// if (app.Environment.IsDevelopment())
-// {
-    app.MapOpenApi();
-    app.MapScalarApiReference();
-// }
+app.MapOpenApi();
+app.MapScalarApiReference();
 
 app.UseHttpsRedirection();
 

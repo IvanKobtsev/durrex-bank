@@ -2,6 +2,20 @@
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
+## Firebase Cloud Messaging
+
+The frontend now subscribes authenticated users to `Backend/MyApp.CoreService` push notifications and handles:
+
+- foreground messages through `react-toastify`
+- background messages through `public/firebase-messaging-sw.js`
+- notification click navigation back into the SPA
+
+Before running locally, create a `.env.local` file from `.env.example` and set:
+
+- `VITE_FIREBASE_VAPID_KEY` — the Web Push certificate key from the Firebase console
+
+The Firebase web config is currently sourced from `src/application/configs.ts`.
+
 Currently, two official plugins are available:
 
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh

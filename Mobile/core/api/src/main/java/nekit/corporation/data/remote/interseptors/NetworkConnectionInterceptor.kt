@@ -29,7 +29,6 @@ class NetworkConnectionInterceptor @Inject constructor(
         }
     }
 
-    @SuppressLint("WrongConstant")
     @RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
     private fun isNetworkAvailable(): Boolean {
         val connectivityManager =

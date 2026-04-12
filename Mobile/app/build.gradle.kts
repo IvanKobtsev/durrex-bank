@@ -4,6 +4,7 @@ plugins {
     alias(stack.plugins.kotlin.serialization)
     alias(stack.plugins.kotlin.ksp)
     alias(stack.plugins.metro)
+    alias(stack.plugins.google.message.service)
 }
 
 android {
@@ -33,7 +34,7 @@ android {
 
     buildFeatures {
         compose = true
-        buildConfig = false
+        buildConfig = true
         viewBinding = true
     }
     packaging {
@@ -48,8 +49,10 @@ android {
 dependencies {
     implementation(projects.components.account)
     implementation(projects.components.authShared)
+    implementation(projects.components.crash)
     implementation(projects.components.languageComponent)
     implementation(projects.components.loan)
+    implementation(projects.components.push)
     implementation(projects.components.onboardingComponent)
     implementation(projects.components.tariff)
     implementation(projects.components.user)
@@ -84,6 +87,9 @@ dependencies {
     implementation(projects.feature.transactionDetails.transactionDetailsImpl)
 
     implementation(stack.lionscribe.libphonenumber)
+
+    implementation(platform(stack.firebase))
+    implementation(stack.firebase.messaging)
 
     implementation(stack.androidx.fragment.ktx)
     implementation(stack.androidx.ui.tooling)

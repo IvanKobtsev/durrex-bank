@@ -138,25 +138,25 @@ app.UseSwagger();
 app.UseSwaggerUI(options =>
 {
     options.SwaggerEndpoint(
-        !app.Environment.IsDevelopment() ? "/services" : "" + "/core/openapi/v1.json",
+        (!app.Environment.IsDevelopment() ? "/services" : "") + "/core/openapi/v1.json",
         "CoreService API"
     );
     options.SwaggerEndpoint(
-        !app.Environment.IsDevelopment() ? "/services" : "" + "/credit/swagger/v1/swagger.json",
+        (!app.Environment.IsDevelopment() ? "/services" : "") + "/credit/swagger/v1/swagger.json",
         "CreditService API"
     );
     options.SwaggerEndpoint(
-        !app.Environment.IsDevelopment() ? "/services" : "" + "/user/swagger/v1/swagger.json",
+        (!app.Environment.IsDevelopment() ? "/services" : "") + "/user/swagger/v1/swagger.json",
         "UserService API"
     );
     options.SwaggerEndpoint(
-        !app.Environment.IsDevelopment() ? "/services" : "" + "/web-app-settings/openapi/v1.json",
+        (!app.Environment.IsDevelopment() ? "/services" : "") + "/web-app-settings/openapi/v1.json",
         "Web App Settings Service API"
     );
     options.SwaggerEndpoint(
-        !app.Environment.IsDevelopment()
+        (!app.Environment.IsDevelopment()
             ? "/services"
-            : "" + "/mobile-app-settings/openapi/v1.json",
+            : "") + "/mobile-app-settings/openapi/v1.json",
         "Mobile App Settings Service API"
     );
     options.RoutePrefix = "swagger";

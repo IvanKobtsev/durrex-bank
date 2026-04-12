@@ -29,6 +29,8 @@ data class AppColors(
     val iconSecondary: Color,
     val iconDisable: Color,
     val iconInvert: Color,
+
+    val isDark: Boolean,
 )
 
 val LightAppColors = AppColors(
@@ -58,6 +60,8 @@ val LightAppColors = AppColors(
     iconSecondary = icon_secondary,
     iconDisable = icon_disable,
     iconInvert = icon_invert,
+
+    isDark = false
 )
 
 val DarkAppColors = AppColors(
@@ -87,4 +91,6 @@ val DarkAppColors = AppColors(
     iconSecondary = dark_icon_secondary,
     iconDisable = dark_icon_disable,
     iconInvert = dark_icon_invert,
+
+    isDark = true
 )

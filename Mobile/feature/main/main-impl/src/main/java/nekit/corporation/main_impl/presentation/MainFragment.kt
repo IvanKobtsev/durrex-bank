@@ -15,7 +15,7 @@ import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesIntoMap
 import dev.zacsweers.metro.Inject
 import nekit.corporation.ThemeViewModel
-import nekit.corporation.common.FragmentKey
+import nekit.corporation.common.di.FragmentKey
 import nekit.corporation.main_impl.ui.MainScreen
 import nekit.corporation.ui.theme.DurexBankTheme
 

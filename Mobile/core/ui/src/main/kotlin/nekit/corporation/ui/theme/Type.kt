@@ -18,6 +18,10 @@ val commonFontFamily = FontFamily(
 val firaSansFontFamily = FontFamily(
     Font(R.font.fira_sans_medium, FontWeight.W500)
 )
+
+val sairaStencilOneFontFamily = FontFamily(
+    Font(R.font.saira_stencil_one_regular)
+)
 val Typography = Typography(
     bodyLarge = TextStyle(
         fontFamily = FontFamily.Default,

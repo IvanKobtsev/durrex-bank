@@ -26,7 +26,9 @@ export const firebaseConfig = {
 };
 
 export const firebaseMessagingOptions = {
-  vapidKey: appEnv.VITE_FIREBASE_VAPID_KEY ?? "",
+  vapidKey:
+    appEnv.VITE_FIREBASE_VAPID_KEY ??
+    "BHFCOnxaDlXaZ7FB3t87-gyOizhLHskP517-yzUeLYTG2oaHbgw81zFA6-WFb1LXuGdrpnN2y21e3nBZNGXC4vY",
   serviceWorkerPath: "/firebase-messaging-sw.js",
 };
 

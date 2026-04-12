@@ -7,8 +7,13 @@ public sealed class IdempotencyMiddleware(RequestDelegate next, IConnectionMulti
 {
     private const string SentinelValue = "__in_progress__";
 
-    private static readonly HashSet<string> MutatingMethods =
-        new(StringComparer.OrdinalIgnoreCase) { "POST", "PUT", "PATCH", "DELETE" };
+    private static readonly HashSet<string> MutatingMethods = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE",
+    };
 
     private sealed record CachedResponse(int StatusCode, string? ContentType, string Body);
 
@@ -20,12 +25,15 @@ public sealed class IdempotencyMiddleware(RequestDelegate next, IConnectionMulti
             return;
         }
 
-        if (!context.Request.Headers.TryGetValue("Idempotency-Key", out var rawKey)
-            || string.IsNullOrWhiteSpace(rawKey))
+        if (
+            !context.Request.Headers.TryGetValue("Idempotency-Key", out var rawKey)
+            || string.IsNullOrWhiteSpace(rawKey)
+        )
         {
             context.Response.StatusCode = StatusCodes.Status422UnprocessableEntity;
             await context.Response.WriteAsJsonAsync(
-                new { error = "Idempotency-Key header is required for mutating requests." });
+                new { error = "Idempotency-Key header is required for mutating requests." }
+            );
             return;
         }
 
@@ -35,13 +43,12 @@ public sealed class IdempotencyMiddleware(RequestDelegate next, IConnectionMulti
 
         var db = redis.GetDatabase();
 
-        // Atomic: SET cacheKey SentinelValue EX 30 NX
-        // Returns true only if the key did not exist — we are the first to claim it.
         var claimed = await db.StringSetAsync(
             cacheKey,
             SentinelValue,
             TimeSpan.FromSeconds(30),
-            When.NotExists);
+            When.NotExists
+        );
 
         if (!claimed)
         {
@@ -49,14 +56,16 @@ public sealed class IdempotencyMiddleware(RequestDelegate next, IConnectionMulti
 
             if (!existing.HasValue || existing == SentinelValue)
             {
-                // Another instance is processing the same key right now
                 context.Response.StatusCode = StatusCodes.Status409Conflict;
                 await context.Response.WriteAsJsonAsync(
-                    new { error = "A request with this Idempotency-Key is already being processed." });
+                    new
+                    {
+                        error = "A request with this Idempotency-Key is already being processed.",
+                    }
+                );
                 return;
             }
 
-            // Found a stored 2xx response — replay it without re-executing the handler
             var hit = JsonSerializer.Deserialize<CachedResponse>((string)existing!);
             if (hit is not null)
             {
@@ -66,11 +75,9 @@ public sealed class IdempotencyMiddleware(RequestDelegate next, IConnectionMulti
                 return;
             }
 
-            // Corrupt entry: delete and let the request proceed as new
             await db.KeyDeleteAsync(cacheKey);
         }
 
-        // We own the sentinel — capture the response body
         var originalBody = context.Response.Body;
         using var buffer = new MemoryStream();
         context.Response.Body = buffer;
@@ -84,14 +91,17 @@ public sealed class IdempotencyMiddleware(RequestDelegate next, IConnectionMulti
 
             if (context.Response.StatusCode is >= 200 and < 300)
             {
-                // Cache only successful responses — non-2xx must remain retryable
                 var entry = JsonSerializer.Serialize(
-                    new CachedResponse(context.Response.StatusCode, context.Response.ContentType, body));
+                    new CachedResponse(
+                        context.Response.StatusCode,
+                        context.Response.ContentType,
+                        body
+                    )
+                );
                 await db.StringSetAsync(cacheKey, entry, TimeSpan.FromHours(24));
             }
             else
             {
-                // Remove sentinel immediately so the client can retry after fixing the problem
                 await db.KeyDeleteAsync(cacheKey);
             }
 
@@ -100,7 +110,6 @@ public sealed class IdempotencyMiddleware(RequestDelegate next, IConnectionMulti
         }
         catch
         {
-            // Remove sentinel on unhandled exception — the upstream error handler will respond
             await db.KeyDeleteAsync(cacheKey);
             throw;
         }

@@ -5,7 +5,7 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
@@ -22,7 +22,7 @@ services:
     restart: unless-stopped
     environment:
       RABBITMQ_DEFAULT_USER: guest
-      RABBITMQ_DEFAULT_PASS: guest
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
     ports:
       - "127.0.0.1:5672:5672"
       - "127.0.0.1:15672:15672"
@@ -34,7 +34,7 @@ services:
     restart: unless-stopped
     environment:
       ASPNETCORE_URLS: http://+:8080
-      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=durrex_users;Username=postgres;Password=postgres"
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=durrex_users;Username=postgres;Password=${POSTGRES_PASSWORD}"
       InternalApiKey: "dev-internal-api-key-12345"
       Services__AuthService: "http://auth-service:8080"
     ports:
@@ -49,11 +49,11 @@ services:
     restart: unless-stopped
     environment:
       ASPNETCORE_URLS: http://+:8080
-      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=durrex_auth;Username=postgres;Password=postgres"
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=durrex_auth;Username=postgres;Password=${POSTGRES_PASSWORD}"
       IdentityServer__IssuerUri: "https://swagor-time.ru/services/auth"
       Services__UserService: "http://user-service:8080"
       InternalApiKey: "dev-internal-api-key-12345"
-      AdminPassword: "Admin123"
+      AdminPassword: ${AUTH_ADMIN_PASSWORD}
     ports:
       - "5005:8080"
     depends_on:
@@ -67,7 +67,7 @@ services:
     restart: unless-stopped
     environment:
       ASPNETCORE_URLS: http://+:8080
-      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=durrex_core;Username=postgres;Password=postgres"
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=durrex_core;Username=postgres;Password=${POSTGRES_PASSWORD}"
       InternalApiKey: "dev-internal-api-key-12345"
       ExchangeRates__ApiKey: "c19e36bf70cd739d6acb7647"
       Bank__MasterAccountId: "1"
@@ -85,7 +85,7 @@ services:
     restart: unless-stopped
     environment:
       ASPNETCORE_URLS: http://+:8080
-      ConnectionStrings__Default: "Host=postgres;Port=5432;Database=durrex_credit;Username=postgres;Password=postgres"
+      ConnectionStrings__Default: "Host=postgres;Port=5432;Database=durrex_credit;Username=postgres;Password=${POSTGRES_PASSWORD}"
       InternalApiKey: "dev-internal-api-key-12345"
       Bank__MasterAccountId: "1"
       RabbitMQ__Host: rabbitmq
@@ -104,7 +104,7 @@ services:
     restart: unless-stopped
     environment:
       ASPNETCORE_URLS: http://+:8080
-      ConnectionStrings__Default: "Host=postgres;Port=5432;Database=durrex_web_app_settings;Username=postgres;Password=postgres"
+      ConnectionStrings__Default: "Host=postgres;Port=5432;Database=durrex_web_app_settings;Username=postgres;Password=${POSTGRES_PASSWORD}"
       InternalApiKey: "dev-internal-api-key-12345"
     ports:
       - "5225:8080"
@@ -118,7 +118,7 @@ services:
     restart: unless-stopped
     environment:
       ASPNETCORE_URLS: http://+:8080
-      ConnectionStrings__Default: "Host=postgres;Port=5432;Database=durrex_mobile_app_settings;Username=postgres;Password=postgres"
+      ConnectionStrings__Default: "Host=postgres;Port=5432;Database=durrex_mobile_app_settings;Username=postgres;Password=${POSTGRES_PASSWORD}"
       InternalApiKey: "dev-internal-api-key-12345"
     ports:
       - "5226:8080"
@@ -132,7 +132,7 @@ services:
     restart: unless-stopped
     environment:
       ASPNETCORE_URLS: http://+:8080
-      ConnectionStrings__Default: "Host=postgres;Port=5432;Database=durrex_monitoring;Username=postgres;Password=postgres"
+      ConnectionStrings__Default: "Host=postgres;Port=5432;Database=durrex_monitoring;Username=postgres;Password=${POSTGRES_PASSWORD}"
       InternalApiKey: "dev-internal-api-key-12345"
       Monitoring__RetentionDays: "30"
       Monitoring__MaxEventsOnDashboard: "250"

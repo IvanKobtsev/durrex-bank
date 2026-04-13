@@ -22,6 +22,7 @@ import nekit.corporation.auth.domain.usecase.GetCredentialsUseCase
 import nekit.corporation.common.di.MainServerUrl
 import nekit.corporation.loan_shared.data.datasource.remote.api.AccountHub
 import nekit.corporation.util.domain.common.ForbiddenFailure
+import java.util.UUID
 
 @Inject
 @SingleIn(AppScope::class)
@@ -33,9 +34,10 @@ class TransactionHub(
 ) : AccountHub, SignalRHub<Unit, Unit>() {
 
     private var currentAccountId: Int? = null
-
+    private val idempotencyKey: String = UUID.randomUUID().toString()
     private val hubConnection: HubConnection = HubConnectionBuilder
         .create("${serverUrl.trimEnd('/')}/$ENDPOINT")
+        .withHeader("Idempotency-Key", idempotencyKey)
         .withAccessTokenProvider(Single.defer {
             rxSingle(exceptionHandler) {
                 val token = getCredentialsUseCase()

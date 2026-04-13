@@ -5,6 +5,7 @@ import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.Inject
 import kotlinx.coroutines.flow.first
 import nekit.corporation.auth.data.datasource.local.AuthDataStore
+import nekit.corporation.auth.data.datasource.local.model.TokenLocal
 import nekit.corporation.auth.data.datasource.remote.AuthApi
 import nekit.corporation.auth.domain.model.Credentials
 import nekit.corporation.auth.domain.model.RegisterModel
@@ -32,6 +33,10 @@ class AuthRepositoryImpl(
 
     override suspend fun getToken(): TokenDto? {
         return authDataStore.data.first().toToken()
+    }
+
+    override suspend fun cleanToken() {
+        authDataStore.updateData { TokenLocal.empty }
     }
 
     override suspend fun saveToken(token: TokenDto) {

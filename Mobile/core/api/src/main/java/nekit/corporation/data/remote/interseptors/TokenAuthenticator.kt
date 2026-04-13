@@ -14,8 +14,13 @@ import okhttp3.Route
 class TokenAuthenticator @Inject constructor(
     private val repository: AuthRepository
 ) : Authenticator {
-
     override fun authenticate(route: Route?, response: Response): Request? {
+        runBlocking {
+            repository.cleanToken()
+        }
+        return null
+    }
+    /*override fun authenticate(route: Route?, response: Response): Request? {
         val accessToken = getRefreshToken(response.request)
         return if (accessToken != null) {
             response.request.newBuilder()
@@ -36,5 +41,5 @@ class TokenAuthenticator @Inject constructor(
         val credentials = repository.getToken()
 
         return@runBlocking credentials?.token
-    }
+    }*/
 }

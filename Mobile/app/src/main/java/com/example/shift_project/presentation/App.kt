@@ -21,6 +21,7 @@ import kotlinx.coroutines.launch
 import nekit.corporation.crash.data.model.fromThrowable
 import nekit.corporation.crash.data.worker.CrashSender
 import nekit.corporation.crash.domain.usecase.AddCrashLogUseCase
+import nekit.corporation.crash.domain.usecase.SendCrashLogsUseCase
 import nekit.corporation.user.domain.usecase.GetUserUseCase
 import java.util.concurrent.TimeUnit
 
@@ -36,11 +37,16 @@ class App : Application(), MetroApplication, Configuration.Provider {
 
     @Inject
     lateinit var getUserUseCase: GetUserUseCase
+
     init {
         AeadConfig.register()
     }
+
     @Inject
     lateinit var addCrashLogUseCase: AddCrashLogUseCase
+
+    @Inject
+    lateinit var sendCrashLogsUseCase: SendCrashLogsUseCase
 
     override fun onCreate() {
         super.onCreate()
@@ -57,8 +63,8 @@ class App : Application(), MetroApplication, Configuration.Provider {
                         threadName = thread.name,
                         userId = getUserUseCase().id
                     )
-
                     addCrashLogUseCase(log)
+                    sendCrashLogsUseCase()
                 }
             } catch (_: Throwable) {
             } finally {

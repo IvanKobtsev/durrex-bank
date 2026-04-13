@@ -12,5 +12,7 @@ interface AuthRepository {
 
     suspend fun getToken(): TokenDto?
 
+    suspend fun cleanToken()
+
     suspend fun saveToken(token: TokenDto)
 }

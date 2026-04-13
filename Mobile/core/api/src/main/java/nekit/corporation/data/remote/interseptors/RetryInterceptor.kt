@@ -6,17 +6,29 @@ import okhttp3.Response
 import java.io.IOException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
+import java.util.UUID
 import java.util.concurrent.TimeUnit
 import kotlin.math.pow
 
 @Inject
-class RetryInterceptor() : Interceptor {
+class RetryInterceptor : Interceptor {
+
     private val maxRetries: Int = 3
     private val baseDelayMs: Long = 300L
 
     override fun intercept(chain: Interceptor.Chain): Response {
+        val originalRequest = chain.request()
 
-        val request = chain.request()
+        val request = if (originalRequest.method.needsIdempotencyKey()) {
+            val key = originalRequest.header("Idempotency-Key")
+                ?: UUID.randomUUID().toString()
+
+            originalRequest.newBuilder()
+                .header("Idempotency-Key", key)
+                .build()
+        } else {
+            originalRequest
+        }
 
         var attempt = 0
         var lastException: IOException? = null
@@ -32,17 +44,14 @@ class RetryInterceptor() : Interceptor {
                 response.close()
             } catch (e: IOException) {
                 lastException = e
-                if (!e.isRetryableException()) {
-                    throw e
-                }
+                if (!e.isRetryableException()) throw e
             }
 
             if (attempt >= maxRetries) {
-                lastException?.let { throw it }
-                throw IOException("Request failed after $maxRetries retries")
+                throw lastException ?: IOException("Request failed after $maxRetries retries")
             }
 
-            val delayMs = baseDelayMs * 2.0.pow(attempt.toDouble()).toLong()
+            val delayMs = (baseDelayMs * 2.0.pow(attempt.toDouble())).toLong()
             Thread.sleep(delayMs)
             attempt++
         }
@@ -54,5 +63,12 @@ class RetryInterceptor() : Interceptor {
 
     private fun IOException.isRetryableException(): Boolean {
         return this is SocketTimeoutException || this is UnknownHostException
+    }
+
+    private fun String.needsIdempotencyKey(): Boolean {
+        return this == "POST" ||
+                this == "PUT" ||
+                this == "DELETE" ||
+                this == "PATCH"
     }
 }

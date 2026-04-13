@@ -47,6 +47,7 @@ class MainViewModel(
             is ForbiddenFailure -> {
                 mainNavigation.openAuth()
             }
+
             else -> {
                 screenEvents.offerEvent(MainEvent.ShowToast(R.string.strange_error))
             }
@@ -129,26 +130,33 @@ class MainViewModel(
             }
             viewModelScope.launch(Dispatchers.IO + exceptionHandler) {
                 supervisorScope {
-                    accountRepository.createAccount(
-                        CreateAccount(state.selectedCurrency.name)
-                    )
-                    accountRepository.getAllAccounts().let {
-                        updateStateOf<MainState.Content> {
-                            copy(
-                                allAccounts = it.toImmutableList(),
-                                accounts = it.filter { account ->
-                                    (if (showHidden)
-                                        hidden.contains(account.id)
-                                    else
-                                        !hidden.contains(account.id)
-                                            ) && account.status == AccountStatus.Open
-                                }.take(10).toImmutableList()
-                            )
+                    launch {
+                        accountRepository.createAccount(
+                            CreateAccount(state.selectedCurrency.name)
+                        )
+                    }.join()
+                    launch {
+                        accountRepository.getAllAccounts().let {
+                            updateStateOf<MainState.Content> {
+                                copy(
+                                    allAccounts = it.toImmutableList(),
+                                    accounts = it.filter { account ->
+                                        (if (showHidden)
+                                            hidden.contains(account.id)
+                                        else
+                                            !hidden.contains(account.id)
+                                                ) && account.status == AccountStatus.Open
+                                    }.take(10).toImmutableList()
+                                )
+                            }
                         }
-                    }
-                    updateStateOf<MainState.Content> {
-                        copy(isLoading = false)
-                    }
+                    }.join()
+
+                    launch {
+                        updateStateOf<MainState.Content> {
+                            copy(isLoading = false)
+                        }
+                    }.join()
                 }
             }
         }

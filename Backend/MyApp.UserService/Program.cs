@@ -87,6 +87,8 @@ builder.Services.AddScoped<ICurrentUserContext>(sp =>
     };
 });
 
+builder.Services.AddTransient<IdempotencyKeyHandler>();
+
 builder.Services.AddHttpClient<AuthServiceClient>(client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["Services:AuthService"]!);
@@ -94,6 +96,7 @@ builder.Services.AddHttpClient<AuthServiceClient>(client =>
         "X-Internal-Api-Key",
         builder.Configuration["InternalApiKey"]!);
 })
+.AddHttpMessageHandler<IdempotencyKeyHandler>()
 .AddStandardResilienceHandler(options =>
 {
     options.Retry.MaxRetryAttempts = 3;
@@ -113,7 +116,8 @@ builder.Services.AddHttpClient<MonitoringClient>(client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["Services:MonitoringService"]!);
     client.DefaultRequestHeaders.Add("X-Internal-Api-Key", builder.Configuration["InternalApiKey"]!);
-});
+})
+.AddHttpMessageHandler<IdempotencyKeyHandler>();
 
 builder.Services.AddScoped<DataSeeder>();
 builder.Services.AddScoped<UserRegistrationService>();

@@ -77,12 +77,15 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(
         builder.Configuration.GetConnectionString("Redis")
         ?? throw new InvalidOperationException("ConnectionStrings:Redis is not configured.")));
 
+builder.Services.AddTransient<IdempotencyKeyHandler>();
+
 // MonitoringClient
 builder.Services.AddHttpClient<MonitoringClient>(client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["Services:MonitoringService"]!);
     client.DefaultRequestHeaders.Add("X-Internal-Api-Key", builder.Configuration["InternalApiKey"]!);
-});
+})
+.AddHttpMessageHandler<IdempotencyKeyHandler>();
 
 builder.Services.AddHostedService<PaymentSchedulerService>();
 

@@ -88,6 +88,8 @@ builder
 
 builder.Services.AddAuthorization();
 
+builder.Services.AddTransient<IdempotencyKeyHandler>();
+
 builder.Services.AddHttpClient(
     RequestTracingMiddleware.MonitoringClientName,
     client =>
@@ -99,7 +101,8 @@ builder.Services.AddHttpClient(
                 ?? throw new InvalidOperationException("InternalApiKey is not configured.")
         );
     }
-);
+)
+.AddHttpMessageHandler<IdempotencyKeyHandler>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

@@ -19,7 +19,7 @@ public sealed class IdempotencyMiddleware(RequestDelegate next, IConnectionMulti
 
     public async Task InvokeAsync(HttpContext context)
     {
-        if (!MutatingMethods.Contains(context.Request.Method))
+        if (!MutatingMethods.Contains(context.Request.Method) || (context.Request.Path.Value ?? "").Contains("hubs"))
         {
             await next(context);
             return;

@@ -45,6 +45,8 @@ builder
     .AddEntityFrameworkStores<AuthDbContext>()
     .AddDefaultTokenProviders();
 
+builder.Services.AddTransient<IdempotencyKeyHandler>();
+
 builder.Services.AddHttpClient<UserServiceClient>(client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["Services:UserService"]!);
@@ -53,6 +55,7 @@ builder.Services.AddHttpClient<UserServiceClient>(client =>
         builder.Configuration["InternalApiKey"]!
     );
 })
+.AddHttpMessageHandler<IdempotencyKeyHandler>()
 .AddStandardResilienceHandler(options =>
 {
     options.Retry.MaxRetryAttempts = 3;
@@ -74,7 +77,8 @@ builder.Services.AddHttpClient<MonitoringClient>(client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["Services:MonitoringService"]!);
     client.DefaultRequestHeaders.Add("X-Internal-Api-Key", builder.Configuration["InternalApiKey"]!);
-});
+})
+.AddHttpMessageHandler<IdempotencyKeyHandler>();
 
 var identityResources =
     builder

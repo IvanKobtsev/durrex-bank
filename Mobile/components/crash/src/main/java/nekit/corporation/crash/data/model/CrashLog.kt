@@ -11,9 +11,11 @@ data class CrashLog(
     val message: String,
     val exceptionType: String,
     val stackTrace: String,
-    val thread: String,
+    val requestMethod: String? = null,
+    val requestPath: String? = null,
     val traceId: String? = null,
-    val userId: Int? = null,
+    val userId: String? = null,
+    val fingerprint: String? = null,
     val occurredAtUtc: String,
     val tags: Map<String, String> = emptyMap(),
     val additionalData: Map<String, String?> = emptyMap()

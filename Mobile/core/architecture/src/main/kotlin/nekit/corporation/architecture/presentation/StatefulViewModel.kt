@@ -31,7 +31,7 @@ abstract class StatefulViewModel<State : ScreenState> : ViewModel() {
 
     @Synchronized
     fun updateState(transform: suspend State.() -> State) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Main) {
             val current = currentScreenState
             val new = transform.invoke(current)
             _screenState.emit(StateChangeUnit(currentState = new))

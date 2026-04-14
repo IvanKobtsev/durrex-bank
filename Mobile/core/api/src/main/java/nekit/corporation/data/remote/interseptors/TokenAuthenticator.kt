@@ -20,26 +20,4 @@ class TokenAuthenticator @Inject constructor(
         }
         return null
     }
-    /*override fun authenticate(route: Route?, response: Response): Request? {
-        val accessToken = getRefreshToken(response.request)
-        return if (accessToken != null) {
-            response.request.newBuilder()
-                .addAuthorizationHeader(accessToken)
-                .build()
-        } else {
-            null
-        }
-    }
-
-    @Synchronized
-    private fun getRefreshToken(request: Request): String? = runBlocking {
-        val token = repository.getToken() ?: return@runBlocking null
-        if (getBearerToken(token.token) != request.getAuthorizationHeader()) {
-            return@runBlocking token.token
-        }
-
-        val credentials = repository.getToken()
-
-        return@runBlocking credentials?.token
-    }*/
 }

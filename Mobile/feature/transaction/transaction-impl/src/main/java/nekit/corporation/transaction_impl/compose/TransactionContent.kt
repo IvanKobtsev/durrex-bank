@@ -46,8 +46,6 @@ fun TransactionContent(state: TransactionState, interactions: TransactionInterac
     val scrollState = rememberScrollState()
     val color = LocalAppColors.current
     Box() {
-        if (state.isLoading)
-            LoadingScreen(modifier = Modifier.fillMaxSize())
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -125,6 +123,8 @@ fun TransactionContent(state: TransactionState, interactions: TransactionInterac
                     .fillMaxWidth()
             )
         }
+        if (state.isLoading)
+            LoadingScreen(modifier = Modifier.fillMaxSize())
     }
 
 }

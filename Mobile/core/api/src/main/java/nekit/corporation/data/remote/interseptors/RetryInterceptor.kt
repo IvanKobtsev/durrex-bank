@@ -7,7 +7,6 @@ import java.io.IOException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import java.util.UUID
-import java.util.concurrent.TimeUnit
 import kotlin.math.pow
 
 @Inject
@@ -31,24 +30,26 @@ class RetryInterceptor : Interceptor {
         }
 
         var attempt = 0
-        var lastException: IOException? = null
+        var lastIOException: IOException? = null
 
         while (true) {
             try {
                 val response = chain.proceed(request)
 
-                if (response.isSuccessful || !response.code.isRetryableStatusCode()) {
+                if (response.isSuccessful) return response
+
+                if (!response.code.isRetryableStatusCode()) {
                     return response
                 }
 
                 response.close()
             } catch (e: IOException) {
-                lastException = e
+                lastIOException = e
                 if (!e.isRetryableException()) throw e
             }
 
             if (attempt >= maxRetries) {
-                throw lastException ?: IOException("Request failed after $maxRetries retries")
+                throw lastIOException ?: IOException("Request failed after $maxRetries retries")
             }
 
             val delayMs = (baseDelayMs * 2.0.pow(attempt.toDouble())).toLong()

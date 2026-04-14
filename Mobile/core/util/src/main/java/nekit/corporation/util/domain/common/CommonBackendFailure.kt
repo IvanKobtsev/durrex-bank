@@ -26,7 +26,7 @@ class NotFoundFailure(
 class ServerFailure(
     message: String? = null,
     cause: Throwable? = null
-) : CommonBackendFailure(message, cause, 500)
+) : RuntimeException(message, cause)
 
 class UnknownFailure(
     message: String? = null,
@@ -43,3 +43,5 @@ class ForbiddenFailure(
     message: String? = null,
     cause: Throwable? = null
 ) : CommonBackendFailure(message, cause, 403)
+
+class CircuitBreakerOpenFailure(message: String?) : RuntimeException(message)

@@ -15,8 +15,12 @@ class MonitoringRepositoryImpl(
     private val monitoringApi: MonitoringApi
 ) : MonitoringRepository {
 
-    override suspend fun sendCrashLogs(logs: List<CrashLog>) {
-        monitoringApi.sendCrashLogs(logs)
+    override suspend fun sendCrashLogs(logs: CrashLog) {
+        monitoringApi.sendCrashLogs(
+            logs.copy(
+                service = "android-app"
+            )
+        )
     }
 
     override suspend fun getLatestCrashLogs(): List<CrashLog> {

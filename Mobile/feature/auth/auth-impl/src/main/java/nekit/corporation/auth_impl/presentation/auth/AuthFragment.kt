@@ -89,7 +89,6 @@ class AuthFragment(
 
         return ComposeView(requireContext()).apply {
             setContent {
-
                 DurexBankTheme {
                     AuthScreen(viewModel)
                 }

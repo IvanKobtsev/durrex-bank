@@ -13,10 +13,12 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import nekit.corporation.architecture.presentation.StatefulViewModel
 import nekit.corporation.loan_shared.data.datasource.remote.model.AccountStatus
+import nekit.corporation.loan_shared.domain.model.Account
 import nekit.corporation.loan_shared.domain.model.CreateAccount
 import nekit.corporation.loan_shared.domain.repository.AccountRepository
 import nekit.corporation.loan_shared.domain.usecase.GetCreditsUseCase
@@ -29,6 +31,7 @@ import nekit.corporation.main_impl.presentation.models.MainViewModelInteraction
 import nekit.corporation.user.domain.model.Scheme
 import nekit.corporation.user.domain.usecase.GetSettingsUseCase
 import nekit.corporation.user.domain.usecase.SaveSettingsUseCase
+import nekit.corporation.util.domain.common.CircuitBreakerOpenFailure
 import nekit.corporation.util.domain.common.ForbiddenFailure
 
 @Inject
@@ -42,72 +45,82 @@ class MainViewModel(
     private val getCreditsUseCase: GetCreditsUseCase,
     private val getSettingsUseCase: GetSettingsUseCase,
 ) : StatefulViewModel<MainState>(), MainViewModelInteraction {
-    private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
-        when (throwable) {
-            is ForbiddenFailure -> {
-                mainNavigation.openAuth()
-            }
 
-            else -> {
-                screenEvents.offerEvent(MainEvent.ShowToast(R.string.strange_error))
-            }
+    private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
+        Log.d(TAG, "throwable: $throwable")
+
+        when (throwable) {
+            is ForbiddenFailure -> mainNavigation.openAuth()
+            is CircuitBreakerOpenFailure -> Log.d(TAG, "break: $throwable")
+            else -> screenEvents.offerEvent(MainEvent.ShowToast(R.string.strange_error))
         }
-        screenEvents.offerEvent(MainEvent.ShowToast(R.string.strange_error))
+        updateState {
+            if (this is MainState.Content) this.copy(isLoading = false)
+            else MainState.Content.default.copy(isLoading = false)
+        }
     }
+
     private var mainTask: Job? = null
 
+    override fun createInitialState(): MainState = MainState.Loading
+
     fun init() {
+        mainTask?.cancel()
         mainTask = viewModelScope.launch(Dispatchers.IO + exceptionHandler) {
-            supervisorScope {
-                val accounts = async { accountRepository.getAllAccounts() }
-                val credits = async { getCreditsUseCase() }
-                val settings = async { getSettingsUseCase() }
-                launch {
-                    val credits = credits.await()
-                    updateState {
-                        with(
-                            when (this) {
-                                is MainState.Content -> this
-                                MainState.Loading -> MainState.Content.default
-                            }
-                        ) {
-                            copy(
-                                credits = credits.take(3).toImmutableList()
-                            )
-                        }
-                    }
-                }
-                launch {
-                    val accounts = accounts.await()
-                    val settings = settings.await()
-                    val allAccountsList = accounts.toImmutableList()
-                    val hiddenIds = settings.hiddenAccountIds.toImmutableList()
-                    val filteredAccounts =
-                        allAccountsList.filter { !hiddenIds.contains(it.id) && it.status == AccountStatus.Open }
-                            .take(10).toImmutableList()
-                    screenEvents.offerEvent(MainEvent.UpdateTheme(settings.theme == Scheme.dark))
-                    updateState {
-                        with(
-                            when (this) {
-                                is MainState.Content -> this
-                                MainState.Loading -> MainState.Content.default
-                            }
-                        ) {
-                            copy(
-                                allAccounts = accounts.toImmutableList(),
-                                accounts = filteredAccounts,
-                                hidden = settings.hiddenAccountIds.toImmutableList()
-                            )
-                        }
-                    }
+            try {
+                Log.d(TAG,"start update")
+                loadMainData()
+            } finally {
+                Log.d(TAG,"end update")
+                updateStateOf<MainState.Content> {
+                    copy(isLoading = false)
                 }
             }
         }
     }
 
-    override fun createInitialState(): MainState {
-        return MainState.Loading
+    private suspend fun loadMainData() = supervisorScope {
+        val accountsDeferred = async { accountRepository.getAllAccounts() }
+        val creditsDeferred = async { getCreditsUseCase() }
+        val settingsDeferred = async { getSettingsUseCase() }
+
+        val accounts = accountsDeferred.await()
+        val credits = creditsDeferred.await()
+        val settings = settingsDeferred.await()
+
+        val hiddenIds = settings.hiddenAccountIds.toImmutableList()
+        val filteredAccounts = filterAccounts(
+            allAccounts = accounts,
+            hiddenIds = hiddenIds,
+            showHidden = false
+        )
+
+        screenEvents.offerEvent(MainEvent.UpdateTheme(settings.theme == Scheme.dark))
+
+        updateState {
+            MainState.Content.default.copy(
+                credits = credits.take(3).toImmutableList(),
+                allAccounts = accounts.toImmutableList(),
+                accounts = filteredAccounts,
+                hidden = hiddenIds,
+                showHidden = false,
+                isLoading = false
+            )
+        }
     }
+
+    private fun filterAccounts(
+        allAccounts: List<Account>,
+        hiddenIds: List<Int>,
+        showHidden: Boolean
+    ) = allAccounts.filter { account ->
+
+        (if (showHidden) {
+            hiddenIds.contains(account.id)
+        } else {
+            !hiddenIds.contains(account.id)
+        }) && account.status == AccountStatus.Open
+    }.take(10).toImmutableList()
 
     override fun openOnboarding() {
         mainNavigation.openOnboarding()
@@ -115,50 +128,48 @@ class MainViewModel(
 
     override fun onCreateCreditClick() {
         val state = screenState.value.currentState
-
         if (state is MainState.Content) {
             mainNavigation.openCreateCredit()
         }
     }
 
     override fun onAccountCreateClick() {
-        val state = screenState.value.currentState
+        val state = screenState.value.currentState as? MainState.Content ?: return
 
-        if (state is MainState.Content) {
+        viewModelScope.launch(Dispatchers.IO + exceptionHandler) {
             updateStateOf<MainState.Content> {
                 copy(isLoading = true)
             }
-            viewModelScope.launch(Dispatchers.IO + exceptionHandler) {
-                supervisorScope {
-                    launch {
-                        accountRepository.createAccount(
-                            CreateAccount(state.selectedCurrency.name)
-                        )
-                    }.join()
-                    launch {
-                        accountRepository.getAllAccounts().let {
-                            updateStateOf<MainState.Content> {
-                                copy(
-                                    allAccounts = it.toImmutableList(),
-                                    accounts = it.filter { account ->
-                                        (if (showHidden)
-                                            hidden.contains(account.id)
-                                        else
-                                            !hidden.contains(account.id)
-                                                ) && account.status == AccountStatus.Open
-                                    }.take(10).toImmutableList()
-                                )
-                            }
-                        }
-                    }.join()
 
-                    launch {
-                        updateStateOf<MainState.Content> {
-                            copy(isLoading = false)
-                        }
-                    }.join()
+            try {
+                accountRepository.createAccount(
+                    CreateAccount(state.selectedCurrency.name)
+                )
+
+                refreshAccounts()
+            } finally {
+                updateStateOf<MainState.Content> {
+                    copy(isLoading = false)
                 }
             }
+        }
+    }
+
+    private suspend fun refreshAccounts() {
+        val currentState = screenState.value.currentState as? MainState.Content ?: return
+        val accounts = accountRepository.getAllAccounts()
+
+        val filteredAccounts = filterAccounts(
+            allAccounts = accounts,
+            hiddenIds = currentState.hidden,
+            showHidden = currentState.showHidden
+        )
+
+        updateStateOf<MainState.Content> {
+            copy(
+                allAccounts = accounts.toImmutableList(),
+                accounts = filteredAccounts
+            )
         }
     }
 
@@ -180,14 +191,14 @@ class MainViewModel(
 
     override fun onHiddenSwitch() {
         updateStateOf<MainState.Content> {
+            val newShowHidden = !showHidden
             copy(
-                showHidden = !showHidden,
-                accounts = allAccounts.filter {
-                    (if (showHidden)
-                        !hidden.contains(it.id)
-                    else
-                        hidden.contains(it.id)) && it.status == AccountStatus.Open
-                }.toImmutableList(),
+                showHidden = newShowHidden,
+                accounts = filterAccounts(
+                    allAccounts = allAccounts,
+                    hiddenIds = hidden,
+                    showHidden = newShowHidden
+                )
             )
         }
     }
@@ -198,9 +209,7 @@ class MainViewModel(
 
     override fun onDismissCurrency() {
         updateStateOf<MainState.Content> {
-            copy(
-                isCurrencyMenuOpen = false,
-            )
+            copy(isCurrencyMenuOpen = false)
         }
     }
 

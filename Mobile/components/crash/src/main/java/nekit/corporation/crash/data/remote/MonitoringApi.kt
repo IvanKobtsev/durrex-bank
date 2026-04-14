@@ -7,5 +7,5 @@ import retrofit2.http.POST
 interface MonitoringApi {
 
     @POST("monitoring/api/events")
-    suspend fun sendCrashLogs(@Body logs: List<CrashLog>)
+    suspend fun sendCrashLogs(@Body logs: CrashLog)
 }

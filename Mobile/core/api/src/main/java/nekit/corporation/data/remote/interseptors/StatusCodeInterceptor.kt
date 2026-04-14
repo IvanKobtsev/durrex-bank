@@ -6,46 +6,65 @@ import nekit.corporation.util.domain.common.NotFoundFailure
 import nekit.corporation.util.domain.common.UnknownFailure
 import kotlinx.serialization.json.Json
 import nekit.corporation.data.remote.model.ErrorDto
+import nekit.corporation.util.domain.common.ForbiddenFailure
 import nekit.corporation.util.domain.common.ServerFailure
 import okhttp3.Interceptor
 import okhttp3.Response
 import java.net.HttpURLConnection
 
-class StatusCodeInterceptor @Inject constructor(private val json: Json) : Interceptor {
+@Inject
+class StatusCodeInterceptor(
+    private val json: Json,
+) : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
         val response = chain.proceed(chain.request())
+
         if (response.isSuccessful) return response
 
-        val responseBody = response.body?.string()
-        val contentType = response.header("Content-Type")
-        val errorMessage = if (responseBody.isNullOrBlank()) {
-            null
-        } else {
-            if (contentType?.contains("application/json") == true) {
-                try {
-                    val errorDto = json.decodeFromString<ErrorDto>(responseBody)
-                    errorDto.message
-                } catch (e: Exception) {
-                    responseBody
-                }
-            } else {
-                responseBody
-            }
+        if (response.code == 429 || response.code in 500..599) {
+            return response
         }
+
+        val errorMessage = response.readErrorMessage(json)
+
         when (response.code) {
-            HttpURLConnection.HTTP_BAD_REQUEST -> throw BadRequestFailure(errorMessage)
-            HttpURLConnection.HTTP_NOT_FOUND -> throw NotFoundFailure(errorMessage)
-            in BACKEND_FAILURE_STATUS_CODE_FROM..BACKEND_FAILURE_STATUS_CODE_TO -> {
-                throw ServerFailure(errorMessage)
+            HttpURLConnection.HTTP_BAD_REQUEST -> {
+                response.close()
+                throw BadRequestFailure(errorMessage)
             }
 
-            else -> throw UnknownFailure(errorMessage, code = response.code)
+            HttpURLConnection.HTTP_UNAUTHORIZED,
+            HttpURLConnection.HTTP_FORBIDDEN -> {
+                response.close()
+                throw ForbiddenFailure(errorMessage)
+            }
+
+            HttpURLConnection.HTTP_NOT_FOUND -> {
+                response.close()
+                throw NotFoundFailure(errorMessage)
+            }
+
+            else -> {
+                response.close()
+                throw UnknownFailure(errorMessage, code = response.code)
+            }
         }
     }
 
-    companion object {
-        private const val BACKEND_FAILURE_STATUS_CODE_FROM = 500
-        private const val BACKEND_FAILURE_STATUS_CODE_TO = 599
+    private fun Response.readErrorMessage(json: Json): String? {
+        val bodyString = body?.string()
+        if (bodyString.isNullOrBlank()) return null
+
+        val contentType = header("Content-Type")
+        return if (contentType?.contains("application/json") == true) {
+            try {
+                json.decodeFromString<ErrorDto>(bodyString).message ?: bodyString
+            } catch (_: Exception) {
+                bodyString
+            }
+        } else {
+            bodyString
+        }
     }
 }

@@ -4,7 +4,7 @@ import nekit.corporation.crash.data.model.CrashLog
 
 interface MonitoringRepository {
 
-    suspend fun sendCrashLogs(logs: List<CrashLog>)
+    suspend fun sendCrashLogs(logs: CrashLog)
 
     suspend fun getLatestCrashLogs(): List<CrashLog>
 

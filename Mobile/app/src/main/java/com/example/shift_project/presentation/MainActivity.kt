@@ -75,14 +75,6 @@ class MainActivity(
             requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 101)
         }
 
-        FirebaseMessaging.getInstance().getToken()
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful && task.getResult() != null) {
-                    val token = task.getResult()
-                    Log.d(TAG, "Token: $token")
-                }
-            }
-
         router.newRootScreen(authApi.auth())
 
         lifecycleScope.launch {

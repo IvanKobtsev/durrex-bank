@@ -2,119 +2,92 @@
 
 package nekit.corporation.data.remote.interseptors
 
+import android.content.Context
+import android.content.SharedPreferences
+import android.util.Log
+import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Inject
-import nekit.corporation.data.remote.model.CircuitBreakerState
+import dev.zacsweers.metro.SingleIn
+import nekit.corporation.util.domain.common.CircuitBreakerOpenFailure
 import okhttp3.Interceptor
 import okhttp3.Response
+import nekit.corporation.util.domain.common.ServerFailure
 import java.io.IOException
+import java.net.ConnectException
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
+import java.time.Instant
 import java.util.concurrent.atomic.AtomicInteger
-import java.util.concurrent.locks.ReentrantReadWriteLock
-import kotlin.concurrent.atomics.AtomicLong
-import kotlin.concurrent.atomics.AtomicReference
-import kotlin.concurrent.atomics.ExperimentalAtomicApi
+import java.util.concurrent.atomic.AtomicLong
+import java.util.concurrent.atomic.AtomicReference
 import kotlin.concurrent.read
 import kotlin.concurrent.write
+import java.util.concurrent.locks.ReentrantReadWriteLock
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
 
+//TODO переделать выделив логику хранения
 @Inject
-class CircuitBreakerInterceptor() : Interceptor {
+@SingleIn(AppScope::class)
+class CircuitBreakerInterceptor(
+    context: Context
+) : Interceptor {
 
-    private val state = AtomicReference(CircuitBreakerState.CLOSED)
-    private val ringBuffer = BooleanArray(WINDOW_SIZE)
-    private var index = 0
-    private var requestCount = 0
-
-    private val lock = ReentrantReadWriteLock()
-
-    private val lastOpenTime = AtomicLong(0)
-
-    private val halfOpenAttempts = AtomicInteger(0)
+    private val prefs: SharedPreferences = context.getSharedPreferences("circuit_breaker", Context.MODE_PRIVATE)
 
     override fun intercept(chain: Interceptor.Chain): Response {
-        when (state.load()) {
-            CircuitBreakerState.OPEN -> {
-                val timeInOpen = System.currentTimeMillis() - lastOpenTime.load()
-                if (timeInOpen >= TIMEOUT_MS) {
-                    state.store(CircuitBreakerState.HALF_OPEN)
-                    halfOpenAttempts.set(0)
-                } else {
-                    throw IOException("Circuit breaker is OPEN (${FAILURE_THRESHOLD_PERCENT}% failures threshold exceeded)")
-                }
-            }
+        val openUntil = getOpenUntil()
+        val now = Instant.now()
 
-            CircuitBreakerState.HALF_OPEN -> {
-                val attempts = halfOpenAttempts.incrementAndGet()
-                if (attempts > HALF_OPEN_MAX_ATTEMPTS) {
-                    throw IOException("Circuit breaker HALF_OPEN: max attempts exceeded")
-                }
-            }
-
-            CircuitBreakerState.CLOSED -> Unit
+        if (openUntil != null && now.isBefore(openUntil)) {
+            Log.d(TAG, "Circuit breaker is OPEN until $openUntil")
+            throw CircuitBreakerOpenFailure("Circuit breaker is OPEN")
         }
 
         return try {
             val response = chain.proceed(chain.request())
-            val success = response.isSuccessful && response.code < 500
-            if (success) {
-                recordResult(true)
-                response
-            } else {
-                recordResult(false)
-                throw IOException("Server error: ${response.code}")
+
+            if (response.code == 503) {
+                handleFailure()
+                response.close()
+                throw CircuitBreakerOpenFailure("Circuit opened due to HTTP 503")
             }
-        } catch (e: IOException) {
-            recordResult(false)
+            response
+        } catch (e: Exception) {
+            if (shouldOpenCircuit(e)) {
+                handleFailure()
+            }
             throw e
         }
     }
 
-    private fun recordResult(success: Boolean) {
-        lock.write {
-            ringBuffer[index] = success
-            index = (index + 1) % WINDOW_SIZE
-            if (requestCount < WINDOW_SIZE) requestCount++
-        }
-
-        if (state.load() == CircuitBreakerState.CLOSED) {
-            val currentFailureRate = getCurrentFailureRate()
-            if (currentFailureRate >= FAILURE_THRESHOLD_PERCENT && requestCount >= MIN_REQUESTS_TO_EVALUATE) {
-                state.store(CircuitBreakerState.OPEN)
-                lastOpenTime.store(System.currentTimeMillis())
-            }
-        } else if (state.load() == CircuitBreakerState.HALF_OPEN) {
-            if (success) {
-                state.store(CircuitBreakerState.CLOSED)
-                clearStats()
-            } else {
-                state.store(CircuitBreakerState.OPEN)
-                lastOpenTime.store(System.currentTimeMillis())
-            }
+    private fun shouldOpenCircuit(throwable: Throwable): Boolean {
+        return when (throwable) {
+            is ConnectException,
+            is SocketTimeoutException,
+            is UnknownHostException -> true
+            is IOException -> throwable.message?.contains("refused") == true
+            else -> false
         }
     }
 
-    private fun getCurrentFailureRate(): Double {
-        lock.read {
-            if (requestCount == 0) return 0.0
-            var failures = 0
-            for (i in 0 until minOf(requestCount, WINDOW_SIZE)) {
-                if (!ringBuffer[i]) failures++
-            }
-            return (failures.toDouble() / requestCount) * 100.0
+    private fun handleFailure() {
+        val openUntil = Instant.now().plusSeconds(TIMEOUT_SECONDS)
+        prefs.edit().putString(KEY_OPEN_UNTIL, openUntil.toString()).apply()
+        Log.d(TAG, "Circuit opened until $openUntil")
+    }
+
+    private fun getOpenUntil(): Instant? {
+        val timestamp = prefs.getString(KEY_OPEN_UNTIL, null) ?: return null
+        return try {
+            Instant.parse(timestamp)
+        } catch (e: Exception) {
+            null
         }
     }
 
-    private fun clearStats() {
-        lock.write {
-            ringBuffer.fill(false)
-            requestCount = 0
-            index = 0
-        }
-    }
-
-    private companion object {
-        private const val WINDOW_SIZE: Int = 100
-        private const val FAILURE_THRESHOLD_PERCENT: Double = 70.0
-        private const val MIN_REQUESTS_TO_EVALUATE: Int = 20
-        private const val TIMEOUT_MS: Long = 30_000
-        private const val HALF_OPEN_MAX_ATTEMPTS: Int = 3
+    companion object {
+        private const val TAG = "CircuitBreakerInterceptor"
+        private const val KEY_OPEN_UNTIL = "open_until"
+        private const val TIMEOUT_SECONDS = 30L
     }
 }

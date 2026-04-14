@@ -11,8 +11,10 @@ import dev.zacsweers.metro.binding
 import dev.zacsweers.metrox.viewmodel.ViewModelKey
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.supervisorScope
 import nekit.corporation.architecture.presentation.StatefulViewModel
 import nekit.corporation.auth_api.AuthApi
 import nekit.corporation.loan_shared.domain.usecase.GetRatingUseCase
@@ -29,7 +31,7 @@ import nekit.corporation.user.domain.usecase.GetSettingsUseCase
 import nekit.corporation.user.domain.usecase.GetUserUseCase
 import nekit.corporation.user.domain.usecase.UpdateThemeUseCase
 import nekit.corporation.util.domain.common.NoConnectionFailure
-import okio.IOException
+import java.io.IOException
 
 @Inject
 @ViewModelKey(ProfileViewModel::class)
@@ -49,34 +51,48 @@ class ProfileViewModel(
         handleError(throwable)
     }
 
-    override fun createInitialState(): ProfileState {
-        return ProfileState.DEFAULT
-    }
+    override fun createInitialState(): ProfileState = ProfileState.DEFAULT
+
+    private var mainJob: Job? = null
 
     fun init() {
-        Log.d(TAG,"init")
-        viewModelScope.launch(Dispatchers.IO + exceptionHandler) {
-            val user = async { getUserUseCase() }
-            val settings = async { getSettingsUseCase() }
-            val rating = async { getRatingUseCase() }
-            runCatching {
+        mainJob?.cancel()
+
+        mainJob = viewModelScope.launch(Dispatchers.IO + exceptionHandler) {
+            try {
+                loadProfile()
+            } finally {
                 updateState {
                     copy(
-                        account = user.await().toAccountModel(rating.await().rating),
-                        settings = settings.await().toUi(),
-                        isLoading = false,
-                        isTechnicBreak = false
+                        isLoading = false
                     )
                 }
-            }.onFailure {
-                Log.d(TAG,"error: $it")
-                if (it is IOException) {
-                    updateState {
-                        copy(isTechnicBreak = true)
-                    }
-                }
             }
+        }
+    }
 
+    private suspend fun loadProfile() = supervisorScope {
+        updateState {
+            copy(
+                isLoading = true,
+                isTechnicBreak = false
+            )
+        }
+
+        val userDeferred = async { getUserUseCase() }
+        val settingsDeferred = async { getSettingsUseCase() }
+        val ratingDeferred = async { getRatingUseCase() }
+
+        val user = userDeferred.await()
+        val settings = settingsDeferred.await()
+        val rating = ratingDeferred.await()
+
+        updateState {
+            copy(
+                account = user.toAccountModel(rating.rating),
+                settings = settings.toUi(),
+                isTechnicBreak = false
+            )
         }
     }
 
@@ -85,41 +101,20 @@ class ProfileViewModel(
     }
 
     override fun onSchemeSwitch(scheme: Scheme) {
-        updateState {
-            copy(isLoading = true)
-        }
-        updateSetting({ it.copy(scheme = scheme) }, R.string.change_scheme_error)
-
+        updateSetting(
+            transform = { it.copy(scheme = scheme) },
+            errorMessageRes = R.string.change_scheme_error
+        )
     }
 
     override fun onLogoutClick() {
         updateState { copy(isLoading = true) }
-        authApi.getLogoutIntent()?.let {
-            screenEvents.offerEvent(UiEvents.OnLogout(it))
-        }
-        updateState {
-            copy(
-                isLoading = false,
-                isTechnicBreak = false
-            )
-        }
-    }
 
-    private fun updateSetting(
-        transform: (SettingsUi) -> SettingsUi,
-        @StringRes errorMessageRes: Int
-    ) {
-        viewModelScope.launch(Dispatchers.IO + exceptionHandler) {
-            val currentSettings = currentScreenState.settings ?: getSettingsUseCase().toUi()
-            try {
-                updateThemeUseCase(transform(currentSettings).scheme).let {
-                    updateState { copy(settings = transform(settings!!)) }
-                    settingsManager.update(transform(currentSettings).scheme)
-                    screenEvents.offerEvent(UiEvents.ChangeTheme)
-                }
-            } catch (_: Throwable) {
-                screenEvents.offerEvent(UiEvents.ShowToast(errorMessageRes))
+        try {
+            authApi.getLogoutIntent()?.let { intent ->
+                screenEvents.offerEvent(UiEvents.OnLogout(intent))
             }
+        } finally {
             updateState {
                 copy(
                     isLoading = false,
@@ -129,21 +124,70 @@ class ProfileViewModel(
         }
     }
 
-    fun handleError(throwable: Throwable){
-        if (throwable is NoConnectionFailure) {
-            screenEvents.offerEvent(UiEvents.ShowToast(R.string.no_connection))
-        }
-        if (throwable is IOException) {
-            updateState {
-                copy(isTechnicBreak = true)
+    private fun updateSetting(
+        transform: (SettingsUi) -> SettingsUi,
+        @StringRes errorMessageRes: Int
+    ) {
+        viewModelScope.launch(Dispatchers.IO + exceptionHandler) {
+            updateState { copy(isLoading = true) }
+
+            try {
+                val currentSettings = currentScreenState.settings ?: getSettingsUseCase().toUi()
+                val newSettings = transform(currentSettings)
+
+                updateThemeUseCase(newSettings.scheme)
+                settingsManager.update(newSettings.scheme)
+
+                updateState {
+                    copy(settings = newSettings)
+                }
+
+                screenEvents.offerEvent(UiEvents.ChangeTheme)
+            } catch (e: Throwable) {
+                handleSettingError(e, errorMessageRes)
+            } finally {
+                updateState {
+                    copy(
+                        isLoading = false,
+                        isTechnicBreak = false
+                    )
+                }
             }
-        } else {
-            screenEvents.offerEvent(UiEvents.ShowToast(R.string.something_went_wrong))
-            Log.d(TAG, "error: $throwable")
         }
     }
 
-    companion object {
+    private fun handleSettingError(
+        throwable: Throwable,
+        @StringRes errorMessageRes: Int
+    ) {
+        when (throwable) {
+            is NoConnectionFailure -> screenEvents.offerEvent(UiEvents.ShowToast(R.string.no_connection))
+            is IOException -> updateState { copy(isTechnicBreak = true) }
+            else -> {
+                screenEvents.offerEvent(UiEvents.ShowToast(errorMessageRes))
+                Log.d(TAG, "setting error: $throwable")
+            }
+        }
+    }
+
+    private fun handleError(throwable: Throwable) {
+        updateState { copy(isTechnicBreak = false) }
+        when (throwable) {
+            is NoConnectionFailure -> screenEvents.offerEvent(UiEvents.ShowToast(R.string.no_connection))
+            is IOException -> updateState { copy(isTechnicBreak = true) }
+            else -> {
+                screenEvents.offerEvent(UiEvents.ShowToast(R.string.something_went_wrong))
+                Log.d(TAG, "error: $throwable")
+            }
+        }
+    }
+
+    fun onLeave() {
+        mainJob?.cancel()
+        mainJob = null
+    }
+
+    private companion object {
         private const val TAG = "ProfileViewModel"
     }
 }

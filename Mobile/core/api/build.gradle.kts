@@ -19,6 +19,7 @@ dependencies {
     implementation(project(":components:auth-shared"))
     implementation(projects.components.crash)
     implementation(project(":components:loan"))
+    implementation(projects.components.push)
     implementation(project(":components:tariff"))
     implementation(project(":components:user"))
 
@@ -34,7 +35,8 @@ dependencies {
 
     //utils
     implementation(stack.kotlinx.serialization.json)
-
+    implementation("com.squareup.moshi:moshi:1.15.2")
+    ksp("com.squareup.moshi:moshi-kotlin-codegen:1.15.2")
 
     implementation("com.microsoft.signalr:signalr:10.0.5")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-rx3:1.10.2")

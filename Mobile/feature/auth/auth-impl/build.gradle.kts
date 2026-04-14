@@ -27,6 +27,7 @@ dependencies {
     implementation(projects.components.authShared)
     implementation(projects.components.account)
     implementation(projects.components.user)
+    implementation(projects.components.push)
 
     implementation(projects.feature.auth.authApi)
     implementation(projects.feature.onboarding.onboardingApi)

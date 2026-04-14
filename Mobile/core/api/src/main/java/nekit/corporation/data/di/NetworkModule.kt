@@ -21,6 +21,7 @@ import nekit.corporation.data.remote.serializer.InstantSerializer
 import nekit.corporation.data.remote.serializer.OffsetDateTimeSerializer
 import nekit.corporation.loan_shared.data.datasource.remote.api.AccountsApi
 import nekit.corporation.loan_shared.data.datasource.remote.api.LoanApi
+import nekit.corporation.push.data.PushApi
 import nekit.corporation.tariff.data.remote.TariffApi
 import nekit.corporation.user.data.remote.SettingsApi
 import nekit.corporation.user.data.remote.UserApi
@@ -48,7 +49,6 @@ interface NetworkModule {
         ignoreUnknownKeys = true
     }
 
-
     @AuthOkHttpClient
     @Provides
     fun provideOkHttpClient(
@@ -63,12 +63,12 @@ interface NetworkModule {
     ): OkHttpClient = getHttpClient(
         cache = okHttpCache,
         interceptors = listOf(
-            retryInterceptor,
+            circuitBreakerInterceptor,
             traceIdInterceptor,
             statusCodeInterceptor,
             authInterceptor,
-            networkInterceptor,
-            circuitBreakerInterceptor
+            retryInterceptor,
+            networkInterceptor
         ),
         authenticator = authenticator,
     )
@@ -143,8 +143,12 @@ interface NetworkModule {
         retrofit.create<SettingsApi>()
 
     @Provides
-    fun provideMonitoringApi(@DefaultRetrofit retrofit: Retrofit): MonitoringApi =
+    fun provideMonitoringApi(@AuthRetrofit retrofit: Retrofit): MonitoringApi =
         retrofit.create<MonitoringApi>()
+
+    @Provides
+    fun providePushApi(@AuthRetrofit retrofit: Retrofit): PushApi =
+        retrofit.create<PushApi>()
 
     @Provides
     @MainServerUrl

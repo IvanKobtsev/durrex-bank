@@ -10,6 +10,7 @@ android {
 }
 
 dependencies {
+    api(stack.retrofit)
     implementation(projects.core.common)
     implementation(platform(stack.firebase))
     implementation(stack.firebase.messaging)

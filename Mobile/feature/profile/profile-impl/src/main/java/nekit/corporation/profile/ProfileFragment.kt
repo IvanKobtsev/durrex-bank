@@ -86,6 +86,11 @@ class ProfileFragment(
         viewModel.init()
     }
 
+    override fun onStop() {
+        super.onStop()
+        viewModel.onLeave()
+    }
+
     companion object {
         private const val TAG = "ProfileFragment"
     }

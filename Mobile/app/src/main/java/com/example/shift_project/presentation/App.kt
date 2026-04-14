@@ -4,6 +4,7 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.util.Log
 import androidx.work.Configuration
 import androidx.work.Data
 import androidx.work.PeriodicWorkRequestBuilder
@@ -17,7 +18,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import nekit.corporation.crash.data.model.fromThrowable
 import nekit.corporation.crash.data.worker.CrashSender
 import nekit.corporation.crash.domain.usecase.AddCrashLogUseCase
@@ -54,22 +57,23 @@ class App : Application(), MetroApplication, Configuration.Provider {
         createNotificationChannels(this)
         INSTANCE = this
         val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
-        scheduleBackgroundWork()
+        // scheduleBackgroundWork()
         Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
-            try {
-                appScope.launch {
+            runBlocking {
+                try {
+                    val userId = try { getUserUseCase().id.toString() } catch (e: Exception) { "anonymous" }
                     val log = fromThrowable(
                         throwable = throwable,
                         threadName = thread.name,
-                        userId = getUserUseCase().id
+                        userId = userId
                     )
-                    addCrashLogUseCase(log)
-                    sendCrashLogsUseCase()
+                    sendCrashLogsUseCase(log)
+                } catch (e: Exception) {
+                    Log.e("App", "Failed to save crash log", e)
                 }
-            } catch (_: Throwable) {
-            } finally {
-                defaultHandler?.uncaughtException(thread, throwable)
             }
+
+            defaultHandler?.uncaughtException(thread, throwable)
         }
     }
 
@@ -81,6 +85,8 @@ class App : Application(), MetroApplication, Configuration.Provider {
     companion object {
         internal lateinit var INSTANCE: App
             private set
+        private const val TAG = "MainAppTag"
+
     }
 
     private fun createNotificationChannels(context: Context) {
@@ -98,10 +104,11 @@ class App : Application(), MetroApplication, Configuration.Provider {
         manager.createNotificationChannels(listOf(defaultChannel, actionableChannel))
     }
 
-    private fun scheduleBackgroundWork() {
-        val workRequest = PeriodicWorkRequestBuilder<CrashSender>(15, TimeUnit.MINUTES)
-            .setInputData(Data.Builder().putString("workName", "onCreate").build())
-            .build()
-        appGraph.workManager.enqueue(workRequest)
-    }
+    /* private fun scheduleBackgroundWork() {
+         val workRequest = PeriodicWorkRequestBuilder<CrashSender>(15, TimeUnit.MINUTES)
+             .setInputData(Data.Builder().putString("workName", "onCreate").build())
+             .build()
+         appGraph.workManager.enqueue(workRequest)
+     }*/
+
 }

@@ -14,6 +14,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
@@ -34,6 +35,7 @@ import nekit.corporation.auth_impl.presentation.sign.`in`.SignInInteract
 import nekit.corporation.auth_impl.presentation.sign.up.SignUpInteract
 import nekit.corporation.loan_shared.domain.repository.AccountRepository
 import nekit.corporation.onboarding_shared.domain.usecase.GetSettingsUseCase
+import nekit.corporation.push.domain.repository.PushRepository
 import nekit.corporation.util.domain.common.BadRequestFailure
 import nekit.corporation.util.domain.common.CommonBackendFailure
 import nekit.corporation.util.domain.common.CredentialsError
@@ -54,6 +56,7 @@ class AuthViewModel(
     private val accountRepository: AccountRepository,
     private val navigator: AuthNavigator,
     private val authRepository: AuthRepository,
+    private val pushRepository: PushRepository,
 ) : StatefulViewModel<AuthState>(), SignUpInteract, SignInInteract {
     init {
         observeSignUpState()
@@ -72,10 +75,24 @@ class AuthViewModel(
                     accountRepository.getAllAccounts()
                     if (credentials.await() == null)
                         onSignInOpen()
-                    else if (!getSettingsUseCase.execute().isShowedOnboarding)
-                        navigator.onOnboardingOpen()
-                    else
-                        navigator.onMainOpen()
+                    else if (!getSettingsUseCase.execute().isShowedOnboarding) {
+                        pushRepository.sendPushToken().onFailure {
+                            Log.d(TAG,"e: $it")
+                            navigator.onOnboardingOpen()
+                        }.onSuccess {
+                            Log.d(TAG,"s: $it")
+                            navigator.onOnboardingOpen()
+                        }
+                    }
+                    else {
+                        pushRepository.sendPushToken().onFailure {
+                            Log.d(TAG,"e: $it")
+                            navigator.onMainOpen()
+                        }.onSuccess {
+                            Log.d(TAG,"s: $it")
+                            navigator.onMainOpen()
+                        }
+                    }
                 } catch (_: Throwable) {
                     onSignInOpen()
                 }

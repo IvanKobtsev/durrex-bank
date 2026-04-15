@@ -5,6 +5,7 @@ import { AppLinks } from "application/constants/appLinks.ts";
 import { useTariffsAllQuery } from "services/credit-api/credit-api-client/Query.ts";
 import { TariffCard } from "../tariffCard/TariffCard.tsx";
 import { PageWrapper } from "components/PageWrapper/PageWrapper.tsx";
+import { Loading } from "../../../components/uikit/suspense/Loading.tsx";
 
 export function TariffsManagementPage() {
   const navigate = useNavigate();
@@ -20,13 +21,15 @@ export function TariffsManagementPage() {
         />
       </div>
       <div className={styles.tariffsList}>
-        {tariffsQuery.data && tariffsQuery.data?.length > 0 ? (
-          tariffsQuery.data
-            ?.sort((t1, t2) => (t1.id ?? 0) - (t2.id ?? 0))
-            .map((t) => <TariffCard key={t.id} tariff={t} />)
-        ) : (
-          <div className={styles.noTariffs}>Нет тарифов</div>
-        )}
+        <Loading loading={tariffsQuery.isLoading} doNotWrapChildren>
+          {tariffsQuery.data && tariffsQuery.data?.length > 0 ? (
+            tariffsQuery.data
+              ?.sort((t1, t2) => (t1.id ?? 0) - (t2.id ?? 0))
+              .map((t) => <TariffCard key={t.id} tariff={t} />)
+          ) : (
+            <div className={styles.noTariffs}>Нет тарифов</div>
+          )}
+        </Loading>
       </div>
     </PageWrapper>
   );
